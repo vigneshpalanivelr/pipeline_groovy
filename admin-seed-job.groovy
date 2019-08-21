@@ -15,9 +15,9 @@ job("admin_seed_job") {
         	git {
 			branch("\$job_dsl_branch")
 			remote {
-			name("origin")
- 			url("\$job_dsl_repo")
-			credentials(GitCred)
+				name("origin")
+ 				url("\$job_dsl_repo")
+				credentials(GitCred)
 			}
 		}
     }
