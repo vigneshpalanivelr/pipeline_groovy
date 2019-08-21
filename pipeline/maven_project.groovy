@@ -3,8 +3,8 @@ node ('master') {
 	sh "chmod a+x git-askpass-${BUILD_TAG}"
 	withEnv(["GIT_ASKPASS=${WORKSPACE}/git-askpass-${BUILD_TAG}"]){
 		withCredentials([usernamePassword(credentialsId: 'GitCred',passwordVariable: 'STASH_PASSWORD',usernameVariable: 'STASH_USERNAME')]) {
-		echo $STASH_PASSWORD
-		echo $STASH_USERNAME
+		echo STASH_PASSWORD
+		sh 'echo $STASH_USERNAME'
 		}
 	}
 }
