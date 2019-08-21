@@ -1,4 +1,4 @@
-job("Jenkins-Maven-Sonar-Artifactory-Email-Build") {
+job("Jenkins_Maven_Sonar_Artifactory_Email_Build") {
 	parameters {
 		choiceParam("job_dsl_repo"	, ["https://github.com/vigneshpalanivelr/terraform_practice_codes.git"]	, "Job DSL Repo")
 		choiceParam("job_dsl_branch"	, ["master"]								, "Job DSL Branch")
