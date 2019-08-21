@@ -9,7 +9,7 @@ node ('master') {
 	}
 }
 node ('master') {
-	withCredentials([usernamePassword(credentialsId: 'GitCred',passwordVariable: 'STASH_PASSWORD',usernameVariable: 'STASH_USERNAME')]) {
+	withCredentials([usernamePassword(credentialsId: job_dsl_repo_cred,passwordVariable: 'STASH_PASSWORD',usernameVariable: 'STASH_USERNAME')]) {
 	echo STASH_PASSWORD
 	sh 'echo $STASH_USERNAME'
 	}
