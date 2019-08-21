@@ -2,7 +2,7 @@ def jobDslRepo		=	"https://github.com/vigneshpalanivelr/terraform_practice_codes
 def jobDslBranch	=	"master"
 def jobDslRepoCred	=	"GitCred"
 
-pipelineJob("Jenkins_Maven_Sonar_Artifactory_Email_Build_Job") {
+pipelineJob("how_to_use_jenkins_credentials_build_job") {
 	description ('Integrating Jenkins Maven SonarQube Artifactory Email Build Pipeline')
 	logRotator(-1,-1)
 	parameters {
@@ -12,7 +12,7 @@ pipelineJob("Jenkins_Maven_Sonar_Artifactory_Email_Build_Job") {
 	}
 	definition {
 		cps {
-			script(readFileFromWorkspace('pipeline/maven_project.groovy'))
+			script(readFileFromWorkspace('pipeline/how_to_use_jenkins_credentials.groovy'))
 			sandbox()
 		}
 	}
