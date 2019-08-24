@@ -7,8 +7,9 @@ node ('master') {
 			echo STASH_PASSWORD
 			sh 'echo $STASH_USERNAME'
 			}
-		}
 		sh 'echo $GIT_ASKPASS'
+		}
+		//sh 'echo $GIT_ASKPASS'
 	}
 }
 node ('master') {
