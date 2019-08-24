@@ -46,3 +46,8 @@ node {
         echo "Build Status : SUCCESS"
     } 
 }
+/*
+Ref : https://support.cloudbees.com/hc/en-us/articles/226554067-Pipeline-How-to-add-an-input-step-with-timeout-that-continues-if-timeout-is-reached-using-a-default-value
+Ref : https://support.cloudbees.com/hc/en-us/articles/230922428-Pipeline-How-to-add-an-input-step-that-continues-if-aborted-using-value
+Ref : https://support.cloudbees.com/hc/en-us/articles/207406207-Avoid-script-approvals-with-a-Jenkins-Pipeline-Groovy-script
+*/
