@@ -14,8 +14,7 @@ try {
 catch(err) { 
     // timeout reached or input false
     echo "${err}"
-    echo "${err}"
-    def user = err.causes.get(0)
+    def user = err.getCauses()[0].getUser()
     echo "${err}"
     echo "${user}"
     if('SYSTEM' == user.toString()) {
