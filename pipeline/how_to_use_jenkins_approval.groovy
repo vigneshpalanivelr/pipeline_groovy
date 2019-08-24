@@ -31,7 +31,6 @@ catch(err) {
     else {
         println('error inside FlowInterruptedException: ' + err)
     }
-    error('error inside FlowInterruptedException: ')
 }
 
 node {
@@ -39,15 +38,11 @@ node {
         echo "No input was received : TIMEOUT"
         currentBuild.result = 'FAILURE'
     } 
-    else if (userInput == true) {
-        echo "Successful"
-    } 
     else if (userInput == false) {
-        echo "Input received as ABORT"
+        echo "Input received as : ABORT"
         currentBuild.result = 'ABORTED'
     }
     else {
-        echo "Build Failed"
-        currentBuild.result = 'FAILURE'
-    }
+        echo "Build Status : SUCCESS"
+    } 
 }
