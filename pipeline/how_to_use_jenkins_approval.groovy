@@ -22,7 +22,7 @@ catch(err) {
       error('ExceededTimeout!') 
     } 
     else {
-      error('error inside FlowInterruptedException: ' + e)
+      error('error inside FlowInterruptedException: ' + err)
     }
 }
 
