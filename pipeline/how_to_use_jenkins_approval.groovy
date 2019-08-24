@@ -22,6 +22,8 @@ catch(err) {
     } 
     else if (cause instanceof org.jenkinsci.plugins.workflow.support.steps.input.Rejection){
       userInput = false
+      def user = err.getCauses()[0].getUser()
+      echo "${user}"
       println('Rejection!')
     }
     else {
