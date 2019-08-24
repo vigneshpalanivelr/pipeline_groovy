@@ -1,5 +1,5 @@
 def gitRepo		=	"https://github.com/vigneshpalanivelr/terraform_practice_codes.git"
-def gitBranch		=	"master"
+def gitBranch		=	"*/master"
 def gitCreds		=	"GitCred"
 
 pipelineJob("1.1-how_to_use_jenkins_credentials_build_job") {
