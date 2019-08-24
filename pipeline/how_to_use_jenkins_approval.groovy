@@ -27,6 +27,7 @@ catch(err) {
             userInput = false
             echo "Aborted by: [${user}]"
         }
+    }
     else {
         println('error inside FlowInterruptedException: ' + err)
     }
