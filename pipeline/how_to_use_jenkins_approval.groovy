@@ -8,7 +8,7 @@ try {
         id: 'Proceed1', message: 'Was this successful?', parameters: [
         [$class: 'BooleanParameterDefinition', defaultValue: true, description: '', name: 'Please confirm you agree with this']
         ])
-        echo ${userInput}
+        echo "${userInput}"
     }
 } catch(err) { 
     // timeout reached or input false
