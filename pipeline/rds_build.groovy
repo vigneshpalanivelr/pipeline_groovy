@@ -33,7 +33,7 @@ node('master') {
 	}
 	stage('Checkout') {
 		checkout()
-		if (createInstance == true){
+		if (createInstance == 'true'){
 			stage('RDS Instance remote state') {
 				terraform_init()
 			}
