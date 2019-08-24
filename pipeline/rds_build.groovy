@@ -25,7 +25,7 @@
 node('master') {
 	def terraformDirectory	= "modules/all_modules/rds_module"
 	
-	withFile(file: "git-askpass-${BUILD_TAG}",text:"#!/bin/bash\ncase \"\$1\" in\nUsername*) echo \"${STASH_USERNAME}\" ;;\nPassword*) \"${STASH_PASSWORD}\" ;;\nesac")
+	withFile(file: "git-askpass-${BUILD_TAG}",text:"#!/bin/bash\ncase \"\$1\" in\nUsername*) echo \"\${STASH_USERNAME}\" ;;\nPassword*) \"\${STASH_PASSWORD}\" ;;\nesac")
 	sh "chmod a+x git-askpass-${BUILD_TAG}"
 	
 	stage('Approve before Start'){
