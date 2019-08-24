@@ -40,7 +40,7 @@ node('master') {
 				}
 				stage('RDS Instance Plan') {
 					global_tfvars	= "../../../global_vars.tfvars"
-					rds_tfvars	= "${db_engine}.tfvars"
+					rds_tfvars	= "../../../${db_engine}.tfvars"
 					terraform_plan(global_tfvars,rds_tfvars)
 				}
 			}
