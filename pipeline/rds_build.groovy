@@ -72,7 +72,7 @@ def checkout() {
 def terraform_init() {
 	withEnv(["GIT_ASKPASS=${WORKSPACE}/askp-${BUILD_TAG}"]){
 		withCredentials([usernamePassword(credentialsId: gitCreds, usernameVariable: 'STASH_USERNAME', passwordVariable: 'STASH_PASSWORD')]) {
-			sh "terraform init -backend=true -backend-config='bucket=${terraformTFstateBucket}' -backend-config='workspace_key_prefix=${terraformTFstateBucketPrefix}' -backend-config='key=rds_module.tfstate'"
+			sh "terraform init -backend=true -backend-config='bucket=${tfstateBucket}' -backend-config='workspace_key_prefix=${tfstateBucketPrefix}' -backend-config='key=rds_module.tfstate'"
 		}
 	}
 }
