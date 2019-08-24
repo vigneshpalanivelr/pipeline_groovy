@@ -2,7 +2,7 @@ def jobDslRepo		=	"https://github.com/vigneshpalanivelr/terraform_practice_codes
 def jobDslBranch	=	"master"
 def jobDslRepoCred	=	"GitCred"
 
-pipelineJob("1-how_to_use_jenkins_credentials_build_job") {
+pipelineJob("1.1-how_to_use_jenkins_credentials_build_job") {
 	description ('Explains how to use Credentials for Build Jobs')
 	logRotator(-1,-1)
 	parameters {
@@ -12,7 +12,7 @@ pipelineJob("1-how_to_use_jenkins_credentials_build_job") {
 	}
 	definition {
 		cps {
-			script(readFileFromWorkspace('pipeline/how_to_use_jenkins_credentials.groovy'))
+			script(readFileFromWorkspace('pipeline/1.1-how_to_use_jenkins_credentials.groovy'))
 			sandbox()
 		}
 	}
@@ -28,7 +28,7 @@ pipelineJob("2.1-how_to_use_jenkins_approval_build_job") {
         }
         definition {
                 cps {
-                        script(readFileFromWorkspace('pipeline/how_to_use_jenkins_approval.groovy'))
+                        script(readFileFromWorkspace('pipeline/2.1-how_to_use_jenkins_approval.groovy'))
                         sandbox()
                 }
 	}
