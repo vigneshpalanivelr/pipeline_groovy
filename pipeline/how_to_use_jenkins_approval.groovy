@@ -13,14 +13,14 @@ try {
 } catch(err) { 
     // timeout reached or input false
     def user = err.getCauses()[0].getUser()
-    echo ${user}
+    echo "${user}"
     if('SYSTEM' == user.toString()) {
         // SYSTEM means timeout.
         didTimeout = true
-        echo ${didTimeout}
+        echo "${didTimeout}"
     } else {
         userInput = false
-        echo ${userInput}
+        echo "${userInput}"
         echo "Aborted by: [${user}]"
     }
 }
