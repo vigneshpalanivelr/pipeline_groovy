@@ -12,9 +12,9 @@ try {
 }
 catch(err) { 
     // timeout reached or input false
-    echo "${err}"
+    // echo "${err}"
     cause = err.causes.get(0)
-    echo "${cause}"
+    // echo "${cause}"
     if (cause instanceof org.jenkinsci.plugins.workflow.support.steps.input.Rejection){
         def user = err.getCauses()[0].getUser()
         if('SYSTEM' == user.toString()) {
@@ -36,7 +36,7 @@ catch(err) {
 node {
     if (didTimeout) {
         echo "No input was received : TIMEOUT"
-        currentBuild.result = 'TIMEOUT'
+        currentBuild.result = 'FAILURE'
     } 
     else if (userInput == true) {
         echo "Successful"
