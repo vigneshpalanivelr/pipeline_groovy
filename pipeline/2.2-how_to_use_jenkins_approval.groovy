@@ -10,6 +10,6 @@ node('master'){
 def approval() {
   timeout(time: 15, unit: 'SECONDS'){
     // Every input step has an unique ID. It is used in the generated URL to proceed or abort.
-    id: 'Approval - 2', message: 'You want to Continue ?', ok: 'Continue'
+    id: 'approve', message: 'You want to Continue ?', ok: 'Continue'
   }
 }
