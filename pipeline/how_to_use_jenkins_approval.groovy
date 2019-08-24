@@ -14,7 +14,7 @@ try {
 catch(err) { 
     // timeout reached or input false
     echo "${err}"
-    cause = e.causes.get(0)
+    cause = err.causes.get(0)
     echo "${cause}"
     if (cause instanceof org.jenkinsci.plugins.workflow.steps.TimeoutStepExecution.ExceededTimeout) {
       currentBuild.result = 'ABORTED'
