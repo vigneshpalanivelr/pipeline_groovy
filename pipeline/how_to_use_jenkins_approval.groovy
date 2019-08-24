@@ -14,17 +14,15 @@ try {
 catch(err) { 
     // timeout reached or input false
     echo "${err}"
-    def user = err.getCauses()[0].getUser()
-    echo "${err}"
-    echo "${user}"
-    if('SYSTEM' == user.toString()) {
-        // SYSTEM means timeout.
-        didTimeout = true
-        echo "${didTimeout}"
-    } else {
-        userInput = false
-        echo "${userInput}"
-        echo "Aborted by: [${user}]"
+    cause = e.causes.get(0)
+    echo "${cause}"
+    if (cause instanceof org.jenkinsci.plugins.workflow.steps.TimeoutStepExecution.ExceededTimeout) {
+      currentBuild.result = 'ABORTED'
+      println('ExceededTimeout!')
+      error('ExceededTimeout!') 
+    } 
+    else {
+      error('error inside FlowInterruptedException: " + e)
     }
 }
 
