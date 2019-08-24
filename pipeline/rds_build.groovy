@@ -40,8 +40,8 @@ node('master') {
 				}
 				stage('RDS Instance Plan') {
 					global_tfvars	= "../../../global_vars.tfvars"
-					rds_tfvars		= "${db_engine}.tfvars"
-					terraform_plan()
+					rds_tfvars	= "${db_engine}.tfvars"
+					terraform_plan(global_tfvars,rds_tfvars)
 				}
 			}
 		}
@@ -84,6 +84,6 @@ def terraform_init() {
 	}
 }
 
-def terraform_plan(global_tfvars) {
-	sh "terraform plan -out=tfplan -input=false -var-file=${global_tfvars}"
+def terraform_plan(global_tfvars,rds_tfvars) {
+	sh "terraform plan -out=tfplan -input=false -var-file=${global_tfvars} -var-file=${rds_tfvars}"
 }
