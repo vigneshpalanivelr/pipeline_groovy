@@ -1,6 +1,6 @@
 node('master') {
 	stage('Clone & Checkout') {
-		checkout([checkout([
+		checkout([
 			$class: 'GitSCM', 
 			branches: [[name: gitBranch ]], 
 			doGenerateSubmoduleConfigurations: false, 
