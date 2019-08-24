@@ -37,7 +37,7 @@ node('master') {
 }
 
 def approval() {
-	timeout(time: 15, unit:'SECONDS') {
+	timeout(time: 15, unit: 'SECONDS') {
 		input(
 			id: 'Approval',
 			message: 'Shall I Continue ?',
