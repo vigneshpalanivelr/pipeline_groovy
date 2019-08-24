@@ -17,7 +17,7 @@ pipelineJob('rds_build_job') {
                 stringParam('db_family'         	, 'db_family'           	, 'db engine_family')
 		stringParam('db_engine_version' 	, 'db_version'          	, 'db engine_version')
                 choiceParam('db_instance_class'		, ['db.t2.small']		, 'db instance type')
-		stringParam('db_identifier'	    	, 'instance_name'       	, 'db instance name'
+		stringParam('db_identifier'	    	, 'instance_name'       	, 'db instance name')
 		stringParam('db_name'			, 'db_name'          		, 'db name')
 		stringParam('db_username'		, 'db_username'        		, 'db username')
 		stringParam('db_password'		, 'db_password'        		, 'db password')
