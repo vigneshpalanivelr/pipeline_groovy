@@ -31,6 +31,7 @@ catch(err) {
     else {
         println('error inside FlowInterruptedException: ' + err)
     }
+    error('error inside FlowInterruptedException: ')
 }
 
 node {
