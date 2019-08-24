@@ -4,6 +4,7 @@ node('master') {
 			$class: 'GitSCM', 
 			branches: [[name: gitBranch ]], 
 			doGenerateSubmoduleConfigurations: false, 
+			clearWorkspace: true,
 			extensions: [[$class: 'CleanCheckout'], [
 				$class: 'SubmoduleOption', 
 				disableSubmodules: false, 
