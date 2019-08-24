@@ -22,11 +22,11 @@ pipelineJob('rds_build_job') {
 		choiceParam('db_username'		, ['Administrator']	, '')
 		stringParam('db_password'		, 'db_password'        	, 'Do you think that you can see !!')
 		stringParam('db_allocated_storage'	, '5'			, 'in GBs')
-		choiceParam('db_multi_az'		, ['true','false']	, '')
+		choiceParam('db_multi_az'		, ['false','true']	, '')
 		choiceParam('createInstance'		, ['true','false']	, '')
 		stringParam('db_R53_name'		, 'R53_Name'		, '')
 		choiceParam('createInstanceDNS'		, ['true','false']	, '')
-		choiceParam('terraformApplyPlan'	, ['true','false']	, '')
+		choiceParam('terraformApplyPlan'	, ['false','true']	, '')
         }
         definition {
                 cps {
