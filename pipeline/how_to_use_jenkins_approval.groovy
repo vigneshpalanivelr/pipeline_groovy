@@ -21,6 +21,11 @@ catch(err) {
       println('ExceededTimeout!')
       error('ExceededTimeout!') 
     } 
+    else if (cause instanceof org.jenkinsci.plugins.workflow.support.steps.input.Rejection){
+      currentBuild.result = 'ABORTED'
+      println('Rejection!')
+      error('Rejection!')
+    }
     else {
       error('error inside FlowInterruptedException: ' + err)
     }
