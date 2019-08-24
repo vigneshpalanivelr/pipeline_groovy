@@ -13,8 +13,10 @@ try {
 }
 catch(err) { 
     // timeout reached or input false
-	echo "${err}"
+    echo "${err}"
+    echo "${err}"
     def user = err.causes.get(0)
+    echo "${err}"
     echo "${user}"
     if('SYSTEM' == user.toString()) {
         // SYSTEM means timeout.
