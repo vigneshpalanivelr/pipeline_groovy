@@ -10,8 +10,10 @@ node('master'){
 }
 
 def approval() {
-  timeout(5){
+  timeout(time: 15, unit: 'SECONDS'){
     // Every input step has an unique ID. It is used in the generated URL to proceed or abort.
-    input id: "Deploy Gate", message: "Deploy ?", ok: 'Deploy'
+    input(id: 'Proceed1', message: 'Was this successful?', parameters: [
+      [$class: 'BooleanParameterDefinition', defaultValue: true, description: '', name: 'Please confirm you agree with this']
+      ])
   }
 }
