@@ -3,7 +3,7 @@ def jobDslBranch	=	"master"
 def jobDslRepoCred	=	"GitCred"
 
 pipelineJob("how_to_use_jenkins_credentials_build_job") {
-	description ('Integrating Jenkins Maven SonarQube Artifactory Email Build Pipeline')
+	description ('Explains how tio use Credentials for Build Jobs')
 	logRotator(-1,-1)
 	parameters {
 		choiceParam("job_dsl_repo"	, [jobDslRepo]		, "Job DSL Repo")
