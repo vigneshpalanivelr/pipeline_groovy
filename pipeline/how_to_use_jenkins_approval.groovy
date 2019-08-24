@@ -10,8 +10,10 @@ try {
         ])
         echo "${userInput}"
     }
-} catch(err) { 
+}
+catch(err) { 
     // timeout reached or input false
+	echo "${err}"
     def user = err.getCauses()[0].getUser()
     echo "${user}"
     if('SYSTEM' == user.toString()) {
