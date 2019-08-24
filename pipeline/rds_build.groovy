@@ -37,10 +37,10 @@ node('master') {
 }
 
 def approval() {
-	timeout(time:15, unit:SECONDS) {
+	timeout(time: 15, unit:'SECONDS') {
 		input(
 			id: 'Approval',
-			message: 'Shall i continue ?',
+			message: 'Shall I Continue ?',
 			parameters:	[[
 				$class:	'BooleanParameterDefinition', 
 				defaultValue: true, 

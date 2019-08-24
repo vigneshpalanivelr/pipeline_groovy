@@ -1,8 +1,8 @@
 def terraformRepo       	= "https://github.com/vigneshpalanivelr/terraform_practice_codes.git"
 def terraformBranch     	= "master"
 def gitCreds            	= "GitCred"
-terraformTFstateBucket		= "terraform-tfstate-mumbai"
-terraformTFstateBucketPrefix	= "rds_module"
+def terraformTFstateBucket	= "terraform-tfstate-mumbai"
+def terraformTFstateBucketPrefix= "rds_module"
 
 pipelineJob('rds_build_job') {
         description('Explains how to use Jenins Approval for Build Jobs')
