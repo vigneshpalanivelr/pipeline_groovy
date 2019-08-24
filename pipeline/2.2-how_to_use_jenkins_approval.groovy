@@ -2,6 +2,9 @@ node('master'){
   stage('Approval - 2') {
     approval()
   }
+  stage('echo') {
+    echo "Approved"
+  }
 }
 
 def approval() {
