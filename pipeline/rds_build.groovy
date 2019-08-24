@@ -79,11 +79,11 @@ def checkout() {
 def terraform_init() {
 	withEnv(["GIT_ASKPASS=${WORKSPACE}/askp-${BUILD_TAG}"]){
 		withCredentials([usernamePassword(credentialsId: gitCreds, usernameVariable: 'STASH_USERNAME', passwordVariable: 'STASH_PASSWORD')]) {
-			sh "terraform init -input=false -upgrade=true -backend=true -force-copy -backend-config='bucket=${tfstateBucket}' -backend-config='workspace_key_prefix=${tfstateBucketPrefix}' -backend-config='key=rds_module.tfstate'"
+			sh "terraform init -no-color -input=false -upgrade=true -backend=true -force-copy -backend-config='bucket=${tfstateBucket}' -backend-config='workspace_key_prefix=${tfstateBucketPrefix}' -backend-config='key=rds_module.tfstate'"
 		}
 	}
 }
 
 def terraform_plan(global_tfvars,rds_tfvars) {
-	sh "terraform plan -out=tfplan -input=false -var-file=${global_tfvars} -var-file=${rds_tfvars}"
+	sh "terraform plan -no-color -out=tfplan -input=false -var-file=${global_tfvars} -var-file=${rds_tfvars}"
 }
