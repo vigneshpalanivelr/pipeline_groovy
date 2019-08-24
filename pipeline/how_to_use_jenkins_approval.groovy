@@ -17,27 +17,26 @@ catch(err) {
     cause = err.causes.get(0)
     echo "${cause}"
     if (cause instanceof org.jenkinsci.plugins.workflow.steps.TimeoutStepExecution.ExceededTimeout) {
-      currentBuild.result = 'ABORTED'
+      didTimeout = true
       println('ExceededTimeout!')
-      error('ExceededTimeout!') 
     } 
     else if (cause instanceof org.jenkinsci.plugins.workflow.support.steps.input.Rejection){
-      currentBuild.result = 'ABORTED'
+      userInput = false
       println('Rejection!')
-      error('Rejection!')
     }
     else {
-      error('error inside FlowInterruptedException: ' + err)
+      println('error inside FlowInterruptedException: ' + err)
     }
 }
 
 node {
     if (didTimeout) {
         echo "no input was received before timeout"
+        currentBuild.result = 'ABORTED'
     } else if (userInput == true) {
         echo "this was successful"
     } else {
         echo "this was not successful"
-        currentBuild.result = 'FAILURE'
+        currentBuild.result = 'ABORTED'
     } 
 }
