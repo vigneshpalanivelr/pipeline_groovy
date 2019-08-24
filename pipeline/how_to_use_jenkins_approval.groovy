@@ -6,17 +6,21 @@ try {
     timeout(time: 15, unit: 'SECONDS') {
         userInput = input(
         id: 'Proceed1', message: 'Was this successful?', parameters: [
-        [$class: 'BooleanParameterDefinition', defaultValue: true, description: '', name: 'Please confirm you agree with this']
+        [$class: 'BooleanParameterDefinition', defaultValue: false, description: 'Accept or Reject', name: 'Please confirm you agree with this']
         ])
+        echo userInput
     }
 } catch(err) { 
     // timeout reached or input false
     def user = err.getCauses()[0].getUser()
+    echo user
     if('SYSTEM' == user.toString()) {
         // SYSTEM means timeout.
         didTimeout = true
+        echo didTimeout
     } else {
         userInput = false
+        echo userInput
         echo "Aborted by: [${user}]"
     }
 }
