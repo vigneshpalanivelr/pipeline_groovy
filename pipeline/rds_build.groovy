@@ -35,8 +35,13 @@ node('master') {
 		checkout()
 		if (createInstance == 'true'){
 			dir(terraformDirectoryRDS){
-				stage('RDS Instance remote state') {
+				stage('RDS Instance remote_state Init') {
 					terraform_init()
+				}
+				stage('RDS Instance Plan') {
+					global_tfvars	= "../../../global_vars.tfvars"
+					rds_tfvars		= "${db_engine}.tfvars"
+					terraform_plan()
 				}
 			}
 		}
@@ -74,7 +79,11 @@ def checkout() {
 def terraform_init() {
 	withEnv(["GIT_ASKPASS=${WORKSPACE}/askp-${BUILD_TAG}"]){
 		withCredentials([usernamePassword(credentialsId: gitCreds, usernameVariable: 'STASH_USERNAME', passwordVariable: 'STASH_PASSWORD')]) {
-			sh "terraform init -input=true -upgrade=true -backend=true -force-copy -backend-config='bucket=${tfstateBucket}' -backend-config='workspace_key_prefix=${tfstateBucketPrefix}' -backend-config='key=rds_module.tfstate'"
+			sh "terraform init -input=false -upgrade=true -backend=true -force-copy -backend-config='bucket=${tfstateBucket}' -backend-config='workspace_key_prefix=${tfstateBucketPrefix}' -backend-config='key=rds_module.tfstate'"
 		}
 	}
+}
+
+def terraform_plan(global_tfvars) {
+	sh "terraform plan -out=tfplan -input=false -var-file=${global_tfvars}"
 }
