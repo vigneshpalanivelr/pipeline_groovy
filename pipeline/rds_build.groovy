@@ -23,7 +23,7 @@
 */
 
 node('master') {
-	def terraformDirectory	= "modules/all_modules/rds_module"
+	def terraformDirectoryRDS	= "modules/all_modules/rds_module"
 	
 	writeFile(file: "askp-${BUILD_TAG}",text:"#!/bin/bash\ncase \"\$1\" in\nUsername*) echo \"\${STASH_USERNAME}\" ;;\nPassword*) \"\${STASH_PASSWORD}\" ;;\nesac")
 	sh "chmod a+x askp-${BUILD_TAG}"
@@ -34,8 +34,10 @@ node('master') {
 	stage('Checkout') {
 		checkout()
 		if (createInstance == 'true'){
-			stage('RDS Instance remote state') {
-				terraform_init()
+			dir(terraformDirectoryRDS){
+				stage('RDS Instance remote state') {
+					terraform_init()
+				}
 			}
 		}
 	}
