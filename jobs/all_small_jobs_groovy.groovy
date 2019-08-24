@@ -13,7 +13,7 @@ pipelineJob("how_to_use_jenkins_credentials_build_job") {
 	definition {
 		cps {
 			script(readFileFromWorkspace('pipeline/how_to_use_jenkins_credentials.groovy'))
-			//sandbox()
+			sandbox()
 		}
 	}
 }
@@ -29,7 +29,7 @@ pipelineJob("how_to_use_jenkins_approval_build_job") {
         definition {
                 cps {
                         script(readFileFromWorkspace('pipeline/how_to_use_jenkins_approval.groovy'))
-                        //sandbox()
+                        sandbox()
                 }
 	}
 }
