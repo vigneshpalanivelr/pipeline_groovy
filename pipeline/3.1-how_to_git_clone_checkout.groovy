@@ -11,6 +11,6 @@ node('master') {
 				recursiveSubmodules: true, 
 				reference: '', trackingSubmodules: false]], 
 			submoduleCfg: [], 
-			userRemoteConfigs: [[credentialsId: gitCreds, url: gitRepo], []]])
+			userRemoteConfigs: [[credentialsId: gitCreds, url: gitRepo]]])
 	}
 }
