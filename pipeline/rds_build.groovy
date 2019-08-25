@@ -40,7 +40,7 @@ node('master') {
 				stage('Remote State Init') {
 					terraform_init()
 				}
-				if (terraformApplyPlan == 'plan') or (terraformApplyPlan == 'apply') {
+				if ((terraformApplyPlan == 'plan') or (terraformApplyPlan == 'apply')) {
 					stage('Terraform Plan'){
 						withEnv(["TF_VAR_db_password=${db_password}"]){
 							set_env_variables()
@@ -54,7 +54,6 @@ node('master') {
 						terraform_apply()
 					}
 				}
-				echo "Plan Destroy - 0 "
 				if (terraformApplyPlan == 'plan-destroy') or (terraformApplyPlan == 'destroy') {
 					echo " Plan Destroy - 1"
 					stage('Plan Destroy'){
