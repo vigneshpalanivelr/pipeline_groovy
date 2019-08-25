@@ -25,7 +25,7 @@
 node('master') {
 	def terraformDirectoryRDS	= "modules/all_modules/rds_module_oracle"
 	global_tfvars   		= "../../../global_vars.tfvars"
-	rds_tfvars      		= "../../../${db_engine}.tfvars"
+	rds_tfvars      		= "../../../${db_rds}.tfvars"
 	env.TF_LOG			= "${tfLogLevel}"
 	env.TF_LOG_PATH			= "terraform.txt"
 	
