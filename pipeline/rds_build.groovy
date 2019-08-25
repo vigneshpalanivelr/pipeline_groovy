@@ -54,7 +54,7 @@ node('master') {
 						terraform_apply()
 					}
 				}
-				if (terraformApplyPlan == 'plan-destroy') or (terraformApplyPlan == 'destroy') {
+				if (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy') {
 					echo " Plan Destroy - 1"
 					stage('Plan Destroy'){
 						echo " Plan Destroy - 2"
