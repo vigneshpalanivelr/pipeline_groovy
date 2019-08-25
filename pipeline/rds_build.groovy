@@ -27,6 +27,7 @@ node('master') {
 	global_tfvars   		= "../../../global_vars.tfvars"
 	rds_tfvars      		= "../../../${db_engine}.tfvars"
 	env.TF_LOG			= "${tfLogLevel}"
+	env.TF_LOG_PATH			= "terraform.txt"
 	
 	writeFile(file: "askp-${BUILD_TAG}",text:"#!/bin/bash\ncase \"\$1\" in\nUsername*) echo \"\${STASH_USERNAME}\" ;;\nPassword*) \"\${STASH_PASSWORD}\" ;;\nesac")
 	sh "chmod a+x askp-${BUILD_TAG}"
