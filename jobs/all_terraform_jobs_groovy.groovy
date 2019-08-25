@@ -13,6 +13,7 @@ pipelineJob('rds_build_job') {
                 choiceParam('gitCreds'          	, [gitCreds]		, '')
 		choiceParam('tfstateBucket'		, [terraformTFstateBucket]	, 'TF State Bucket'		)
 		choiceParam('tfstateBucketPrefix'	, [terraformTFstateBucketPrefix], 'TF State Bucket Prefix'	)
+		choiceParam('tfLogLevel'		, ['ERROR','WARN','INFO','DEBUG','TRACE'],			,'')
                 choiceParam('db_engine'	        	, ['postgres','oracle','mssql','mariadb','mysql','aurora']	,'')
                 stringParam('db_family'         	, 'db_family'		, '')
 		stringParam('db_engine_version' 	, 'db_version'		, '')
