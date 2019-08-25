@@ -57,9 +57,11 @@ node('master') {
 				}
 				if (terraformApplyPlan == 'plan-destroy') {
 					stage('Plan Destroy'){
-						set_env_variables()
-                                                terraform_plan_destroy()
-                                        }
+						withEnv(["TF_VAR_db_password=${db_password}"]){
+							set_env_variables()
+        	                                        terraform_plan_destroy()
+                	                        }
+					}
 				}
 				if (terraformApplyPlan == 'destroy') {
 					stage('Approve & Destroy'){
