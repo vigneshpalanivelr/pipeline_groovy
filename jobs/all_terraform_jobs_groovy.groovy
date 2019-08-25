@@ -50,6 +50,7 @@ pipelineJob('rds_build_gen_job') {
                 choiceParam('db_rds'			, ['postgres','oracle','mssql','mariadb','mysql','aurora']      ,'')
 		stringParam('db_engine'                 , 'db_engine'           , '')
                 stringParam('db_engine_version'         , 'db_version'          , '')
+		stringParam('db_major_engine_version'	, 'db_major_eng_version', '')
                 choiceParam('db_instance_class'         , ['db.t2.small']       , '')
                 stringParam('db_identifier'             , 'instance_name'       , '')
                 stringParam('db_name'                   , 'db_name'             , '')
