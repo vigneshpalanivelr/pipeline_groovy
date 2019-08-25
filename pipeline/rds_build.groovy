@@ -58,8 +58,8 @@ node('master') {
 					}
 				}
 				stage('Approve & Apply'){
-					approval()
 					if (terraformApplyPlan == 'apply') {
+						approval()
 						terraform_apply()
 	               	                }
 				}
