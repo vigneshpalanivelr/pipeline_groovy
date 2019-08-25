@@ -104,15 +104,17 @@ def checkout() {
 }
 
 def set_env_variables() {
-	env.TF_VAR_db_engine            = "${db_engine}"
-	env.TF_VAR_db_engine_version    = "${db_engine_version}"
-	env.TF_VAR_db_instance_class    = "${db_instance_class}"
-	env.TF_VAR_db_identifier        = "${db_identifier}"
-	env.TF_VAR_db_name              = "${db_name}"
-	env.TF_VAR_db_username          = "${db_username}"
-	env.TF_VAR_db_allocated_storage = "${db_allocated_storage}"
-	env.TF_VAR_db_multi_az          = "${db_multi_az}"
-	env.TF_VAR_db_R53_name          = "${db_R53_name}"
+	env.TF_VAR_db_engine            	= "${db_engine}"
+	env.TF_VAR_db_engine_version    	= "${db_engine_version}"
+	env.TF_VAR_db_instance_class    	= "${db_instance_class}"
+	env.TF_VAR_db_identifier        	= "${db_identifier}"
+	env.TF_VAR_db_name              	= "${db_name}"
+	env.TF_VAR_db_username          	= "${db_username}"
+	env.TF_VAR_db_allocated_storage 	= "${db_allocated_storage}"
+	env.TF_VAR_db_multi_az          	= "${db_multi_az}"
+	env.TF_VAR_db_R53_name          	= "${db_R53_name}"
+	env.TF_VAR_db_rds			= "${db_rds}"
+	env.TF_VAR_db_engine_major_version	= "${db_engine_major_version}"
 }
 
 def terraform_init() {
