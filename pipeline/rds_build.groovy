@@ -116,6 +116,6 @@ def terraform_plan_destroy() {
         sh "terraform plan -destroy -no-color"
 }
 
-def terraform_apply() {
+def terraform_destroy() {
         sh "terraform destroy -no-color"
 }
