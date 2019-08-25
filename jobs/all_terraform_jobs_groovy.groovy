@@ -20,7 +20,7 @@ pipelineJob('rds_build_job') {
 		stringParam('db_identifier'	    	, 'instance_name'	, '')
 		stringParam('db_name'			, 'db_name'		, '')
 		choiceParam('db_username'		, ['Administrator']	, '')
-		nonStoredPasswordParam('db_password'	, 'db_password'        	, 'Do you think that you can see !!')
+		nonStoredPasswordParam('db_password'	, 'Do you think that you can see !!')
 		stringParam('db_allocated_storage'	, '5'			, 'in GBs')
 		choiceParam('db_multi_az'		, ['false','true']	, '')
 		choiceParam('createInstance'		, ['true','false']	, '')
