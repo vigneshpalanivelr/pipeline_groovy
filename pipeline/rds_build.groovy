@@ -39,22 +39,20 @@ node('master') {
 					terraform_init()
 				}
 				stage('Terraform Plan'){
-					if (terraformApplyPlan == 'plan') {
-        	                                global_tfvars   = "../../../global_vars.tfvars"
-                	                        rds_tfvars      = "../../../${db_engine}.tfvars"
-                        	                withEnv(["TF_VAR_db_password=${db_password}"]){
-                                	                env.TF_VAR_db_engine            = "${db_engine}"
-                                        	        env.TF_VAR_db_family            = "${db_family}"
-                                                	env.TF_VAR_db_engine_version    = "${db_engine_version}"
-	                                                env.TF_VAR_db_instance_class    = "${db_instance_class}"
-        	                                        env.TF_VAR_db_identifier        = "${db_identifier}"
-                	                                env.TF_VAR_db_name              = "${db_name}"
-                        	                        env.TF_VAR_db_username          = "${db_username}"
-                                	                env.TF_VAR_db_allocated_storage = "${db_allocated_storage}"
-                                        	        env.TF_VAR_db_multi_az          = "${db_multi_az}"
-                                                	env.TF_VAR_db_R53_name          = "${db_R53_name}"
-                                                	terraform_plan(global_tfvars,rds_tfvars)
-						}
+					global_tfvars   = "../../../global_vars.tfvars"
+                	                rds_tfvars      = "../../../${db_engine}.tfvars"
+                        	        withEnv(["TF_VAR_db_password=${db_password}"]){
+                                		env.TF_VAR_db_engine            = "${db_engine}"
+                                        	env.TF_VAR_db_family            = "${db_family}"
+                                                env.TF_VAR_db_engine_version    = "${db_engine_version}"
+	                                        env.TF_VAR_db_instance_class    = "${db_instance_class}"
+        	                                env.TF_VAR_db_identifier        = "${db_identifier}"
+                	                        env.TF_VAR_db_name              = "${db_name}"
+                        	                env.TF_VAR_db_username          = "${db_username}"
+                                	        env.TF_VAR_db_allocated_storage = "${db_allocated_storage}"
+                                        	env.TF_VAR_db_multi_az          = "${db_multi_az}"
+                                                env.TF_VAR_db_R53_name          = "${db_R53_name}"
+                                                terraform_plan(global_tfvars,rds_tfvars)
 					}
 				}
 				stage('Approve & Apply'){
