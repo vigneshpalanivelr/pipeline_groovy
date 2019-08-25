@@ -40,22 +40,21 @@ node('master') {
 				stage('Remote State Init') {
 					terraform_init()
 				}
-				stage('Terraform Plan'){
-					withEnv(["TF_VAR_db_password=${db_password}"]){
-						set_env_variables()
-                	               		terraform_plan(global_tfvars,rds_tfvars)
+				if (terraformApplyPlan == 'plan' or terraformApplyPlan == 'apply') {
+					stage('Terraform Plan'){
+						withEnv(["TF_VAR_db_password=${db_password}"]){
+							set_env_variables()
+                		               		terraform_plan(global_tfvars,rds_tfvars)
+						}
 					}
 				}
 				if (terraformApplyPlan == 'apply') {
 					stage('Plan Approve & Apply'){
-						withEnv(["TF_VAR_db_password=${db_password}"]){
-							set_env_variables()
-							approval()
-							terraform_apply()
-	        	       	                }
+						approval()
+						terraform_apply()
 					}
 				}
-				if (terraformApplyPlan == 'plan-destroy') {
+				if (terraformApplyPlan == 'plan-destroy' or terraformApplyPlan == 'destroy') {
 					stage('Plan Destroy'){
 						withEnv(["TF_VAR_db_password=${db_password}"]){
 							set_env_variables()
