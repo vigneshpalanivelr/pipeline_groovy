@@ -56,6 +56,7 @@ node('master') {
 				}
 				if (terraformApplyPlan == 'plan-destroy') {
 					stage('Plan Destroy'){
+						set_env_variables()
                                                 terraform_plan_destroy()
                                         }
 				}
@@ -130,9 +131,9 @@ def terraform_apply() {
 }
 
 def terraform_plan_destroy() {
-        sh "terraform plan -destroy -no-color"
+        sh "terraform plan -destroy -no-color -out=tfdestroy -input=false -var-file=${global_tfvars} -var-file=${rds_tfvars}"
 }
 
 def terraform_destroy() {
-        sh "terraform destroy -no-color"
+        sh "terraform apply -no-color -input=false tfdestroy"
 }
