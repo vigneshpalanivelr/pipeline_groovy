@@ -105,7 +105,6 @@ def checkout() {
 
 def set_env_variables() {
 	env.TF_VAR_db_engine            = "${db_engine}"
-	env.TF_VAR_db_family            = "${db_family}"
 	env.TF_VAR_db_engine_version    = "${db_engine_version}"
 	env.TF_VAR_db_instance_class    = "${db_instance_class}"
 	env.TF_VAR_db_identifier        = "${db_identifier}"
