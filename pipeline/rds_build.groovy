@@ -58,7 +58,7 @@ node('master') {
 					stage('Plan Destroy'){
 						withEnv(["TF_VAR_db_password=${db_password}"]){
 							set_env_variables()
-        	                                        terraform_plan_destroy()
+        	                                        terraform_plan_destroy(global_tfvars,rds_tfvars)
                 	                        }
 					}
 				}
@@ -130,7 +130,7 @@ def terraform_apply() {
 	sh "terraform apply -no-color -input=false tfplan"
 }
 
-def terraform_plan_destroy() {
+def terraform_plan_destroy(global_tfvars,rds_tfvars) {
         sh "terraform plan -destroy -no-color -out=tfdestroy -input=false -var-file=${global_tfvars} -var-file=${rds_tfvars}"
 }
 
