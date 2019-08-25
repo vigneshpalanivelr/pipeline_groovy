@@ -55,11 +55,23 @@ node('master') {
                                                 terraform_plan(global_tfvars,rds_tfvars)
 					}
 				}
-				stage('Approve & Apply'){
-					if (terraformApplyPlan == 'apply') {
+				if (terraformApplyPlan == 'apply') {
+					stage('Approve & Apply'){
 						approval()
 						terraform_apply()
 	               	                }
+				}
+				if (terraformApplyPlan == 'plan-destroy') {
+					stage('Plan Destroy'){
+                                                approval()
+                                                terraform_plan_destroy()
+                                        }
+				}
+				if (terraformApplyPlan == 'destroy') {
+					stage('Approve & Destroy'){
+                                                approval()
+                                                terraform_destroy()
+                                	}
 				}
 			}
 		}

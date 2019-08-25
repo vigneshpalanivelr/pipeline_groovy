@@ -13,7 +13,7 @@ pipelineJob('rds_build_job') {
                 choiceParam('gitCreds'          	, [gitCreds]		, '')
 		choiceParam('tfstateBucket'		, [terraformTFstateBucket]	, 'TF State Bucket'		)
 		choiceParam('tfstateBucketPrefix'	, [terraformTFstateBucketPrefix], 'TF State Bucket Prefix'	)
-                choiceParam('db_engine'	        	, ['postgres','oracle','mssql','mariadb','mysql','aurora']	)
+                choiceParam('db_engine'	        	, ['postgres','oracle','mssql','mariadb','mysql','aurora']	,'')
                 stringParam('db_family'         	, 'db_family'		, '')
 		stringParam('db_engine_version' 	, 'db_version'		, '')
                 choiceParam('db_instance_class'		, ['db.t2.small']	, '')
@@ -26,7 +26,7 @@ pipelineJob('rds_build_job') {
 		choiceParam('createInstance'		, ['true','false']	, '')
 		stringParam('db_R53_name'		, 'R53_Name'		, '')
 		choiceParam('createInstanceDNS'		, ['true','false']	, '')
-		choiceParam('terraformApplyPlan'	, ['plan','apply']	, '')
+		choiceParam('terraformApplyPlan'	, ['plan','apply','plan-destroy','destroy']	, '')
         }
         definition {
                 cps {
