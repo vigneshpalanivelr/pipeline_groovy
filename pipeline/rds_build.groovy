@@ -55,13 +55,8 @@ node('master') {
 					}
 				}
 				if (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy') {
-					echo " Plan Destroy - 1"
 					stage('Plan Destroy'){
-						echo " Plan Destroy - 2"
-						withEnv(["TF_VAR_db_password=${db_password}"]){
-							set_env_variables()
-        	                                        terraform_plan_destroy(global_tfvars,rds_tfvars)
-                	                        }
+        	                        	terraform_plan_destroy(global_tfvars,rds_tfvars)
 					}
 				}
 				if (terraformApplyPlan == 'destroy') {
