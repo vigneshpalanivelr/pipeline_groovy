@@ -43,12 +43,14 @@ node('master') {
 				if (terraformApplyPlan == 'plan') {
 					stage('Terraform Plan'){
 						set_env_variables()
-                	                	terraform_plan(global_tfvars,rds_tfvars)
+						withEnv(["TF_VAR_db_password=${db_password}"]){
+                	                		terraform_plan(global_tfvars,rds_tfvars)
+						}
 					}
 				}
 				if (terraformApplyPlan == 'apply') {
 					stage('Plan Approve & Apply'){
-						set_env_variables()
+						#set_env_variables()
 						terraform_plan(global_tfvars,rds_tfvars)
 						approval()
 						terraform_apply()
