@@ -50,7 +50,7 @@ node('master') {
 				}
 				if (terraformApplyPlan == 'apply') {
 					stage('Plan Approve & Apply'){
-						#set_env_variables()
+						set_env_variables()
 						terraform_plan(global_tfvars,rds_tfvars)
 						approval()
 						terraform_apply()
