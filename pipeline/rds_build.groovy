@@ -35,25 +35,33 @@ node('master') {
 		checkout()
 		if (createInstance == 'true'){
 			dir(terraformDirectoryRDS){
-				stage('RDS Instance remote_state Init') {
+				stage('Remote State Init') {
 					terraform_init()
 				}
-				stage('RDS Instance Plan') {
-					global_tfvars	= "../../../global_vars.tfvars"
-					rds_tfvars	= "../../../${db_engine}.tfvars"
-					withEnv(["TF_VAR_db_password=${db_password}"]){
-						env.TF_VAR_db_engine		= "${db_engine}"
-                                                env.TF_VAR_db_family		= "${db_family}"
-                                                env.TF_VAR_db_engine_version	= "${db_engine_version}"
-                                                env.TF_VAR_db_instance_class	= "${db_instance_class}"
-                                                env.TF_VAR_db_identifier	= "${db_identifier}"
-						env.TF_VAR_db_name		= "${db_name}"
-						env.TF_VAR_db_username		= "${db_username}"
-						env.TF_VAR_db_allocated_storage	= "${db_allocated_storage}"
-						env.TF_VAR_db_multi_az		= "${db_multi_az}"
-						env.TF_VAR_db_R53_name		= "${db_R53_name}"
-						terraform_plan(global_tfvars,rds_tfvars)
+				stage('Terraform Plan'){
+					if (terraformApplyPlan == 'plan') {
+        	                                global_tfvars   = "../../../global_vars.tfvars"
+                	                        rds_tfvars      = "../../../${db_engine}.tfvars"
+                        	                withEnv(["TF_VAR_db_password=${db_password}"]){
+                                	                env.TF_VAR_db_engine            = "${db_engine}"
+                                        	        env.TF_VAR_db_family            = "${db_family}"
+                                                	env.TF_VAR_db_engine_version    = "${db_engine_version}"
+	                                                env.TF_VAR_db_instance_class    = "${db_instance_class}"
+        	                                        env.TF_VAR_db_identifier        = "${db_identifier}"
+                	                                env.TF_VAR_db_name              = "${db_name}"
+                        	                        env.TF_VAR_db_username          = "${db_username}"
+                                	                env.TF_VAR_db_allocated_storage = "${db_allocated_storage}"
+                                        	        env.TF_VAR_db_multi_az          = "${db_multi_az}"
+                                                	env.TF_VAR_db_R53_name          = "${db_R53_name}"
+                                                	terraform_plan(global_tfvars,rds_tfvars)
+						}
 					}
+				}
+				stage('Approve & Apply'){
+					approval()
+					if (terraformApplyPlan == 'apply') {
+						terraform_apply()
+	               	                }
 				}
 			}
 		}
@@ -98,4 +106,16 @@ def terraform_init() {
 
 def terraform_plan(global_tfvars,rds_tfvars) {
 	sh "terraform plan -no-color -out=tfplan -input=false -var-file=${global_tfvars} -var-file=${rds_tfvars}"
+}
+
+def terraform_apply() {
+	sh "terraform apply -no-color -input=false tfplan"
+}
+
+def terraform_plan_destroy() {
+        sh "terraform plan -destroy -no-color"
+}
+
+def terraform_apply() {
+        sh "terraform destroy -no-color"
 }

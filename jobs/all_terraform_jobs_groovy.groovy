@@ -26,7 +26,7 @@ pipelineJob('rds_build_job') {
 		choiceParam('createInstance'		, ['true','false']	, '')
 		stringParam('db_R53_name'		, 'R53_Name'		, '')
 		choiceParam('createInstanceDNS'		, ['true','false']	, '')
-		choiceParam('terraformApplyPlan'	, ['false','true']	, '')
+		choiceParam('terraformApplyPlan'	, ['plan','apply']	, '')
         }
         definition {
                 cps {
