@@ -23,16 +23,16 @@
 */
 
 node('master') {
-	def terraformDirectoryRDS	= "modules/all_modules/rds_module_oracle"
-	def global_tfvars   		= "../../../variables/global_vars.tfvars"
-	def rds_tfvars      		= "../../../variables/rds.tfvars"
-	def db_rds 			= (db_engine		=~ /[a-zA-Z]+/)[0]
-	def db_engine_major_version 	= (db_engine_version	=~ /\d+.\d+/)[0]
-	def date 			= new Date()
+	terraformDirectoryRDS	= "modules/all_modules/rds_module_oracle"
+	global_tfvars   	= "../../../variables/global_vars.tfvars"
+	rds_tfvars      	= "../../../variables/rds.tfvars"
+	db_rds 			= (db_engine		=~ /[a-zA-Z]+/)[0]
+	db_engine_major_version = (db_engine_version	=~ /\d+.\d+/)[0]
+	date 			= new Date()
 
 	println date
-	println db_rds.getClass()
-	println db_engine_major_version.getClass()
+	println db_rds
+	println db_engine_major_version
 	
 	writeFile(file: "askp-${BUILD_TAG}",text:"#!/bin/bash\ncase \"\$1\" in\nUsername*) echo \"\${STASH_USERNAME}\" ;;\nPassword*) \"\${STASH_PASSWORD}\" ;;\nesac")
 	sh "chmod a+x askp-${BUILD_TAG}"
