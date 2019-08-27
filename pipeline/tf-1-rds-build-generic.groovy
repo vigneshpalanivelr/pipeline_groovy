@@ -5,8 +5,8 @@
 *	tfstateBucket
 *	tfstateBucketPrefix
 
-*	db_engine
 *	db_family
+*	db_engine
 *	db_engine_version
 *	db_instance_class
 *	db_identifier
@@ -20,9 +20,13 @@
 *	createInstance
 *	createInstanceDNS
 *	terraformApplyPlan
+
+	local variable	: Use def keyword
+	global variable	: No def keyword
 */
 
 node('master') {
+
 	terraformDirectoryRDS	= "modules/all_modules/rds_module_oracle"
 	global_tfvars   	= "../../../variables/global_vars.tfvars"
 	rds_tfvars      	= "../../../variables/rds.tfvars"
@@ -31,8 +35,6 @@ node('master') {
 	date 			= new Date()
 
 	println date
-	println db_rds
-	println db_engine_major_version
 	
 	writeFile(file: "askp-${BUILD_TAG}",text:"#!/bin/bash\ncase \"\$1\" in\nUsername*) echo \"\${STASH_USERNAME}\" ;;\nPassword*) \"\${STASH_PASSWORD}\" ;;\nesac")
 	sh "chmod a+x askp-${BUILD_TAG}"
