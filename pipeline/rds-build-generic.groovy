@@ -24,16 +24,18 @@
 
 node('master') {
 	def terraformDirectoryRDS	= "modules/all_modules/rds_module_oracle"
-	global_tfvars   		= "../../../variables/global_vars.tfvars"
-	rds_tfvars      		= "../../../variables/rds.tfvars"
+	def global_tfvars   		= "../../../variables/global_vars.tfvars"
+	def rds_tfvars      		= "../../../variables/rds.tfvars"
+	def db_rds 			= (db_engine		=~ /[a-zA-Z]+/)
+	def db_engine_major_version 	= (db_engine_version	=~ /\d+.\d+/)
+	def date 			= new Date()
+
+	println date
 	
 	writeFile(file: "askp-${BUILD_TAG}",text:"#!/bin/bash\ncase \"\$1\" in\nUsername*) echo \"\${STASH_USERNAME}\" ;;\nPassword*) \"\${STASH_PASSWORD}\" ;;\nesac")
 	sh "chmod a+x askp-${BUILD_TAG}"
 	
-	def date = new Date()
-	println date
-	
-	stage('Approve before Start'){
+	stage('Approval'){
 		approval()
 	}
 	stage('Checkout') {
@@ -52,8 +54,10 @@ node('master') {
 					}
 				}
 				if (terraformApplyPlan == 'apply') {
-					stage('Plan Approve & Apply'){
+					stage('Approve Plan'){
 						approval()
+					}
+					stage('Terraform Apply'){
 						terraform_apply()
 					}
 				}
@@ -66,8 +70,10 @@ node('master') {
 					}
 				}
 				if (terraformApplyPlan == 'destroy') {
-					stage('Approve & Destroy'){
+					stage('Approve Destroy'){
                                                 approval()
+                                	}
+					stage(' Destroy'){
                                                 terraform_destroy()
                                 	}
 				}
@@ -105,6 +111,7 @@ def checkout() {
 }
 
 def set_env_variables() {
+	env.TF_VAR_db_family            	= "${db_family}"
 	env.TF_VAR_db_engine            	= "${db_engine}"
 	env.TF_VAR_db_engine_version    	= "${db_engine_version}"
 	env.TF_VAR_db_instance_class    	= "${db_instance_class}"
@@ -121,7 +128,7 @@ def set_env_variables() {
 def terraform_init() {
 	withEnv(["GIT_ASKPASS=${WORKSPACE}/askp-${BUILD_TAG}"]){
 		withCredentials([usernamePassword(credentialsId: gitCreds, usernameVariable: 'STASH_USERNAME', passwordVariable: 'STASH_PASSWORD')]) {
-			sh "terraform init -no-color -input=false -upgrade=true -backend=true -force-copy -backend-config='bucket=${tfstateBucket}' -backend-config='key=${tfstateBucketPrefix}/${db_identifier}-${db_engine}-rds.tfstate'"
+			sh "terraform init -no-color -input=false -upgrade=true -backend=true -force-copy -backend-config='bucket=${tfstateBucket}' -backend-config='key=${tfstateBucketPrefix}/${db_identifier}-${db_rds}-rds.tfstate'"
 		}
 	}
 }
