@@ -26,8 +26,8 @@ node('master') {
 	def terraformDirectoryRDS	= "modules/all_modules/rds_module_oracle"
 	def global_tfvars   		= "../../../variables/global_vars.tfvars"
 	def rds_tfvars      		= "../../../variables/rds.tfvars"
-	def db_rds 			= (db_engine		=~ /[a-zA-Z]+/)
-	def db_engine_major_version 	= (db_engine_version	=~ /\d+.\d+/)
+	def db_rds 			= (${db_engine}		=~ /[a-zA-Z]+/)
+	def db_engine_major_version 	= (${db_engine_version}	=~ /\d+.\d+/)
 	def date 			= new Date()
 
 	println date
