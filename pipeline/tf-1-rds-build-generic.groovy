@@ -27,7 +27,7 @@
 
 node('master') {
 
-	terraformDirectoryRDS	= "modules/all_modules/rds_module_oracle"
+	terraformDirectoryRDS	= "modules/all_modules/${tfstateBucketPrefix}"
 	global_tfvars   	= "../../../variables/global_vars.tfvars"
 	rds_tfvars      	= "../../../variables/rds.tfvars"
 	db_rds 			= (db_engine		=~ /[a-zA-Z]+/)[0]
