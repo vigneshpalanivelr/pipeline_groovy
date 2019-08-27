@@ -31,8 +31,8 @@ node('master') {
 	def date 			= new Date()
 
 	println date
-	println db_rds
-	println db_engine_major_version
+	println db_rds.getClass()
+	println db_engine_major_version.getClass()
 	
 	writeFile(file: "askp-${BUILD_TAG}",text:"#!/bin/bash\ncase \"\$1\" in\nUsername*) echo \"\${STASH_USERNAME}\" ;;\nPassword*) \"\${STASH_PASSWORD}\" ;;\nesac")
 	sh "chmod a+x askp-${BUILD_TAG}"
