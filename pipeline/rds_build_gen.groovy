@@ -26,8 +26,6 @@ node('master') {
 	def terraformDirectoryRDS	= "modules/all_modules/rds_module_oracle"
 	global_tfvars   		= "../../../variables/global_vars.tfvars"
 	rds_tfvars      		= "../../../variables/rds.tfvars"
-	env.TF_LOG			= "${tfLogLevel}"
-	env.TF_LOG_PATH			= "terraform.txt"
 	
 	writeFile(file: "askp-${BUILD_TAG}",text:"#!/bin/bash\ncase \"\$1\" in\nUsername*) echo \"\${STASH_USERNAME}\" ;;\nPassword*) \"\${STASH_PASSWORD}\" ;;\nesac")
 	sh "chmod a+x askp-${BUILD_TAG}"
