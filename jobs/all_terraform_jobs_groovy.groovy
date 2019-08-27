@@ -31,7 +31,7 @@ pipelineJob('tf-1-rds-build-generic-job') {
         }
         definition {
                 cps {
-                        script(readFileFromWorkspace('pipeline/rds-build-generic.groovy'))
+                        script(readFileFromWorkspace('pipeline/tf-1-rds-build-generic.groovy'))
                         sandbox()
                 }
         }
