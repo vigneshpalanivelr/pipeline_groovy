@@ -49,8 +49,10 @@ node('master') {
 					}
 				}
 				if (terraformApplyPlan == 'apply') {
-					stage('Plan Approve & Apply'){
+					stage('Approve Plan'){
 						approval()
+					}
+					stage('Apply Plan'){
 						terraform_apply()
 					}
 				}
@@ -63,8 +65,10 @@ node('master') {
 					}
 				}
 				if (terraformApplyPlan == 'destroy') {
-					stage('Approve & Destroy'){
+					stage('Approve Destroy'){
                                                 approval()
+                                	}
+					stage('Destroy'){
                                                 terraform_destroy()
                                 	}
 				}
