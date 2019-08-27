@@ -30,6 +30,10 @@ node('master') {
 	writeFile(file: "askp-${BUILD_TAG}",text:"#!/bin/bash\ncase \"\$1\" in\nUsername*) echo \"\${STASH_USERNAME}\" ;;\nPassword*) \"\${STASH_PASSWORD}\" ;;\nesac")
 	sh "chmod a+x askp-${BUILD_TAG}"
 	
+	wrappers {
+        	timestamps()
+	}
+	
 	stage('Approve before Start'){
 		approval()
 	}
