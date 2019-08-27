@@ -121,8 +121,8 @@ def set_env_variables() {
 	env.TF_VAR_db_allocated_storage 	= "${db_allocated_storage}"
 	env.TF_VAR_db_multi_az          	= "${db_multi_az}"
 	env.TF_VAR_db_R53_name          	= "${db_R53_name}"
-	env.TF_VAR_db_rds			= "${db_rds}"
-	env.TF_VAR_db_engine_major_version	= "${db_engine_major_version}"
+	env.TF_VAR_db_rds			= "${db_rds}[0]"
+	env.TF_VAR_db_engine_major_version	= "${db_engine_major_version}[0]"
 }
 
 def terraform_init() {
