@@ -4,6 +4,7 @@ def gitCreds            	= "GitCred"
 def terraformTFstateBucket	= "terraform-tfstate-mumbai"
 def terraformTFstateBucketPrefix= "rds_module"
 
+// RDS Build Job
 pipelineJob('rds_build_job') {
         description('Explains how to use Jenins Approval for Build Jobs')
         logRotator(-1,-1)
@@ -13,16 +14,15 @@ pipelineJob('rds_build_job') {
                 choiceParam('gitCreds'          	, [gitCreds]		, '')
 		choiceParam('tfstateBucket'		, [terraformTFstateBucket]	, 'TF State Bucket'		)
 		choiceParam('tfstateBucketPrefix'	, [terraformTFstateBucketPrefix], 'TF State Bucket Prefix'	)
-		choiceParam('tfLogLevel'		, ['ERROR','WARN','INFO','DEBUG','TRACE'],			,'')
                 choiceParam('db_engine'	        	, ['postgres','oracle','mssql','mariadb','mysql','aurora']	,'')
-                stringParam('db_family'         	, 'db_family'		, '')
-		stringParam('db_engine_version' 	, 'db_version'		, '')
+                stringParam('db_family'         	, 'postgres,oracle-se1'	, '')
+		stringParam('db_engine_version' 	, '9.6.11,11.2.0.4.v21'	, '')
                 choiceParam('db_instance_class'		, ['db.t2.small']	, '')
-		stringParam('db_identifier'	    	, 'instance_name'	, '')
-		stringParam('db_name'			, 'db_name'		, '')
+		stringParam('db_identifier'	    	, 'test-instance'	, '')
+		stringParam('db_name'			, 'DBNAME'		, '')
 		choiceParam('db_username'		, ['Administrator']	, '')
 		nonStoredPasswordParam('db_password'	, 'Do you think that you can see !!')
-		stringParam('db_allocated_storage'	, '5'			, 'in GBs')
+		stringParam('db_allocated_storage'	, '10'			, 'in GBs')
 		choiceParam('db_multi_az'		, ['false','true']	, '')
 		choiceParam('createInstance'		, ['true','false']	, '')
 		stringParam('db_R53_name'		, 'R53_Name'		, '')
@@ -37,6 +37,7 @@ pipelineJob('rds_build_job') {
         }
 }
 
+// RDS Build Generic Job
 pipelineJob('rds_build_gen_job') {
         description('Explains how to use Jenins Approval for Build Jobs')
         logRotator(-1,-1)
@@ -46,17 +47,16 @@ pipelineJob('rds_build_gen_job') {
                 choiceParam('gitCreds'                  , [gitCreds]            , '')
                 choiceParam('tfstateBucket'             , [terraformTFstateBucket]      , 'TF State Bucket'             )
                 choiceParam('tfstateBucketPrefix'       , [terraformTFstateBucketPrefix], 'TF State Bucket Prefix'      )
-                choiceParam('tfLogLevel'                , ['ERROR','WARN','INFO','DEBUG','TRACE'],                      ,'')
                 choiceParam('db_rds'			, ['postgres','oracle','mssql','mariadb','mysql','aurora']      ,'')
-		stringParam('db_engine'                 , 'db_engine'           , '')
-                stringParam('db_engine_version'         , 'db_version'          , '')
-		stringParam('db_engine_major_version'	, 'db_major_eng_version', '')
+		stringParam('db_engine'                 , 'postgres,oracle-se1'	, '')
+                stringParam('db_engine_version'         , '9.6.11,11.2.0.4.v21'	, '')
+		stringParam('db_engine_major_version'	, '9.6,11.2'		, '')
                 choiceParam('db_instance_class'         , ['db.t2.small']       , '')
-                stringParam('db_identifier'             , 'instance_name'       , '')
-                stringParam('db_name'                   , 'db_name'             , '')
+                stringParam('db_identifier'             , 'test-instance'       , '')
+                stringParam('db_name'                   , 'DBNAME'		, '')
                 choiceParam('db_username'               , ['Administrator']     , '')
                 nonStoredPasswordParam('db_password'    , 'Do you think that you can see !!')
-                stringParam('db_allocated_storage'      , '5'                   , 'in GBs')
+                stringParam('db_allocated_storage'      , '10'			, 'in GBs')
                 choiceParam('db_multi_az'               , ['false','true']      , '')
                 choiceParam('createInstance'            , ['true','false']      , '')
                 stringParam('db_R53_name'               , 'R53_Name'            , '')
