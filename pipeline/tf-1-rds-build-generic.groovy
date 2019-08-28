@@ -21,11 +21,13 @@
 *	createInstanceDNS
 *	terraformApplyPlan
 
+Error
 	local variable	: Use def keyword
 	global variable	: No def keyword
 	
 	sqlserver-ex	: Engine sqlserver-ex does not support encryption at rest
 	sqlserver-web 	: DBName must be null for engine
+	sqlserver-se	: DBName must be null for engine
 */
 
 node('master') {
