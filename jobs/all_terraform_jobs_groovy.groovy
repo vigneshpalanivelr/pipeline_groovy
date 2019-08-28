@@ -38,7 +38,7 @@ pipelineJob('tf-1-rds-build-generic-job') {
 }
 
 // RDS Build Mysql Job
-pipelineJob('tf-1-rds-build-generic-job') {
+pipelineJob('tf-2-rds-build-generic-job') {
         description('Explains how to use Jenins Approval for Build Jobs')
         logRotator(-1,-1)
         parameters{
@@ -64,7 +64,7 @@ pipelineJob('tf-1-rds-build-generic-job') {
         }
         definition {
                 cps {
-                        script(readFileFromWorkspace('pipeline/tf-1-rds-build-generic.groovy'))
+                        script(readFileFromWorkspace('pipeline/tf-2-rds-build-generic.groovy'))
                         sandbox()
                 }
         }
