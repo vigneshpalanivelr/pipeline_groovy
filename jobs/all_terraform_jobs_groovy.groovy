@@ -55,7 +55,7 @@ pipelineJob('tf-2-rds-build-generic-job') {
                 choiceParam('db_name'                   , ['DBNAME']                    , '')
                 choiceParam('db_username'               , ['Administrator']             , '')
                 nonStoredPasswordParam('db_password'    , 'Do you think that you can see !!')
-                stringParam('db_allocated_storage'      , ['20','10']			, 'in GBs')
+                choiceParam('db_allocated_storage'      , ['20','10']			, 'in GBs')
                 choiceParam('db_multi_az'               , ['false','true']              , '')
                 choiceParam('createInstance'            , ['true','false']              , '')
                 stringParam('db_R53_name'               , 'R53_Name'                    , '')
