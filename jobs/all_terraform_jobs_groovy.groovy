@@ -52,7 +52,7 @@ pipelineJob('tf-2-rds-build-generic-job') {
                 stringParam('db_engine_version'         , '14.00.1000.169.v1'		, '')
                 choiceParam('db_instance_class'         , ['db.t2.small']               , '')
                 stringParam('db_identifier'             , 'test-instance'               , '')
-                choiceParam('db_name'                   , ['','DBNAME']                 , '')
+                choiceParam('db_name'                   , [null,'DBNAME']               , '')
                 choiceParam('db_username'               , ['Administrator']             , '')
                 nonStoredPasswordParam('db_password'    , 'Do you think that you can see !!')
                 choiceParam('db_allocated_storage'      , ['20','10']			, 'in GBs')
