@@ -36,3 +36,36 @@ pipelineJob('tf-1-rds-build-generic-job') {
                 }
         }
 }
+
+// RDS Build Mysql Job
+pipelineJob('tf-1-rds-build-generic-job') {
+        description('Explains how to use Jenins Approval for Build Jobs')
+        logRotator(-1,-1)
+        parameters{
+                choiceParam('gitRepo'                   , [terraformRepo]               , '')
+                choiceParam('gitBranch'                 , [terraformBranch]             , '')
+                choiceParam('gitCreds'                  , [gitCreds]                    , '')
+                choiceParam('tfstateBucket'             , [terraformTFstateBucket]      , 'TF State Bucket'             )
+                choiceParam('tfstateBucketPrefix'       , [terraformTFstateBucketPrefix], 'TF State Bucket Prefix'      )
+                stringParam('db_family'                 , 'mysql8.0' 			, '')
+                stringParam('db_engine'                 , 'mysql'			, '')
+                stringParam('db_engine_version'         , '8.0.15'			, '')
+                choiceParam('db_instance_class'         , ['db.t2.small']               , '')
+                stringParam('db_identifier'             , 'test-instance-mysql'         , '')
+                stringParam('db_name'                   , 'DBNAME'                      , '')
+                choiceParam('db_username'               , ['Administrator']             , '')
+                nonStoredPasswordParam('db_password'    , 'Do you think that you can see !!')
+                stringParam('db_allocated_storage'      , '10'                          , 'in GBs')
+                choiceParam('db_multi_az'               , ['false','true']              , '')
+                choiceParam('createInstance'            , ['true','false']              , '')
+                stringParam('db_R53_name'               , 'R53_Name'                    , '')
+                choiceParam('createInstanceDNS'         , ['true','false']              , '')
+                choiceParam('terraformApplyPlan'        , ['plan','apply','plan-destroy','destroy']     , '')
+        }
+        definition {
+                cps {
+                        script(readFileFromWorkspace('pipeline/tf-1-rds-build-generic.groovy'))
+                        sandbox()
+                }
+        }
+}
