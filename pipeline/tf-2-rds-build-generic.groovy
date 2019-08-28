@@ -27,7 +27,7 @@
 
 node('master') {
 
-	terraformDirectoryRDS	= "modules/all_modules/${tfstateBucketPrefix}_mssql"
+	terraformDirectoryRDS	= "modules/all_modules/${tfstateBucketPrefix}_sqlserver"
 	global_tfvars   	= "../../../variables/global_vars.tfvars"
 	rds_tfvars      	= "../../../variables/rds-sqlserver.tfvars"
 	db_rds 			= (db_engine		=~ /[a-zA-Z]+/)[0]
