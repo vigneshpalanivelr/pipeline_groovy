@@ -62,6 +62,8 @@ node('master') {
 		checkout()
 		//Create RDS Instance
 		if ((includeInstance == 'true') && (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply')) {
+	date 			= new Date()
+	println date
 			dir(terraformDirectoryRDS) {
 				stage('RDS Init') {
 					terraform_rds_init()
@@ -86,6 +88,8 @@ node('master') {
 		}
 		//Create RDS DNS
 		if ((includeInstanceDNS == 'true') && (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply')) {
+	date 			= new Date()
+	println date
 			dir(terraformDirectoryDNS) {
 				stage('DNS Init') {
 					terraform_dns_init()
@@ -108,6 +112,8 @@ node('master') {
 		}
 		//Destroy RDS DNS
 		if ((includeInstanceDNS == 'true') && (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy')) {
+	date 			= new Date()
+	println date
 			dir(terraformDirectoryDNS) {
 				stage('DNS Init') {
 					terraform_rds_init()
@@ -130,6 +136,8 @@ node('master') {
 		}
 		//Destroy RDS Instance
 		if ((includeInstance == 'true') && (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy')) {
+	date 			= new Date()
+	println date
 			dir(terraformDirectoryRDS) {
 				stage('RDS Init') {
 					terraform_rds_init()
