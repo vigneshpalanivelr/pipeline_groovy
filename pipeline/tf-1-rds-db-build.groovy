@@ -110,7 +110,7 @@ node('master') {
 		if ((includeInstanceDNS == 'true') && (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy')) {
 			dir(terraformDirectoryDNS) {
 				stage('DNS Init') {
-					terraform_rds_init()
+					terraform_dns_init()
 				}
 				if (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy') {
 					stage('DNS Destroy Plan') {
