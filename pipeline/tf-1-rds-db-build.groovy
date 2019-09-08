@@ -32,7 +32,7 @@ Error
 
 node('master') {
 
-	terraformDirectoryRDS	= "modules/all_modules/${tfstateBucketPrefix}"
+	terraformDirectoryRDS	= "modules/all_modules/${tfstateBucketPrefixRDS}"
 	terraformDirectoryDNS	= "modules/all_modules/rds_dns_module"
 
 	global_tfvars   	= "../../../variables/global_vars.tfvars"
