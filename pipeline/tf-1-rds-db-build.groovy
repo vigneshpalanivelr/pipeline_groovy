@@ -20,7 +20,6 @@
 *	createInstance
 *	createInstanceDNS
 *	terraformApplyPlan
-
 Error
 	local variable	: Use def keyword
 	global variable	: No def keyword
@@ -32,7 +31,7 @@ Error
 
 node('master') {
 
-	terraformDirectoryRDS	= "modules/all_modules/${tfstateBucketPrefixRDS}"
+	terraformDirectoryRDS	= "modules/all_modules/rds_module"
 	terraformDirectoryDNS	= "modules/all_modules/rds_dns_module"
 
 	global_tfvars   	= "../../../variables/global_vars.tfvars"
