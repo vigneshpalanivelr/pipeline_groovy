@@ -16,7 +16,7 @@
 node ('master'){
 	terraformDirectory	= "modules/all_modules/${tfstateBucketPrefix}"
 	global_tfvars   	= "../../../variables/global_vars.tfvars"
-	r53a_tfvars		= "../../../variables/r53a_vars.tfvars"
+	r53_tfvars		= "../../../variables/r53_vars.tfvars"
 	date 			= new Date()
 
 	println date
@@ -38,7 +38,7 @@ node ('master'){
 				if (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply') {
 					stage('Terraform Plan') {
 						set_env_variables()
-						terraform_plan(global_tfvars,r53a_tfvars)
+						terraform_plan(global_tfvars,r53_tfvars)
 					}
 				}
 				if (terraformApplyPlan == 'apply') {
@@ -52,7 +52,7 @@ node ('master'){
 				if (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy') {
 					stage('Plan Destroy') {
 						set_env_variables()
-						terraform_plan_destroy(global_tfvars,r53a_tfvars)
+						terraform_plan_destroy(global_tfvars,r53_tfvars)
 					}
 				}
 				if (terraformApplyPlan == 'destroy') {
@@ -109,16 +109,16 @@ def terraform_init() {
 	}
 }
 
-def terraform_plan(global_tfvars,rds_tfvars) {
-	sh "terraform plan -no-color -out=tfplan -input=false -var-file=${global_tfvars} -var-file=${r53a_tfvars}"
+def terraform_plan(global_tfvars,r53_tfvars) {
+	sh "terraform plan -no-color -out=tfplan -input=false -var-file=${global_tfvars} -var-file=${r53_tfvars}"
 }
 
 def terraform_apply() {
 	sh "terraform apply -no-color -input=false tfplan"
 }
 
-def terraform_plan_destroy(global_tfvars,rds_tfvars) {
-        sh "terraform plan -destroy -no-color -out=tfdestroy -input=false -var-file=${global_tfvars} -var-file=${r53a_tfvars}"
+def terraform_plan_destroy(global_tfvars,r53_tfvars) {
+        sh "terraform plan -destroy -no-color -out=tfdestroy -input=false -var-file=${global_tfvars} -var-file=${r53_tfvars}"
 }
 
 def terraform_destroy() {
