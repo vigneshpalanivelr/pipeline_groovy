@@ -36,7 +36,7 @@ node('master') {
 
 	global_tfvars   	= "../../../variables/global_vars.tfvars"
 	rds_tfvars      	= "../../../variables/rds_vars.tfvars"
-	rds_dns_tfvars		= "../../../variables/rds_dns_tfvars.tfvars"
+	rds_dns_tfvars		= "../../../variables/rds_dns_vars.tfvars"
 
 	db_rds 			= (db_engine		=~ /[a-zA-Z]+/)[0]
 	db_engine_major_version = (db_engine_version	=~ /\d+.\d+/)[0]
@@ -92,11 +92,7 @@ node('master') {
 				}
 			}
 		}
-			date 		= new Date()
-			println date
 		if (includeInstanceDNS == 'true') {
-			date 		= new Date()
-			println date
 			dir(terraformDirectoryDNS) {
 				date 		= new Date()
 				println date
