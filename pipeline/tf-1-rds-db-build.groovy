@@ -53,8 +53,8 @@ node('master') {
 	}
 	stage('Checkout') {
 		checkout()
-		if (includeInstance == 'true'){
-			dir(terraformDirectoryRDS){
+		if (includeInstance == 'true') {
+			dir(terraformDirectoryRDS) {
 				stage('Remote State Init') {
 					terraform_rds_init()
 				}
@@ -92,6 +92,8 @@ node('master') {
 				}
 			}
 		}
+			date 		= new Date()
+			println date
 		if (includeInstanceDNS == 'true') {
 			date 		= new Date()
 			println date
@@ -131,6 +133,8 @@ node('master') {
                                 }
 			}
 		}
+			date 		= new Date()
+			println date
 	}
 }
 
