@@ -28,7 +28,7 @@ node ('master'){
 
 	stage('Checkout') {
 		checkout()
-		if (createR53Zone == 'true') {
+		if (includeR53Zone == 'true') {
 			dir(terraformDirectory) {
 				stage('Remote State Init') {
 					terraform_init()
