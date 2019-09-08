@@ -4,6 +4,7 @@ def gitCreds            		= "GitCred"
 def tfStateBucket			= "terraform-tfstate-mumbai"
 def tfStateBucketPrefixRDS		= "rds_module"
 def tfStateBucketPrefixR53		= "r53_module"
+def tfStateBucketPrefixR53a		= "r53a_module"
 
 // RDS DB Build Generic Job
 pipelineJob('tf-1-rds-db-build-job') {
@@ -56,6 +57,30 @@ pipelineJob('tf-1-route53-zone-build-job') {
         definition {
                 cps {
                         script(readFileFromWorkspace('pipeline/tf-1-route53-zone-build.groovy'))
+                        sandbox()
+                }
+        }
+}
+
+// Route53 A record Creation
+pipelineJob('tf-1-route53a-record-build-job') {
+        description('Explains how to use Jenins Approval for Build Jobs')
+        logRotator(-1,-1)
+        parameters{
+                choiceParam('gitRepo'                   , [terraformRepo]       	, '')
+                choiceParam('gitBranch'                 , [terraformBranch]     	, '')
+                choiceParam('gitCreds'                  , [gitCreds]            	, '')
+                choiceParam('tfstateBucket'             , [tfStateBucket]      		, 'TF State Bucket'             )
+                choiceParam('tfstateBucketPrefix'       , [tfStateBucketPrefixR53]	, 'TF State Bucket Prefix'      )
+		stringParam('r53_zone_name'		, 'vignesh-private-zone'	, '')
+		stringParam('r53a_record_name'		, 'vignesh-private-a-record'	, '')
+		stringParam('r53a_records'		, ''				, 'Ip address')
+		choiceParam('createR53aRecord'		, ['true','false']      	, '')
+		choiceParam('terraformApplyPlan'        , ['plan','apply','plan-destroy','destroy']	, '')
+	}
+        definition {
+                cps {
+                        script(readFileFromWorkspace('pipeline/tf-1-route53a-record-build.groovy'))
                         sandbox()
                 }
         }
