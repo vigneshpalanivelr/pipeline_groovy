@@ -27,6 +27,13 @@ Error
 	sqlserver-ex	: Engine sqlserver-ex does not support encryption at rest
 	sqlserver-web 	: DBName must be null for engine
 	sqlserver-se	: DBName must be null for engine
+	
+Steps
+	1)	Create RDS Instance
+	2)	Create RDS DNS
+	3)	Destroy RDS DNS
+	4)	Destroy RDS Instance
+	5)	Defined all the required functions
 */
 
 node('master') {
@@ -53,6 +60,7 @@ node('master') {
 	}
 	stage('Checkout') {
 		checkout()
+		//Create RDS Instance
 		if (includeInstance == 'true') {
 			dir(terraformDirectoryRDS) {
 				stage('Remote State Init') {
@@ -76,27 +84,29 @@ node('master') {
 				}
 			}
 		}
+		//Create RDS DNS
 		if (includeInstanceDNS == 'true') {
 			dir(terraformDirectoryDNS) {
 				stage('Remote State Init') {
 					terraform_dns_init()
+				}
+				if (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply') {
+					stage('Terraform Plan') {
+						set_env_variables()
+						terraform_dns_plan(global_tfvars,rds_dns_tfvars)
 					}
-					if (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply') {
-						stage('Terraform Plan') {
-							set_env_variables()
-							terraform_dns_plan(global_tfvars,rds_dns_tfvars)
-						}
+				}
+				if (terraformApplyPlan == 'apply') {
+					stage('Approve Plan'){
+						approval()
 					}
-					if (terraformApplyPlan == 'apply') {
-						stage('Approve Plan'){
-							approval()
-						}
-						stage('Terraform Apply') {
-							terraform_dns_apply()
-						}
+					stage('Terraform Apply') {
+						terraform_dns_apply()
 					}
 				}
 			}
+		}
+		//Destroy RDS DNS
 		if (includeInstanceDNS == 'true') {
 			dir(terraformDirectoryDNS) {
 				stage('Remote State Init') {
@@ -118,6 +128,7 @@ node('master') {
 				}
 			}
 		}
+		//Destroy RDS Instance
 		if (includeInstance == 'true') {
 			dir(terraformDirectoryRDS) {
 				stage('Remote State Init') {
@@ -145,6 +156,7 @@ node('master') {
 	}
 }
 
+//Common functions
 def approval() {
 	timeout(time: 15, unit: 'SECONDS') {
 		input(
@@ -153,7 +165,6 @@ def approval() {
 		)
 	}
 }
-
 def checkout() {
 	checkout([
 		$class: 'GitSCM', 
@@ -171,7 +182,6 @@ def checkout() {
 		userRemoteConfigs: [[credentialsId: gitCreds, url: gitRepo]]
 	])
 }
-
 def set_env_variables() {
 	env.TF_VAR_db_family            	= "${db_family}"
 	env.TF_VAR_db_engine            	= "${db_engine}"
@@ -187,6 +197,7 @@ def set_env_variables() {
 	env.TF_VAR_db_engine_major_version	= "${db_engine_major_version}"
 }
 
+//RDS Instance creation-destroy functions
 def terraform_rds_init() {
 	withEnv(["GIT_ASKPASS=${WORKSPACE}/askp-${BUILD_TAG}"]){
 		withCredentials([usernamePassword(credentialsId: gitCreds, usernameVariable: 'STASH_USERNAME', passwordVariable: 'STASH_PASSWORD')]) {
@@ -194,23 +205,20 @@ def terraform_rds_init() {
 		}
 	}
 }
-
 def terraform_rds_plan(global_tfvars,rds_tfvars) {
 	sh "terraform plan -no-color -out=tfplan -input=false -var-file=${global_tfvars} -var-file=${rds_tfvars}"
 }
-
 def terraform_rds_apply() {
 	sh "terraform apply -no-color -input=false tfplan"
 }
-
 def terraform_rds_plan_destroy(global_tfvars,rds_tfvars) {
 	sh "terraform plan -destroy -no-color -out=tfdestroy -input=false -var-file=${global_tfvars} -var-file=${rds_tfvars}"
 }
-
 def terraform_rds_destroy() {
 	sh "terraform apply -no-color -input=false tfdestroy"
 }
 
+//RDS DNS creation/destroy functions
 def terraform_dns_init() {
 	withEnv(["GIT_ASKPASS=${WORKSPACE}/askp-${BUILD_TAG}"]){
 		withCredentials([usernamePassword(credentialsId: gitCreds, usernameVariable: 'STASH_USERNAME', passwordVariable: 'STASH_PASSWORD')]) {
@@ -218,19 +226,15 @@ def terraform_dns_init() {
 		}
 	}
 }
-
 def terraform_dns_plan(global_tfvars,rds_dns_tfvars) {
 	sh "terraform plan -no-color -out=tfplan -input=false -var-file=${global_tfvars} -var-file=${rds_dns_tfvars}"
 }
-
 def terraform_dns_apply() {
 	sh "terraform apply -no-color -input=false tfplan"
 }
-
 def terraform_dns_plan_destroy(global_tfvars,rds_dns_tfvars) {
 	sh "terraform plan -destroy -no-color -out=tfdestroy -input=false -var-file=${global_tfvars} -var-file=${rds_dns_tfvars}"
 }
-
 def terraform_dns_destroy() {
 	sh "terraform apply -no-color -input=false tfdestroy"
 }
