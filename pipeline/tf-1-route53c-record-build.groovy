@@ -30,7 +30,7 @@ node ('master'){
 
 	stage('Checkout') {
 		checkout()
-		if (createR53aRecord == 'true') {
+		if (createR53cRecord == 'true') {
 			dir(terraformDirectory) {
 				stage('Remote State Init') {
 					terraform_init()
