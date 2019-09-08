@@ -99,6 +99,7 @@ def set_env_variables() {
 	env.TF_VAR_r53_zone_name            	= "${r53_zone_name}"
 	env.TF_VAR_r53_record_name		= "${r53_record_name}"
         env.TF_VAR_r53_records 			= "${r53_records}"
+	env.TF_VAR_r53_record_type		= "${r53_record_type}"
 }
 
 def terraform_init() {
