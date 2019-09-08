@@ -88,7 +88,7 @@ pipelineJob('tf-1-route53a-record-build-job') {
 }
 
 // Route53 C Name Creation
-pipelineJob('tf-1-route53a-record-build-job') {
+pipelineJob('tf-1-route53c-record-build-job') {
         description('Explains how to use Jenins Approval for Build Jobs')
         logRotator(-1,-1)
         parameters{
@@ -106,7 +106,7 @@ pipelineJob('tf-1-route53a-record-build-job') {
 	}
         definition {
                 cps {
-                        script(readFileFromWorkspace('pipeline/tf-1-route53a-record-build.groovy'))
+                        script(readFileFromWorkspace('pipeline/tf-1-route53c-record-build.groovy'))
                         sandbox()
                 }
         }
