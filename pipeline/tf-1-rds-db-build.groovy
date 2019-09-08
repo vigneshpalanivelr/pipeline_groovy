@@ -99,10 +99,8 @@ node('master') {
                                 }
                                 if (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply') {
                                         stage('Terraform Plan'){
-                                                withEnv(["TF_VAR_db_password=${db_password}"]){
-                                                        set_env_variables()
-                                                        terraform_dns_plan(global_tfvars,rds_tfvars)
-                                                }
+						set_env_variables()
+						terraform_dns_plan(global_tfvars,rds_dns_tfvars)
                                         }
                                 }
                                 if (terraformApplyPlan == 'apply') {
@@ -115,10 +113,8 @@ node('master') {
                                 }
                                 if (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy') {
                                         stage('Plan Destroy'){
-                                                withEnv(["TF_VAR_db_password=${db_password}"]){
-                                                        set_env_variables()
-                                                        terraform_dns_plan_destroy(global_tfvars,rds_tfvars)
-                                                }
+						set_env_variables()
+						terraform_dns_plan_destroy(global_tfvars,rds_dns_tfvars)
                                         }
                                 }
                                 if (terraformApplyPlan == 'destroy') {
