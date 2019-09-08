@@ -14,7 +14,7 @@
 node ('master'){
 	terraformDirectoryR53	= "modules/all_modules/${tfstateBucketPrefix}"
 	global_tfvars   	= "../../../variables/global_vars.tfvars"
-	r53_tfvars		= "../../../variables/r53_tfvars.tfvars"
+	r53_tfvars		= "../../../variables/r53_vars.tfvars"
 	date 			= new Date()
 
 	println date
