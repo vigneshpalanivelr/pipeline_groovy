@@ -49,7 +49,7 @@ node('master') {
 	}
 	stage('Checkout') {
 		checkout()
-		if (createInstance == 'true'){
+		if (includeInstance == 'true'){
 			dir(terraformDirectory){
 				stage('Remote State Init') {
 					terraform_init()
