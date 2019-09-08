@@ -26,9 +26,9 @@ pipelineJob('tf-1-rds-db-build-job') {
                 nonStoredPasswordParam('db_password'    , 'Do you think that you can see !!')
                 choiceParam('db_allocated_storage'      , ['10']			, 'in GBs')
                 choiceParam('db_multi_az'               , ['false','true']      	, '')
-                choiceParam('createInstance'            , ['true','false']      	, '')
+                choiceParam('includeInstance'            , ['true','false']      	, '')
                 stringParam('db_R53_name'               , 'R53_Name'            	, '')
-                choiceParam('createInstanceDNS'         , ['true','false']      	, '')
+                choiceParam('includeInstanceDNS'         , ['true','false']      	, '')
                 choiceParam('terraformApplyPlan'        , ['plan','apply','plan-destroy','destroy']	, '')
         }
         definition {
@@ -51,7 +51,7 @@ pipelineJob('tf-1-route53-zone-build-job') {
                 choiceParam('tfstateBucketPrefix'       , [tfStateBucketPrefixR53]	, 'TF State Bucket Prefix'      )
 		stringParam('r53_zone_name'		, 'vignesh-private-zone'	, '')
                 stringParam('vpc_name'			, 'Default_VPC'			, '')
-		choiceParam('createR53Zone'		, ['true','false']      	, '')
+		choiceParam('includeR53Zone'		, ['true','false']      	, '')
 		choiceParam('terraformApplyPlan'        , ['plan','apply','plan-destroy','destroy']	, '')
 	}
         definition {
@@ -76,7 +76,7 @@ pipelineJob('tf-1-route53ac-record-build-job') {
 		stringParam('r53_record_name'		, 'postgres-r53,ec2-r53'	, '')
 		stringParam('r53_records'		, ''				, 'ip-address | end-point')
 		choiceParam('r53_record_type'		, ['A','CNAME']      		, 'A : ip-address | CNAME : end-point')
-		choiceParam('createR53acRecord'		, ['true','false']      	, '')
+		choiceParam('includeR53acRecord'		, ['true','false']      	, '')
 		choiceParam('terraformApplyPlan'        , ['plan','apply','plan-destroy','destroy']	, '')
 	}
         definition {
