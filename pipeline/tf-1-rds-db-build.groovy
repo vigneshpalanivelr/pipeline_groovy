@@ -32,7 +32,7 @@ Error
 
 node('master') {
 
-	terraformDirectoryRDS	= "modules/all_modules/${tfstateBucketPrefix}"
+	terraformDirectory	= "modules/all_modules/${tfstateBucketPrefix}"
 	global_tfvars   	= "../../../variables/global_vars.tfvars"
 	rds_tfvars      	= "../../../variables/rds_vars.tfvars"
 	db_rds 			= (db_engine		=~ /[a-zA-Z]+/)[0]
@@ -50,7 +50,7 @@ node('master') {
 	stage('Checkout') {
 		checkout()
 		if (createInstance == 'true'){
-			dir(terraformDirectoryRDS){
+			dir(terraformDirectory){
 				stage('Remote State Init') {
 					terraform_init()
 				}
