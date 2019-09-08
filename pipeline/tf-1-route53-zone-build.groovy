@@ -106,7 +106,7 @@ def terraform_init() {
 	}
 }
 
-def terraform_plan(global_tfvars,rds_tfvars) {
+def terraform_plan(global_tfvars,r53_tfvars) {
 	sh "terraform plan -no-color -out=tfplan -input=false -var-file=${global_tfvars} -var-file=${r53_tfvars}"
 }
 
@@ -114,7 +114,7 @@ def terraform_apply() {
 	sh "terraform apply -no-color -input=false tfplan"
 }
 
-def terraform_plan_destroy(global_tfvars,rds_tfvars) {
+def terraform_plan_destroy(global_tfvars,r53_tfvars) {
         sh "terraform plan -destroy -no-color -out=tfdestroy -input=false -var-file=${global_tfvars} -var-file=${r53_tfvars}"
 }
 
