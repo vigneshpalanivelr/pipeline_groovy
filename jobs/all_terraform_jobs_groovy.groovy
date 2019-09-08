@@ -76,7 +76,7 @@ pipelineJob('tf-1-route53ac-record-build-job') {
 		stringParam('r53_record_name'		, 'postgres-r53,ec2-r53'	, '')
 		stringParam('r53_records'		, ''				, 'ip-address | end-point')
 		choiceParam('r53_record_type'		, ['A','CNAME']      		, 'A : ip-address | CNAME : end-point')
-		choiceParam('includeR53acRecord'		, ['true','false']      	, '')
+		choiceParam('includeR53acRecord'	, ['true','false']      	, '')
 		choiceParam('terraformApplyPlan'        , ['plan','apply','plan-destroy','destroy']	, '')
 	}
         definition {
