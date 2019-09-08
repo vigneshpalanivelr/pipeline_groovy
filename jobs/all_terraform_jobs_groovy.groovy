@@ -51,6 +51,7 @@ pipelineJob('tf-1-route53-zone-build-job') {
 		stringParam('r53_zone_name'		, '', '')
 		stringParam('r53_zone_description'	, '', 'Private | Public + r53_zone_name')
                 stringParam('vpc_name'			, '', '')
+		choiceParam('terraformApplyPlan'        , ['plan','apply','plan-destroy','destroy']	, '')
 	}
         definition {
                 cps {
