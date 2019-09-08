@@ -71,7 +71,7 @@ pipelineJob('tf-1-route53a-record-build-job') {
                 choiceParam('gitBranch'                 , [terraformBranch]     	, '')
                 choiceParam('gitCreds'                  , [gitCreds]            	, '')
                 choiceParam('tfstateBucket'             , [tfStateBucket]      		, 'TF State Bucket'             )
-                choiceParam('tfstateBucketPrefix'       , [tfStateBucketPrefixR53]	, 'TF State Bucket Prefix'      )
+                choiceParam('tfstateBucketPrefix'       , [tfStateBucketPrefixR53a]	, 'TF State Bucket Prefix'      )
 		stringParam('r53_zone_name'		, 'vignesh-private-zone'	, '')
 		stringParam('r53a_record_name'		, 'vignesh-private-a-record'	, '')
 		stringParam('r53a_records'		, ''				, 'Ip address')
