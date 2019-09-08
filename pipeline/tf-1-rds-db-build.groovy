@@ -34,7 +34,7 @@ node('master') {
 
 	terraformDirectoryRDS	= "modules/all_modules/${tfstateBucketPrefix}"
 	global_tfvars   	= "../../../variables/global_vars.tfvars"
-	rds_tfvars      	= "../../../variables/rds.tfvars"
+	rds_tfvars      	= "../../../variables/rds_vars.tfvars"
 	db_rds 			= (db_engine		=~ /[a-zA-Z]+/)[0]
 	db_engine_major_version = (db_engine_version	=~ /\d+.\d+/)[0]
 	date 			= new Date()
