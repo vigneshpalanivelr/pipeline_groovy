@@ -92,7 +92,7 @@ node('master') {
 				}
 			}
 		}
-		if (includeInstanceDNS == true) {
+		if (includeInstanceDNS == 'true') {
 			dir(terraformDirectoryDNS) {
                                 stage('Remote State Init') {
                                         terraform_dns_init()
