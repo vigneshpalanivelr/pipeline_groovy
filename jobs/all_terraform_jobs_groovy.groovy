@@ -48,8 +48,8 @@ pipelineJob('tf-1-route53-zone-build-job') {
                 choiceParam('gitCreds'                  , [gitCreds]            	, '')
                 choiceParam('tfstateBucket'             , [tfStateBucket]      		, 'TF State Bucket'             )
                 choiceParam('tfstateBucketPrefix'       , [tfStateBucketPrefixR53]	, 'TF State Bucket Prefix'      )
-		stringParam('r53_zone_name'		, '', '')
-                stringParam('vpc_name'			, '', '')
+		stringParam('r53_zone_name'		, 'vignesh-private-zone'	, '')
+                stringParam('vpc_name'			, 'Default_VPC'			, '')
 		choiceParam('terraformApplyPlan'        , ['plan','apply','plan-destroy','destroy']	, '')
 	}
         definition {
