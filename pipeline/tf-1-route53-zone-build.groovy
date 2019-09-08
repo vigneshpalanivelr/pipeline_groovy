@@ -12,7 +12,7 @@
 */
 
 node ('master'){
-	terraformDirectoryR53	= "modules/all_modules/${tfstateBucketPrefix}"
+	terraformDirectory	= "modules/all_modules/${tfstateBucketPrefix}"
 	global_tfvars   	= "../../../variables/global_vars.tfvars"
 	r53_tfvars		= "../../../variables/r53_vars.tfvars"
 	date 			= new Date()
@@ -29,7 +29,7 @@ node ('master'){
 	stage('Checkout') {
 		checkout()
 		if (createR53Zone == 'true') {
-			dir(terraformDirectoryR53) {
+			dir(terraformDirectory) {
 				stage('Remote State Init') {
 					terraform_init()
 				}
