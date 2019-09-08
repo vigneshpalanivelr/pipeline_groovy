@@ -32,15 +32,20 @@ Error
 
 node('master') {
 
-	terraformDirectory	= "modules/all_modules/${tfstateBucketPrefix}"
+	terraformDirectoryRDS	= "modules/all_modules/${tfstateBucketPrefix}"
+	terraformDirectoryDNS	= "modules/all_modules/rds_dns_module"
+
 	global_tfvars   	= "../../../variables/global_vars.tfvars"
 	rds_tfvars      	= "../../../variables/rds_vars.tfvars"
+	rds_dns_tfvars		= "../../../variables/rds_dns_tfvars.tfvars"
+
 	db_rds 			= (db_engine		=~ /[a-zA-Z]+/)[0]
 	db_engine_major_version = (db_engine_version	=~ /\d+.\d+/)[0]
 	date 			= new Date()
 
 	println date
 	
+
 	writeFile(file: "askp-${BUILD_TAG}",text:"#!/bin/bash\ncase \"\$1\" in\nUsername*) echo \"\${STASH_USERNAME}\" ;;\nPassword*) \"\${STASH_PASSWORD}\" ;;\nesac")
 	sh "chmod a+x askp-${BUILD_TAG}"
 	
@@ -50,15 +55,15 @@ node('master') {
 	stage('Checkout') {
 		checkout()
 		if (includeInstance == 'true'){
-			dir(terraformDirectory){
+			dir(terraformDirectoryRDS){
 				stage('Remote State Init') {
-					terraform_init()
+					terraform_rds_init()
 				}
 				if (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply') {
 					stage('Terraform Plan'){
 						withEnv(["TF_VAR_db_password=${db_password}"]){
 							set_env_variables()
-                		               		terraform_plan(global_tfvars,rds_tfvars)
+                		               		terraform_rds_plan(global_tfvars,rds_tfvars)
 						}
 					}
 				}
@@ -67,14 +72,14 @@ node('master') {
 						approval()
 					}
 					stage('Terraform Apply'){
-						terraform_apply()
+						terraform_rds_apply()
 					}
 				}
 				if (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy') {
 					stage('Plan Destroy'){
                                                 withEnv(["TF_VAR_db_password=${db_password}"]){
 							set_env_variables()
-	        	                        	terraform_plan_destroy(global_tfvars,rds_tfvars)
+	        	                        	terraform_rds_plan_destroy(global_tfvars,rds_tfvars)
 						}
 					}
 				}
@@ -83,9 +88,48 @@ node('master') {
                                                 approval()
                                 	}
 					stage(' Destroy'){
-                                                terraform_destroy()
+                                                terraform_rds_destroy()
                                 	}
 				}
+			}
+		}
+		if (includeInstanceDNS == true) {
+			dir(terraformDirectoryDNS) {
+                                stage('Remote State Init') {
+                                        terraform_dns_init()
+                                }
+                                if (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply') {
+                                        stage('Terraform Plan'){
+                                                withEnv(["TF_VAR_db_password=${db_password}"]){
+                                                        set_env_variables()
+                                                        terraform_dns_plan(global_tfvars,rds_tfvars)
+                                                }
+                                        }
+                                }
+                                if (terraformApplyPlan == 'apply') {
+                                        stage('Approve Plan'){
+                                                approval()
+                                        }
+                                        stage('Terraform Apply'){
+                                                terraform_dns_apply()
+                                        }
+                                }
+                                if (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy') {
+                                        stage('Plan Destroy'){
+                                                withEnv(["TF_VAR_db_password=${db_password}"]){
+                                                        set_env_variables()
+                                                        terraform_dns_plan_destroy(global_tfvars,rds_tfvars)
+                                                }
+                                        }
+                                }
+                                if (terraformApplyPlan == 'destroy') {
+                                        stage('Approve Destroy'){
+                                                approval()
+                                        }
+                                        stage(' Destroy'){
+                                                terraform_dns_destroy()
+                                        }
+                                }
 			}
 		}
 	}
@@ -134,26 +178,50 @@ def set_env_variables() {
 	env.TF_VAR_db_engine_major_version	= "${db_engine_major_version}"
 }
 
-def terraform_init() {
+def terraform_rds_init() {
 	withEnv(["GIT_ASKPASS=${WORKSPACE}/askp-${BUILD_TAG}"]){
 		withCredentials([usernamePassword(credentialsId: gitCreds, usernameVariable: 'STASH_USERNAME', passwordVariable: 'STASH_PASSWORD')]) {
-			sh "terraform init -no-color -input=false -upgrade=true -backend=true -force-copy -backend-config='bucket=${tfstateBucket}' -backend-config='key=${tfstateBucketPrefix}/${db_identifier}-${db_rds}-rds.tfstate'"
+			sh "terraform init -no-color -input=false -upgrade=true -backend=true -force-copy -backend-config='bucket=${tfstateBucket}' -backend-config='key=${tfstateBucketPrefixRDS}/${db_identifier}-${db_rds}-rds.tfstate'"
 		}
 	}
 }
 
-def terraform_plan(global_tfvars,rds_tfvars) {
+def terraform_rds_plan(global_tfvars,rds_tfvars) {
 	sh "terraform plan -no-color -out=tfplan -input=false -var-file=${global_tfvars} -var-file=${rds_tfvars}"
 }
 
-def terraform_apply() {
+def terraform_rds_apply() {
 	sh "terraform apply -no-color -input=false tfplan"
 }
 
-def terraform_plan_destroy(global_tfvars,rds_tfvars) {
+def terraform_rds_plan_destroy(global_tfvars,rds_tfvars) {
         sh "terraform plan -destroy -no-color -out=tfdestroy -input=false -var-file=${global_tfvars} -var-file=${rds_tfvars}"
 }
 
-def terraform_destroy() {
+def terraform_rds_destroy() {
+        sh "terraform apply -no-color -input=false tfdestroy"
+}
+
+def terraform_dns_init() {
+        withEnv(["GIT_ASKPASS=${WORKSPACE}/askp-${BUILD_TAG}"]){
+                withCredentials([usernamePassword(credentialsId: gitCreds, usernameVariable: 'STASH_USERNAME', passwordVariable: 'STASH_PASSWORD')]) {
+                        sh "terraform init -no-color -input=false -upgrade=true -backend=true -force-copy -backend-config='bucket=${tfstateBucket}' -backend-config='key=${tfstateBucketPrefixDNS}/${db_identifier}-${db_rds}-dns.tfstate'"
+                }
+        }
+}
+
+def terraform_dns_plan(global_tfvars,rds_dns_tfvars) {
+        sh "terraform plan -no-color -out=tfplan -input=false -var-file=${global_tfvars} -var-file=${rds_dns_tfvars}"
+}
+
+def terraform_dns_apply() {
+        sh "terraform apply -no-color -input=false tfplan"
+}
+
+def terraform_dns_plan_destroy(global_tfvars,rds_dns_tfvars) {
+        sh "terraform plan -destroy -no-color -out=tfdestroy -input=false -var-file=${global_tfvars} -var-file=${rds_dns_tfvars}"
+}
+
+def terraform_dns_destroy() {
         sh "terraform apply -no-color -input=false tfdestroy"
 }

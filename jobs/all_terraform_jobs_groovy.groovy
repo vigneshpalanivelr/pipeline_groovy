@@ -14,8 +14,9 @@ pipelineJob('tf-1-rds-db-build-job') {
                 choiceParam('gitRepo'                   , [terraformRepo]       	, '')
                 choiceParam('gitBranch'                 , [terraformBranch]     	, '')
                 choiceParam('gitCreds'                  , [gitCreds]            	, '')
-                choiceParam('tfstateBucket'             , [tfStateBucket]      		, 'TF State Bucket'             )
-                choiceParam('tfstateBucketPrefix'       , [tfStateBucketPrefixRDS]	, 'TF State Bucket Prefix'      )
+                choiceParam('tfstateBucket'             , [tfStateBucket]      		, 'TF State Bucket'             	)
+                choiceParam('tfstateBucketPrefixRDS'	, [tfStateBucketPrefixRDS]	, 'TF State Bucket Prefix - RDS'	)
+		choiceParam('tfstateBucketPrefixDNS'    , [tfStateBucketPrefixR53ac]	, 'TF State Bucket Prefix - DNS'	)
 		stringParam('db_family'                 , 'postgres9.6,oracle-se1-11.2'	, '')
 		stringParam('db_engine'                 , 'postgres,oracle-se1'		, '')
                 stringParam('db_engine_version'         , '9.6.11,11.2.0.4.v21'		, '')
@@ -26,9 +27,9 @@ pipelineJob('tf-1-rds-db-build-job') {
                 nonStoredPasswordParam('db_password'    , 'Do you think that you can see !!')
                 choiceParam('db_allocated_storage'      , ['10']			, 'in GBs')
                 choiceParam('db_multi_az'               , ['false','true']      	, '')
-                choiceParam('includeInstance'            , ['true','false']      	, '')
+                choiceParam('includeInstance'		, ['true','false']      	, '')
                 stringParam('db_R53_name'               , 'R53_Name'            	, '')
-                choiceParam('includeInstanceDNS'         , ['true','false']      	, '')
+                choiceParam('includeInstanceDNS'	, ['true','false']      	, '')
                 choiceParam('terraformApplyPlan'        , ['plan','apply','plan-destroy','destroy']	, '')
         }
         definition {
