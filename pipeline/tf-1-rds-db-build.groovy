@@ -40,8 +40,8 @@ node('master') {
 
 	db_rds 			= (db_engine		=~ /[a-zA-Z]+/)[0]
 	db_engine_major_version = (db_engine_version	=~ /\d+.\d+/)[0]
+	
 	date 			= new Date()
-
 	println date
 	
 
@@ -93,7 +93,11 @@ node('master') {
 			}
 		}
 		if (includeInstanceDNS == 'true') {
+			date 		= new Date()
+			println date
 			dir(terraformDirectoryDNS) {
+				date 		= new Date()
+				println date
                                 stage('Remote State Init') {
                                         terraform_dns_init()
                                 }
