@@ -61,7 +61,7 @@ node('master') {
 	stage('Checkout') {
 		checkout()
 		//Create RDS Instance
-		if (includeInstance == 'true') && (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply') {
+		if ((includeInstance == 'true') && (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply')) {
 			dir(terraformDirectoryRDS) {
 				stage('RDS Init') {
 					terraform_rds_init()
@@ -85,7 +85,7 @@ node('master') {
 			}
 		}
 		//Create RDS DNS
-		if (includeInstanceDNS == 'true') && (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply') {
+		if ((includeInstanceDNS == 'true') && (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply')) {
 			dir(terraformDirectoryDNS) {
 				stage('DNS Init') {
 					terraform_dns_init()
@@ -107,7 +107,7 @@ node('master') {
 			}
 		}
 		//Destroy RDS DNS
-		if (includeInstanceDNS == 'true') && (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy') {
+		if ((includeInstanceDNS == 'true') && (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy')) {
 			dir(terraformDirectoryDNS) {
 				stage('DNS Init') {
 					terraform_rds_init()
@@ -129,7 +129,7 @@ node('master') {
 			}
 		}
 		//Destroy RDS Instance
-		if (includeInstance == 'true') && (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy') {
+		if ((includeInstance == 'true') && (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy')) {
 			dir(terraformDirectoryRDS) {
 				stage('RDS Init') {
 					terraform_rds_init()
