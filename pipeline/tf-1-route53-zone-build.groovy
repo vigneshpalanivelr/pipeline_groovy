@@ -12,9 +12,9 @@
 */
 
 node ('master'){
-	terraformDirectoryR53	= 
-	global_tfvars   	= 
-	r53_tfvars		= 
+	terraformDirectoryR53	= "modules/all_modules/${tfstateBucketPrefix}"
+	global_tfvars   	= "../../../variables/global_vars.tfvars"
+	r53_tfvars		= "../../../variables/r53_tfvars.tfvars"
 	date 			= new Date()
 
 	println date
