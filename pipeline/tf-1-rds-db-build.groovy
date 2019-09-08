@@ -97,7 +97,6 @@ node('master') {
 					}
 				}
 			}
-		}
 		if (includeInstanceDNS == 'true') {
 			dir(terraformDirectoryDNS) {
 				stage('Remote State Init') {
