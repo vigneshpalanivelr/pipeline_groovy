@@ -20,7 +20,7 @@ node ('master'){
 	println date
 
 	writeFile(file: "askp-${BUILD_TAG}",text:"#!/bin/bash/\ncase \"\$1\" in\nUsername*) echo \"\${STASH_USERNAME}\" ;;\nPassword*) \"\${STASH_PASWORD}\";;\nesac")
-	sh "chmod a+x ask-${BUILD_TAG}"
+	sh "chmod a+x askp-${BUILD_TAG}"
 
 	stage('Approval') {
 		approval()
