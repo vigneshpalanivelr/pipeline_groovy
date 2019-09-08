@@ -63,32 +63,8 @@ pipelineJob('tf-1-route53-zone-build-job') {
         }
 }
 
-// Route53 A record Creation
-pipelineJob('tf-1-route53a-record-build-job') {
-        description('Explains how to use Jenins Approval for Build Jobs')
-        logRotator(-1,-1)
-        parameters{
-                choiceParam('gitRepo'                   , [terraformRepo]       	, '')
-                choiceParam('gitBranch'                 , [terraformBranch]     	, '')
-                choiceParam('gitCreds'                  , [gitCreds]            	, '')
-                choiceParam('tfstateBucket'             , [tfStateBucket]      		, 'TF State Bucket'             )
-                choiceParam('tfstateBucketPrefix'       , [tfStateBucketPrefixR53a]	, 'TF State Bucket Prefix'      )
-		stringParam('r53_zone_name'		, 'vignesh-private-zone'	, '')
-		stringParam('r53a_record_name'		, 'vignesh-private-a-record'	, '')
-		stringParam('r53a_records'		, ''				, 'Ip address')
-		choiceParam('createR53aRecord'		, ['true','false']      	, '')
-		choiceParam('terraformApplyPlan'        , ['plan','apply','plan-destroy','destroy']	, '')
-	}
-        definition {
-                cps {
-                        script(readFileFromWorkspace('pipeline/tf-1-route53a-record-build.groovy'))
-                        sandbox()
-                }
-        }
-}
-
-// Route53 C Name Creation
-pipelineJob('tf-1-route53c-record-build-job') {
+// Route53 A-record and CNAME Creation
+pipelineJob('tf-1-route53ac-record-build-job') {
         description('Explains how to use Jenins Approval for Build Jobs')
         logRotator(-1,-1)
         parameters{
@@ -98,15 +74,14 @@ pipelineJob('tf-1-route53c-record-build-job') {
                 choiceParam('tfstateBucket'             , [tfStateBucket]      		, 'TF State Bucket'             )
                 choiceParam('tfstateBucketPrefix'       , [tfStateBucketPrefixR53c]	, 'TF State Bucket Prefix'      )
 		stringParam('r53_zone_name'		, 'vignesh-private-zone'	, '')
-		stringParam('r53c_record_name'		, 'postgres'			, '')
+		stringParam('r53c_record_name'		, 'postgres-r53,ec2-r53'	, '')
 		stringParam('r53c_records'		, ''				, 'CNAME')
-		stringParam('r53c_record_zone_id'	, ''				, 'zone id of the record')
-		choiceParam('createR53cRecord'		, ['true','false']      	, '')
+		choiceParam('createR53acRecord'		, ['true','false']      	, '')
 		choiceParam('terraformApplyPlan'        , ['plan','apply','plan-destroy','destroy']	, '')
 	}
         definition {
                 cps {
-                        script(readFileFromWorkspace('pipeline/tf-1-route53c-record-build.groovy'))
+                        script(readFileFromWorkspace('pipeline/tf-1-route53ac-record-build.groovy'))
                         sandbox()
                 }
         }
