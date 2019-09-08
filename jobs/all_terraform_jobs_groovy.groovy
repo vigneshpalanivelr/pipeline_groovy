@@ -74,8 +74,8 @@ pipelineJob('tf-1-route53ac-record-build-job') {
                 choiceParam('tfstateBucket'             , [tfStateBucket]      		, 'TF State Bucket'             )
                 choiceParam('tfstateBucketPrefix'       , [tfStateBucketPrefixR53c]	, 'TF State Bucket Prefix'      )
 		stringParam('r53_zone_name'		, 'vignesh-private-zone'	, '')
-		stringParam('r53c_record_name'		, 'postgres-r53,ec2-r53'	, '')
-		stringParam('r53c_records'		, ''				, 'CNAME')
+		stringParam('r53_record_name'		, 'postgres-r53,ec2-r53'	, '')
+		stringParam('r53_records'		, ''				, 'ip-address | end-point')
 		choiceParam('createR53acRecord'		, ['true','false']      	, '')
 		choiceParam('terraformApplyPlan'        , ['plan','apply','plan-destroy','destroy']	, '')
 	}
