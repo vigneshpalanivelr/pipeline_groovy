@@ -5,6 +5,7 @@ def tfStateBucket			= "terraform-tfstate-mumbai"
 def tfStateBucketPrefixRDS		= "rds_module"
 def tfStateBucketPrefixR53		= "r53_module"
 def tfStateBucketPrefixR53ac		= "r53ac_module"
+def tfStateBucketPrefixKMS		= "r53ac_module"
 
 // RDS DB Build Generic Job
 pipelineJob('tf-1-rds-db-build-job') {
@@ -97,7 +98,7 @@ pipelineJob('tf-1-kms-key-build-job') {
                 choiceParam('gitBranch'                 , [terraformBranch]     	, '')
                 choiceParam('gitCreds'                  , [gitCreds]            	, '')
                 choiceParam('tfstateBucket'             , [tfStateBucket]      		, 'TF State Bucket'             )
-                choiceParam('tfstateBucketPrefix'       , [tfStateBucketPrefixR53ac]	, 'TF State Bucket Prefix'      )
+                choiceParam('tfstateBucketPrefix'       , [tfStateBucketPrefixKMS]	, 'TF State Bucket Prefix'      )
 		stringParam('kms_key_name'		, 'custome-key'			, '')
 		choiceParam('includeKMSKey'		, ['true','false']      	, '')
 		choiceParam('terraformApplyPlan'        , ['plan','apply','plan-destroy','destroy']	, '')
