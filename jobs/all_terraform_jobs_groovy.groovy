@@ -8,7 +8,7 @@ def tfStateBucketPrefixR53ac		= "r53ac_module"
 
 // RDS DB Build Generic Job
 pipelineJob('tf-1-rds-db-build-job') {
-        description('Explains how to use Jenins Approval for Build Jobs')
+        description('Building AWS RDS (PostgreSQL | Oracle | MySql | MariaDb)')
         logRotator(-1,-1)
         parameters{
                 choiceParam('gitRepo'                   , [terraformRepo]       	, '')
@@ -42,7 +42,7 @@ pipelineJob('tf-1-rds-db-build-job') {
 
 // Route53 Zone Creation
 pipelineJob('tf-1-route53-zone-build-job') {
-        description('Explains how to use Jenins Approval for Build Jobs')
+        description('Building AWS Route53 Zone Creation')
         logRotator(-1,-1)
         parameters{
                 choiceParam('gitRepo'                   , [terraformRepo]       	, '')
@@ -65,7 +65,7 @@ pipelineJob('tf-1-route53-zone-build-job') {
 
 // Route53 A-record and CNAME Creation
 pipelineJob('tf-1-route53ac-record-build-job') {
-        description('Explains how to use Jenins Approval for Build Jobs')
+        description('Building AWS Route53 Record Creation')
         logRotator(-1,-1)
         parameters{
                 choiceParam('gitRepo'                   , [terraformRepo]       	, '')
@@ -83,6 +83,28 @@ pipelineJob('tf-1-route53ac-record-build-job') {
         definition {
                 cps {
                         script(readFileFromWorkspace('pipeline/tf-1-route53ac-record-build.groovy'))
+                        sandbox()
+                }
+        }
+}
+
+// AWS KMS Key Creation
+pipelineJob('tf-1-kms-key-build-job') {
+        description('Building AWS KMS key creation')
+        logRotator(-1,-1)
+        parameters{
+                choiceParam('gitRepo'                   , [terraformRepo]       	, '')
+                choiceParam('gitBranch'                 , [terraformBranch]     	, '')
+                choiceParam('gitCreds'                  , [gitCreds]            	, '')
+                choiceParam('tfstateBucket'             , [tfStateBucket]      		, 'TF State Bucket'             )
+                choiceParam('tfstateBucketPrefix'       , [tfStateBucketPrefixR53ac]	, 'TF State Bucket Prefix'      )
+		stringParam('kms_key_name'		, 'custome-key'			, '')
+		choiceParam('includeKMSKey'		, ['true','false']      	, '')
+		choiceParam('terraformApplyPlan'        , ['plan','apply','plan-destroy','destroy']	, '')
+	}
+        definition {
+                cps {
+                        script(readFileFromWorkspace('pipeline/tf-1-kms-key-build.groovy'))
                         sandbox()
                 }
         }
