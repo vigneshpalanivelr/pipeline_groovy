@@ -5,7 +5,7 @@ def tfStateBucket			= "terraform-tfstate-mumbai"
 def tfStateBucketPrefixRDS		= "rds_module"
 def tfStateBucketPrefixR53		= "r53_module"
 def tfStateBucketPrefixR53ac		= "r53ac_module"
-def tfStateBucketPrefixKMS		= "r53ac_module"
+def tfStateBucketPrefixKMS		= "kms_module"
 
 // RDS DB Build Generic Job
 pipelineJob('tf-1-rds-db-build-job') {
