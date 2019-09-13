@@ -17,8 +17,8 @@
 *	db_multi_az
 *	db_R53_name
 
-*	createInstance
-*	createInstanceDNS
+*	includeInstance
+*	includeInstanceDNS
 *	terraformApplyPlan
 Error
 	local variable	: Use def keyword
