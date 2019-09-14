@@ -22,14 +22,17 @@
 *	includeInstance
 *	includeInstanceDNS
 *	terraformApplyPlan
-Error
+Error on pipeline
 	local variable	: Use def keyword
 	global variable	: No def keyword
 	
 	sqlserver-ex	: Engine sqlserver-ex does not support encryption at rest
 	sqlserver-web 	: DBName must be null for engine
 	sqlserver-se	: DBName must be null for engine
-	
+Error on Terraform
+	Creating	: DBSubnetGroupNotAllowedFault: DbSubnetGroupName should not be specified for read replicas that are created in the same region as the master
+	Destroying 	: DB Instance FinalSnapshotIdentifier is required when a final snapshot is required
+
 Steps
 	1)	Create RDS Instance
 	2)	Create RDS DNS
