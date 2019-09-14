@@ -18,6 +18,7 @@
 *	db_R53_name
 *	db_read_replica
 *	db_apply_changes
+*	db_route53_name
 
 *	includeInstance
 *	includeInstanceDNS
@@ -210,13 +211,14 @@ def set_env_variables() {
 	env.TF_VAR_db_engine_major_version	= "${db_engine_major_version}"
 	env.TF_VAR_db_read_replica		= "${db_read_replica}"
 	env.TF_VAR_db_apply_immediately		= "${db_apply_changes}"
+	env.TF_VAR_db_route53_name		= "${db_route53_name}"
 }
 
 //RDS Instance creation-destroy functions
 def terraform_rds_init() {
 	withEnv(["GIT_ASKPASS=${WORKSPACE}/askp-${BUILD_TAG}"]){
 		withCredentials([usernamePassword(credentialsId: gitCreds, usernameVariable: 'STASH_USERNAME', passwordVariable: 'STASH_PASSWORD')]) {
-			sh "terraform init -no-color -input=false -upgrade=true -backend=true -force-copy -backend-config='bucket=${tfstateBucket}' -backend-config='key=${tfstateBucketPrefixRDS}/${db_identifier}-${db_rds}-rds.tfstate'"
+			sh "terraform init -no-color -input=false -upgrade=true -backend=true -force-copy -backend-config='bucket=${tfstateBucket}' -backend-config='key=${tfstateBucketPrefixRDS}/${db_identifier}.tfstate'"
 		}
 	}
 }
@@ -237,7 +239,7 @@ def terraform_rds_destroy() {
 def terraform_dns_init() {
 	withEnv(["GIT_ASKPASS=${WORKSPACE}/askp-${BUILD_TAG}"]){
 		withCredentials([usernamePassword(credentialsId: gitCreds, usernameVariable: 'STASH_USERNAME', passwordVariable: 'STASH_PASSWORD')]) {
-			sh "terraform init -no-color -input=false -upgrade=true -backend=true -force-copy -backend-config='bucket=${tfstateBucket}' -backend-config='key=${tfstateBucketPrefixDNS}/${db_identifier}-${db_rds}-rds-dns.tfstate'"
+			sh "terraform init -no-color -input=false -upgrade=true -backend=true -force-copy -backend-config='bucket=${tfstateBucket}' -backend-config='key=${tfstateBucketPrefixDNS}/${db_route53_name}-dns.tfstate'"
 		}
 	}
 }
