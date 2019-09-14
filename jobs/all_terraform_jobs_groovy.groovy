@@ -9,12 +9,12 @@ def tfStateBucketPrefixKMS		= "kms_module"
 
 // RDS DB Build Generic Job
 pipelineJob('tf-1-rds-db-build-job') {
-        description('Building AWS RDS Instances 
+        description('''Building AWS RDS Instances 
 		    <br>&emsp 1) PostgreSQL <br>&emsp 2) Oracle <br>&emsp 3) MySQL <br>&emsp 4) MariaDB <br>
 		    <br>Instructions :
 		    <br>&emsp 1) Creates Master or Master + Slave Instance&emsp TF-STATE : InstanceId.tfstate
 		    <br>&emsp 2) Creates Master Route53 Name&emsp&emsp&emsp&emsp&emsp &emsp TF-STATE : Route53-dns.tfstate
-		    <br>&emsp 3) Creates Replica Route53 Name&emsp&emsp&emsp&emsp&emsp&emsp TF-STATE : Route53-dns.tfstate')
+		    <br>&emsp 3) Creates Replica Route53 Name&emsp&emsp&emsp&emsp&emsp&emsp TF-STATE : Route53-dns.tfstate''')
         logRotator(-1,-1)
         parameters{
                 choiceParam('gitRepo'                   , [terraformRepo]       	, '')
