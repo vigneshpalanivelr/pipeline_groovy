@@ -198,7 +198,6 @@ def set_env_variables() {
 	env.TF_VAR_db_engine_major_version	= "${db_engine_major_version}"
 	env.TF_VAR_db_read_replica		= "${db_read_replica}"
 	env.TF_VAR_db_apply_immediately		= "${db_apply_changes}"
-	env.TF_VAR_db_create_r53		= "${includeInstanceDNS}"
 }
 
 //RDS Instance creation-destroy functions
