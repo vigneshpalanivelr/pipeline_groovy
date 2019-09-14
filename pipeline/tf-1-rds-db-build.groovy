@@ -16,6 +16,8 @@
 *	db_allocated_storage
 *	db_multi_az
 *	db_R53_name
+*	db_read_replica
+*	db_apply_changes
 
 *	includeInstance
 *	includeInstanceDNS
@@ -195,7 +197,8 @@ def set_env_variables() {
 	env.TF_VAR_db_R53_name          	= "${db_R53_name}"
 	env.TF_VAR_db_rds			= "${db_rds}"
 	env.TF_VAR_db_engine_major_version	= "${db_engine_major_version}"
-	env.TF_VAR_db_apply_immediately		= "${dbApplyChanges}"
+	env.TF_VAR_db_read_replica		= "${db_read_replica}"
+	env.TF_VAR_db_apply_immediately		= "${db_apply_changes}"
 }
 
 //RDS Instance creation-destroy functions
