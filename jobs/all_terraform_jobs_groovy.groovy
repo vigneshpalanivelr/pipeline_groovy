@@ -9,7 +9,18 @@ def tfStateBucketPrefixKMS		= "kms_module"
 
 // RDS DB Build Generic Job
 pipelineJob('tf-1-rds-db-build-job') {
-        description('Building AWS RDS (PostgreSQL | Oracle | MySql | MariaDb)')
+        description('''Building AWS RDS Instances 1) PostgreSQL 2) Oracle 3) MySQL 4) MariaDB <br>
+<br>Instructions for Creating:
+		    <br>&emsp 1) Creates Master Instance&emsp&emsp&emsp&emsp&emsp&emsp&emsp&emsp&ensp TF-STATE : InstanceId.tfstate
+		    <br>&emsp 2) Creates Master Route53 DNS&emsp&emsp&emsp&emsp&emsp&emsp&nbsp TF-STATE : Route53-dns.tfstate
+		    <br>&emsp 3) Creates Slave Instance&emsp&emsp&emsp&emsp&emsp&emsp&emsp&emsp&emsp&nbsp TF-STATE : InstanceId.tfstate
+		    <br>&emsp 4) Creates Replica Route53 DNS&emsp&emsp&emsp&emsp&emsp&emsp TF-STATE : Route53-dns.tfstate
+<br>Instructions for Destroying (Imp : Reverse Order):
+		    <br>&emsp 4) Destroy Replica Route53 DNS&emsp&emsp&emsp&emsp&emsp&emsp TF-STATE : Route53-dns.tfstate
+		    <br>&emsp 3) Destroy Slave Instance&emsp&emsp&emsp&emsp&emsp&emsp&emsp&emsp&emsp&nbsp TF-STATE : InstanceId.tfstate
+		    <br>&emsp 2) Destroy Master Route53 DNS&emsp&emsp&emsp&emsp&emsp &emsp TF-STATE : Route53-dns.tfstate
+		    <br>&emsp 1) Destroy Master Instance&emsp&emsp&emsp&emsp&emsp&emsp&emsp&emsp&ensp&nbsp TF-STATE : InstanceId.tfstate
+		    ''')
         logRotator(-1,-1)
         parameters{
                 choiceParam('gitRepo'                   , [terraformRepo]       	, '')
@@ -17,22 +28,32 @@ pipelineJob('tf-1-rds-db-build-job') {
                 choiceParam('gitCreds'                  , [gitCreds]            	, '')
                 choiceParam('tfstateBucket'             , [tfStateBucket]      		, 'TF State Bucket'             	)
                 choiceParam('tfstateBucketPrefixRDS'	, [tfStateBucketPrefixRDS]	, 'TF State Bucket Prefix - RDS'	)
-		choiceParam('tfstateBucketPrefixDNS'    , [tfStateBucketPrefixR53ac]	, 'TF State Bucket Prefix - DNS'	)
-		stringParam('db_family'                 , 'postgres9.6,oracle-se1-11.2'	, '')
-		stringParam('db_engine'                 , 'postgres,oracle-se1'		, '')
+                choiceParam('tfstateBucketPrefixDNS'    , [tfStateBucketPrefixR53ac]	, 'TF State Bucket Prefix - DNS')
+                stringParam('db_family'                 , 'postgres9.6,oracle-se1-11.2'	, '')
+                stringParam('db_engine'                 , 'postgres,oracle-se1'		, '')
                 stringParam('db_engine_version'         , '9.6.11,11.2.0.4.v21'		, '')
                 choiceParam('db_instance_class'         , ['db.t2.small']       	, '')
-                stringParam('db_identifier'             , 'test-instance'       	, '')
+                stringParam('db_identifier'             , 'test-instance'       	, '''Name : name-(pgsql|oracle|mysql|mariadb)-rds + rr<br>
+			TF-STATE : Statefile for Instance<br>
+			db_identifier.tfstate''')
                 choiceParam('db_name'                   , ['DBNAME']			, '')
                 choiceParam('db_username'               , ['Administrator']     	, '')
                 nonStoredPasswordParam('db_password'    , 'Do you think that you can see !!')
                 choiceParam('db_allocated_storage'      , ['10']			, 'in GBs')
                 choiceParam('db_multi_az'               , ['false','true']      	, '')
-		choiceParam('db_read_replica'		, ['true','false']      	, '')
-                choiceParam('db_apply_changes'		, ['true','false']      	, '')
-		choiceParam('includeInstance'		, ['true','false']      	, '')
+		choiceParam('db_apply_changes'		, ['true','false']      	, '')
+		choiceParam('db_availability_zone'	, ['ap-south-1a','ap-south-1c']	, 'either a or b')
+                choiceParam('db_action'			, ['master','replica','promote','promote-as-master'], '')
+                choiceParam('includeInstance'		, ['true','false']      	, '')
+                stringParam('db_source_identifier'	, 'test-instance'       	, 'source instance to replicate')
+                stringParam('db_route53_name'		, 'test-instance'		, '''TF-STATE : Statefile for Route53 Name<br>
+			db_route53_name-dns.tfstate''')
                 choiceParam('includeInstanceDNS'	, ['false','true']      	, '')
-                choiceParam('terraformApplyPlan'        , ['plan','apply','plan-destroy','destroy']	, '')
+                choiceParam('terraformApplyPlan'        , ['plan','apply','plan-destroy','destroy']	, '''
+			<br>&emsp plan&emsp&emsp&emsp&emsp: only plan to create 
+			<br>&emsp apply&emsp&emsp&emsp&ensp: will apply above plan 
+			<br>&emsp plan-destroy&nbsp&nbsp: only plan to destroy
+			<br>&emsp destroy&emsp&emsp&ensp&nbsp: will apply above plan-destroy''') 
         }
         definition {
                 cps {
