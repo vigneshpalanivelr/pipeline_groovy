@@ -31,7 +31,6 @@ pipelineJob('tf-1-rds-db-build-job') {
 		choiceParam('db_read_replica'		, ['true','false']      	, '')
                 choiceParam('db_apply_changes'		, ['true','false']      	, '')
 		choiceParam('includeInstance'		, ['true','false']      	, '')
-                stringParam('db_R53_name'               , 'test-instance'            	, '')
                 choiceParam('includeInstanceDNS'	, ['false','true']      	, '')
                 choiceParam('terraformApplyPlan'        , ['plan','apply','plan-destroy','destroy']	, '')
         }
