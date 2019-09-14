@@ -27,8 +27,8 @@ pipelineJob('tf-1-rds-db-build-job') {
 		stringParam('db_engine'                 , 'postgres,oracle-se1'		, '')
                 stringParam('db_engine_version'         , '9.6.11,11.2.0.4.v21'		, '')
                 choiceParam('db_instance_class'         , ['db.t2.small']       	, '')
-                stringParam('db_identifier'             , 'test-instance'       	, "TF-STATE : Statefile for Instance<br>
-			    db_identifier.tfstate")
+                stringParam('db_identifier'             , 'test-instance'       	, '''TF-STATE : Statefile for Instance<br>
+			    db_identifier.tfstate''')
                 choiceParam('db_name'                   , ['DBNAME']			, '')
                 choiceParam('db_username'               , ['Administrator']     	, '')
                 nonStoredPasswordParam('db_password'    , 'Do you think that you can see !!')
@@ -37,14 +37,14 @@ pipelineJob('tf-1-rds-db-build-job') {
 		choiceParam('db_read_replica'		, ['true','false']      	, '')
                 choiceParam('db_apply_changes'		, ['true','false']      	, '')
 		choiceParam('includeInstance'		, ['true','false']      	, '')
-		stringParam('db_route53_name'		, 'test-instance'		, 'TF-STATE : Statefile for Route53 Name<br>
-			    db_route53_name-dns.tfstate')
+		stringParam('db_route53_name'		, 'test-instance'		, '''TF-STATE : Statefile for Route53 Name<br>
+			    db_route53_name-dns.tfstate''')
                 choiceParam('includeInstanceDNS'	, ['false','true']      	, '')
-                choiceParam('terraformApplyPlan'        , ['plan','apply','plan-destroy','destroy']	, '
+                choiceParam('terraformApplyPlan'        , ['plan','apply','plan-destroy','destroy']	, '''
 			    <br>&emsp plan&emsp&emsp&emsp&emsp: only plan to create 
 			    <br>&emsp apply&emsp&emsp&emsp&ensp: will apply above plan 
 			    <br>&emsp plan-destroy&nbsp&nbsp: only plan to destroy
-			    <br>&emsp destroy&emsp&emsp&ensp&nbsp: will apply above plan-destroy') 
+			    <br>&emsp destroy&emsp&emsp&ensp&nbsp: will apply above plan-destroy''') 
         }
         definition {
                 cps {
