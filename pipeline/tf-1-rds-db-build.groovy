@@ -35,7 +35,7 @@ Recommendations and Error on Terraform
 	Creating RR	: Cannot change master user password on an RDS postgres Read Replica because it uses physical replication and therefore cannot differ from its parent.
 	Creating RR	: InvalidDBInstanceState: DB Backups not supported on a read replica for engine postgres
 	Recommending RR	: Change or Disable Availability zone variable in RR
-	Recommending RR	: Disable Username
+	Recommending RR	: Disable Username and Database
 	Destroying RR	: DB Instance FinalSnapshotIdentifier is required when a final snapshot is required
 
 Steps
