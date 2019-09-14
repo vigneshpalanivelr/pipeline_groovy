@@ -9,7 +9,12 @@ def tfStateBucketPrefixKMS		= "kms_module"
 
 // RDS DB Build Generic Job
 pipelineJob('tf-1-rds-db-build-job') {
-        description('Building AWS RDS (PostgreSQL | Oracle | MySql | MariaDb)')
+        description('Building AWS RDS Instances 
+		    <br>&emsp 1) PostgreSQL <br>&emsp 2) Oracle <br>&emsp 3) MySQL <br>&emsp 4) MariaDB <br>
+		    <br>Instructions :
+		    <br>&emsp 1) Creates Master or Master + Slave Instance&emsp TF-STATE : InstanceId.tfstate
+		    <br>&emsp 2) Creates Master Route53 Name&emsp&emsp&emsp&emsp&emsp &emsp TF-STATE : Route53-dns.tfstate
+		    <br>&emsp 3) Creates Replica Route53 Name&emsp&emsp&emsp&emsp&emsp&emsp TF-STATE : Route53-dns.tfstate')
         logRotator(-1,-1)
         parameters{
                 choiceParam('gitRepo'                   , [terraformRepo]       	, '')
@@ -22,7 +27,7 @@ pipelineJob('tf-1-rds-db-build-job') {
 		stringParam('db_engine'                 , 'postgres,oracle-se1'		, '')
                 stringParam('db_engine_version'         , '9.6.11,11.2.0.4.v21'		, '')
                 choiceParam('db_instance_class'         , ['db.t2.small']       	, '')
-                stringParam('db_identifier'             , 'test-instance'       	, '')
+                stringParam('db_identifier'             , 'test-instance'       	, 'TF-STATE : Statefile for Instance<br>db_identifier.tfstate')
                 choiceParam('db_name'                   , ['DBNAME']			, '')
                 choiceParam('db_username'               , ['Administrator']     	, '')
                 nonStoredPasswordParam('db_password'    , 'Do you think that you can see !!')
@@ -31,8 +36,13 @@ pipelineJob('tf-1-rds-db-build-job') {
 		choiceParam('db_read_replica'		, ['true','false']      	, '')
                 choiceParam('db_apply_changes'		, ['true','false']      	, '')
 		choiceParam('includeInstance'		, ['true','false']      	, '')
+		stringParam('db_route53_name'		, 'test-instance'		, 'TF-STATE : Statefile for Route53 Name<br>db_route53_name-dns.tfstate'')
                 choiceParam('includeInstanceDNS'	, ['false','true']      	, '')
-                choiceParam('terraformApplyPlan'        , ['plan','apply','plan-destroy','destroy']	, '')
+                choiceParam('terraformApplyPlan'        , ['plan','apply','plan-destroy','destroy']	, '
+			    <br>&emsp plan&emsp&emsp&emsp&emsp: only plan to create 
+			    <br>&emsp apply&emsp&emsp&emsp&ensp: will apply above plan 
+			    <br>&emsp plan-destroy&nbsp&nbsp: only plan to destroy
+			    <br>&emsp destroy&emsp&emsp&ensp&nbsp: will apply above plan-destroy') 
         }
         definition {
                 cps {
