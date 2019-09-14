@@ -31,6 +31,7 @@ pipelineJob('tf-1-rds-db-build-job') {
                 choiceParam('includeInstance'		, ['true','false']      	, '')
                 stringParam('db_R53_name'               , 'R53_Name'            	, '')
                 choiceParam('includeInstanceDNS'	, ['true','false']      	, '')
+		choiceParam('dbApplyChanges'		, ['true','false']      	, '')
                 choiceParam('terraformApplyPlan'        , ['plan','apply','plan-destroy','destroy']	, '')
         }
         definition {
