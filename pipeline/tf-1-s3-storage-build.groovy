@@ -14,7 +14,7 @@
 node ('master'){
 	terraformDirectory	= "modules/all_modules/${tfstateBucketPrefix}"
 	global_tfvars   	= "../../../variables/global_vars.tfvars"
-	kms_key_tfvars		= "../../../variables/kms_key_vars.tfvars"
+	s3_storage_tfvars	= "../../../variables/s3_storage_vars.tfvars"
 	date 			= new Date()
 
 	println date
@@ -94,7 +94,9 @@ def checkout() {
 }
 
 def set_env_variables() {
-	env.TF_VAR_kms_key_name		= "${kms_key_name}"
+	env.TF_VAR_s3_bucket_name		= "${s3_bucket_name}"
+	env.TF_VAR_s3_log_bucket_name		= "${s3_log_bucket_name}"
+	env.TF_VAR_s3_versioning		= "${s3_versioning}"
 }
 
 def terraform_init() {
