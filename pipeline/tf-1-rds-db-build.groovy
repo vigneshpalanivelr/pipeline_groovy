@@ -32,6 +32,7 @@ Error on pipeline
 
 Error on Terraform
 	Creating	: DBSubnetGroupNotAllowedFault: DbSubnetGroupName should not be specified for read replicas that are created in the same region as the master
+	Creating	: Cannot change master user password on an RDS postgres Read Replica because it uses physical replication and therefore cannot differ from its parent.
 	Destroying 	: DB Instance FinalSnapshotIdentifier is required when a final snapshot is required
 
 Steps
