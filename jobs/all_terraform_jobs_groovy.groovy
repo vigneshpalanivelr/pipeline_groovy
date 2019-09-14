@@ -11,15 +11,15 @@ def tfStateBucketPrefixKMS		= "kms_module"
 pipelineJob('tf-1-rds-db-build-job') {
         description('''Building AWS RDS Instances 1) PostgreSQL 2) Oracle 3) MySQL 4) MariaDB <br>
 <br>Instructions for Creating:
-		    <br>&emsp 1) Creates Master Instance&emsp TF-STATE : InstanceId.tfstate
-		    <br>&emsp 2) Creates Master Route53 Name&emsp&emsp&emsp&emsp&emsp &emsp TF-STATE : Route53-dns.tfstate
-		    <br>&emsp 3) Creates Slave Instance&emsp TF-STATE : InstanceId.tfstate
-		    <br>&emsp 4) Creates Replica Route53 Name&emsp&emsp&emsp&emsp&emsp&emsp TF-STATE : Route53-dns.tfstate
+		    <br>&emsp 1) Creates Master Instance&emsp&emsp&emsp&emsp&emsp&emsp&emsp&emsp&ensp TF-STATE : InstanceId.tfstate
+		    <br>&emsp 2) Creates Master Route53 DNS&emsp&emsp&emsp&emsp&emsp&emsp&nbsp TF-STATE : Route53-dns.tfstate
+		    <br>&emsp 3) Creates Slave Instance&emsp&emsp&emsp&emsp&emsp&emsp&emsp&emsp&emsp&nbsp TF-STATE : InstanceId.tfstate
+		    <br>&emsp 4) Creates Replica Route53 DNS&emsp&emsp&emsp&emsp&emsp&emsp TF-STATE : Route53-dns.tfstate
 <br>Instructions for Destroying (Imp : Reverse Order):
-		    <br>&emsp 4) Destroy Replica Route53 Name&emsp&emsp&emsp&emsp&emsp&emsp TF-STATE : Route53-dns.tfstate
-		    <br>&emsp 3) Destroy Slave Instance&emsp TF-STATE : InstanceId.tfstate
-		    <br>&emsp 2) Destroy Master Route53 Name&emsp&emsp&emsp&emsp&emsp &emsp TF-STATE : Route53-dns.tfstate
-		    <br>&emsp 1) Destroy Master Instance&emsp TF-STATE : InstanceId.tfstate
+		    <br>&emsp 4) Destroy Replica Route53 DNS&emsp&emsp&emsp&emsp&emsp&emsp TF-STATE : Route53-dns.tfstate
+		    <br>&emsp 3) Destroy Slave Instance&emsp&emsp&emsp&emsp&emsp&emsp&emsp&emsp&emsp&nbsp TF-STATE : InstanceId.tfstate
+		    <br>&emsp 2) Destroy Master Route53 DNS&emsp&emsp&emsp&emsp&emsp &emsp TF-STATE : Route53-dns.tfstate
+		    <br>&emsp 1) Destroy Master Instance&emsp&emsp&emsp&emsp&emsp&emsp&emsp&emsp&ensp&nbsp TF-STATE : InstanceId.tfstate
 		    ''')
         logRotator(-1,-1)
         parameters{
