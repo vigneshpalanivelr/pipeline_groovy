@@ -253,7 +253,7 @@ def set_env_variables() {
 	env.TF_VAR_db_multi_az          	= "${db_multi_az}"
 	env.TF_VAR_db_apply_immediately		= "${db_apply_changes}"
 	env.TF_VAR_db_availability_zone    	= "${db_availability_zone}"
-	env.TF_VAR_action			= "${action}"
+	env.TF_VAR_db_action			= "${db_action}"
 	env.TF_VAR_db_route53_name		= "${db_route53_name}"
 }
 def terraform_plan(global_tfvars,first_tfvars) {
