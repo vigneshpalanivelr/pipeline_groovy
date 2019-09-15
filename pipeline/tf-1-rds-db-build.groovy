@@ -278,7 +278,7 @@ def terraform_master_init() {
 }
 
 //RDS Instance init/load remote state function for Replica RDS
-def terraform_master_init() {
+def terraform_replica_init() {
 	withEnv(["GIT_ASKPASS=${WORKSPACE}/askp-${BUILD_TAG}"]){
 		withCredentials([usernamePassword(credentialsId: gitCreds, usernameVariable: 'STASH_USERNAME', passwordVariable: 'STASH_PASSWORD')]) {
 			sh "terraform init -no-color -input=false -upgrade=true -backend=true -force-copy -backend-config='bucket=${tfstateBucket}' -backend-config='key=${tfstateBucketPrefixRDS}/${db_identifier}-rr.tfstate'"
