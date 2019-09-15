@@ -74,7 +74,7 @@ node('master') {
 	stage('Checkout') {
 		checkout()
 		//Create Master RDS Instance
-		if ((action == 'master') && (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply')) {
+		if ((db_action == 'master') && (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply')) {
 			dir(terraformDirMasterRDS) {
 				stage('RDS Init') {
 					terraform_master_init()
@@ -98,7 +98,7 @@ node('master') {
 			}
 		}
 		//Create Replica RDS Instance
-		if ((action == 'replica') && (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply')) {
+		if ((db_action == 'replica') && (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply')) {
 			dir(terraformDirReplicaRDS) {
 				stage('RDS Init') {
 					terraform_master_init()
@@ -164,7 +164,7 @@ node('master') {
 			}
 		}
 		//Destroy Replica RDS Instance
-		if ((action == 'replica') && (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy')) {
+		if ((db_action == 'replica') && (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy')) {
 			dir(terraformDirReplicaRDS) {
 				stage('RDS Init') {
 					terraform_replica_init()
@@ -186,7 +186,7 @@ node('master') {
 			}
 		}
 		//Destroy Master RDS Instance
-		if ((action == 'master') && (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy')) {
+		if ((db_action == 'master') && (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy')) {
 			dir(terraformDirMasterRDS) {
 				stage('RDS Init') {
 					terraform_master_init()
