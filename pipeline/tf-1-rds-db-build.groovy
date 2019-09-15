@@ -31,9 +31,9 @@ Error on pipeline
 	sqlserver-web 	: DBName must be null for engine
 	sqlserver-se	: DBName must be null for engine
 Recommendations and Error on Terraform
-	Creating RR		: DBSubnetGroupNotAllowedFault: DbSubnetGroupName should not be specified for read replicas that are created in the same region as the master
-	Creating RR		: Cannot change master user password on an RDS postgres Read Replica because it uses physical replication and therefore cannot differ from its parent.
-	Creating RR		: InvalidDBInstanceState: DB Backups not supported on a read replica for engine postgres
+	Creating RR	: DBSubnetGroupNotAllowedFault: DbSubnetGroupName should not be specified for read replicas that are created in the same region as the master
+	Creating RR	: Cannot change master user password on an RDS postgres Read Replica because it uses physical replication and therefore cannot differ from its parent.
+	Creating RR	: InvalidDBInstanceState: DB Backups not supported on a read replica for engine postgres
 	Recommending RR	: Change or Disable Availability zone variable in RR
 	Recommending RR	: Disable Username and Database
 	Destroying RR	: DB Instance FinalSnapshotIdentifier is required when a final snapshot is required
