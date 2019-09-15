@@ -4,21 +4,24 @@
 *	gitCreds
 *	tfstateBucket
 *	tfstateBucketPrefix
+
 *	db_family
 *	db_engine
 *	db_engine_version
 *	db_instance_class
 *	db_identifier
+*	db_source_identifier
 *	db_name
 *	db_username
 *	db_password
 *	db_allocated_storage
 *	db_multi_az
-*	db_R53_name
 *	db_read_replica
 *	db_apply_changes
 *	db_route53_name
-*	includeInstance
+
+*	includeMaster
+*	includeReplica
 *	includeInstanceDNS
 *	terraformApplyPlan
 Error on pipeline
@@ -51,14 +54,14 @@ node('master') {
 	terraformDirReplicaRDS	= "modules/all_modules/rds_replica_module"
 	terraformDirectoryDNS	= "modules/all_modules/rds_dns_module"
 
-	global_tfvars			= "../../../variables/global_vars.tfvars"
-	rds_tfvars				= "../../../variables/rds_vars.tfvars"
-	rds_dns_tfvars			= "../../../variables/rds_dns_vars.tfvars"
+	global_tfvars		= "../../../variables/global_vars.tfvars"
+	rds_tfvars		= "../../../variables/rds_vars.tfvars"
+	rds_dns_tfvars		= "../../../variables/rds_dns_vars.tfvars"
 
-	db_rds					= (db_engine			=~ /[a-zA-Z]+/)[0]
+	db_rds			= (db_engine		=~ /[a-zA-Z]+/)[0]
 	db_engine_major_version = (db_engine_version	=~ /\d+.\d+/)[0]
 	
-	date					= new Date()
+	date			= new Date()
 	println date
 	
 
@@ -70,8 +73,8 @@ node('master') {
 	}
 	stage('Checkout') {
 		checkout()
-		//Create RDS Instance
-		if ((includeInstance == 'true') && (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply')) {
+		//Create Master RDS Instance
+		if ((includeMaster == 'true') && (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply')) {
 			dir(terraformDirectoryRDS) {
 				stage('RDS Init') {
 					terraform_rds_init()
@@ -80,8 +83,30 @@ node('master') {
 					stage('RDS Plan'){
 						withEnv(["TF_VAR_db_password=${db_password}"]) {
 							set_env_variables()
-							terraform_rds_plan(global_tfvars,rds_tfvars)
+							terraform_plan(global_tfvars,rds_tfvars)
 						}
+					}
+				}
+				if (terraformApplyPlan == 'apply') {
+					stage('RDS Approve'){
+						approval()
+					}
+					stage('RDS Apply') {
+						terraform_apply()
+					}
+				}
+			}
+		}
+		//Create Replica RDS Instance
+		if ((includeReplica == 'true') && (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply')) {
+			dir(terraformDirectoryRDS) {
+				stage('RDS Init') {
+					terraform_rds_init()
+				}
+				if (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply') {
+					stage('RDS Plan'){
+						set_env_variables()
+						terraform_plan(global_tfvars,rds_tfvars)
 					}
 				}
 				if (terraformApplyPlan == 'apply') {
@@ -103,7 +128,7 @@ node('master') {
 				if (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply') {
 					stage('DNS Plan') {
 						set_env_variables()
-						terraform_dns_plan(global_tfvars,rds_dns_tfvars)
+						terraform_plan(global_tfvars,rds_dns_tfvars)
 					}
 				}
 				if (terraformApplyPlan == 'apply') {
@@ -125,7 +150,7 @@ node('master') {
 				if (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy') {
 					stage('DNS Destroy Plan') {
 						set_env_variables()
-						terraform_dns_plan_destroy(global_tfvars,rds_dns_tfvars)
+						terraform_plan_destroy(global_tfvars,rds_dns_tfvars)
 					}
 				}
 				if (terraformApplyPlan == 'destroy') {
@@ -138,8 +163,8 @@ node('master') {
 				}
 			}
 		}
-		//Destroy RDS Instance
-		if ((includeInstance == 'true') && (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy')) {
+		//Destroy Replica RDS Instance
+		if ((includeReplica == 'true') && (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy')) {
 			dir(terraformDirectoryRDS) {
 				stage('RDS Init') {
 					terraform_rds_init()
@@ -147,9 +172,30 @@ node('master') {
 				if (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy') {
 					stage('RDS Destroy Plan') {
 						set_env_variables()
+						terraform_plan_destroy(global_tfvars,rds_tfvars)
+					}
+				}
+				if (terraformApplyPlan == 'destroy') {
+					stage('RDS Approve') {
+						approval()
+					}
+					stage('RDS Destroy') {
+						terraform_destroy()
+					}
+				}
+			}
+		}
+		//Destroy Master RDS Instance
+		if ((includeMaster == 'true') && (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy')) {
+			dir(terraformDirectoryRDS) {
+				stage('RDS Init') {
+					terraform_rds_init()
+				}
+				if (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy') {
+					stage('RDS Destroy Plan') {
 						withEnv(["TF_VAR_db_password=${db_password}"]) {
 							set_env_variables()
-							terraform_rds_plan_destroy(global_tfvars,rds_tfvars)
+							terraform_plan_destroy(global_tfvars,rds_tfvars)
 						}
 					}
 				}
@@ -168,7 +214,7 @@ node('master') {
 
 //Common functions
 def approval() {
-	timeout(time: 1, unit: 'MINUTES') {
+	timeout(time: 5, unit: 'MINUTES') {
 		input(
 			id: 'Approval', message: 'Shall I Continue ?', parameters: [[
 				$class:	'BooleanParameterDefinition', defaultValue: true, description: 'default to tick', name: 'Please confirm to proceed']]
@@ -196,26 +242,33 @@ def set_env_variables() {
 	env.TF_VAR_db_family            	= "${db_family}"
 	env.TF_VAR_db_engine            	= "${db_engine}"
 	env.TF_VAR_db_engine_version    	= "${db_engine_version}"
+	env.TF_VAR_db_engine_major_version	= "${db_engine_major_version}"
 	env.TF_VAR_db_identifier        	= "${db_identifier}"
+	env.TF_VAR_db_source_identifier		= "${db_source_identifier}"
 	env.TF_VAR_db_instance_class    	= "${db_instance_class}"
-	env.TF_VAR_db_rds					= "${db_rds}"
+	env.TF_VAR_db_rds			= "${db_rds}"
 	env.TF_VAR_db_name              	= "${db_name}"
 	env.TF_VAR_db_username          	= "${db_username}"
 	env.TF_VAR_db_allocated_storage 	= "${db_allocated_storage}"
 	env.TF_VAR_db_multi_az          	= "${db_multi_az}"
-	env.TF_VAR_db_engine_major_version	= "${db_engine_major_version}"
-	env.TF_VAR_db_read_replica			= "${db_read_replica}"
+	env.TF_VAR_db_read_replica		= "${db_read_replica}"
 	env.TF_VAR_db_apply_immediately		= "${db_apply_changes}"
-	env.TF_VAR_db_route53_name			= "${db_route53_name}"
+	env.TF_VAR_db_route53_name		= "${db_route53_name}"
+}
+def terraform_plan(global_tfvars,first_tfvars) {
+	sh "terraform plan -no-color -out=tfplan -input=false -var-file=${global_tfvars} -var-file=${first_tfvars}"
 }
 def terraform_apply() {
 	sh "terraform apply -no-color -input=false tfplan"
+}
+def terraform_plan_destroy(global_tfvars,first_tfvars) {
+	sh "terraform plan -destroy -no-color -out=tfdestroy -input=false -var-file=${global_tfvars} -var-file=${first_tfvars}"
 }
 def terraform_destroy() {
 	sh "terraform apply -no-color -input=false tfdestroy"
 }
 
-//RDS Instance creation-destroy functions
+//RDS Instance init/load remote state function
 def terraform_rds_init() {
 	withEnv(["GIT_ASKPASS=${WORKSPACE}/askp-${BUILD_TAG}"]){
 		withCredentials([usernamePassword(credentialsId: gitCreds, usernameVariable: 'STASH_USERNAME', passwordVariable: 'STASH_PASSWORD')]) {
@@ -223,25 +276,12 @@ def terraform_rds_init() {
 		}
 	}
 }
-def terraform_rds_plan(global_tfvars,rds_tfvars) {
-	sh "terraform plan -no-color -out=tfplan -input=false -var-file=${global_tfvars} -var-file=${rds_tfvars}"
-}
 
-def terraform_rds_plan_destroy(global_tfvars,rds_tfvars) {
-	sh "terraform plan -destroy -no-color -out=tfdestroy -input=false -var-file=${global_tfvars} -var-file=${rds_tfvars}"
-}
-
-//RDS DNS creation/destroy functions
+//RDS DNS init/load remote state function
 def terraform_dns_init() {
 	withEnv(["GIT_ASKPASS=${WORKSPACE}/askp-${BUILD_TAG}"]){
 		withCredentials([usernamePassword(credentialsId: gitCreds, usernameVariable: 'STASH_USERNAME', passwordVariable: 'STASH_PASSWORD')]) {
 			sh "terraform init -no-color -input=false -upgrade=true -backend=true -force-copy -backend-config='bucket=${tfstateBucket}' -backend-config='key=${tfstateBucketPrefixDNS}/${db_route53_name}-dns.tfstate'"
 		}
 	}
-}
-def terraform_dns_plan(global_tfvars,rds_dns_tfvars) {
-	sh "terraform plan -no-color -out=tfplan -input=false -var-file=${global_tfvars} -var-file=${rds_dns_tfvars}"
-}
-def terraform_dns_plan_destroy(global_tfvars,rds_dns_tfvars) {
-	sh "terraform plan -destroy -no-color -out=tfdestroy -input=false -var-file=${global_tfvars} -var-file=${rds_dns_tfvars}"
 }
