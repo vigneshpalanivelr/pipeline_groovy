@@ -98,7 +98,7 @@ node('master') {
 			}
 		}
 		//Create Replica RDS Instance
-		if ((db_action == 'replica') && (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply')) {
+		if ((db_action == 'replica' || db_action == 'promote') && (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply')) {
 			dir(terraformDirReplicaRDS) {
 				stage('RDS Init') {
 					terraform_master_init()
