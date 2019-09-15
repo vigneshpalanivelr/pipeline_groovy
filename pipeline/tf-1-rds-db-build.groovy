@@ -75,7 +75,7 @@ node('master') {
 		checkout()
 		//Create Master RDS Instance
 		if ((includeMaster == 'true') && (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply')) {
-			dir(terraformDirectoryRDS) {
+			dir(terraformDirMasterRDS) {
 				stage('RDS Init') {
 					terraform_rds_init()
 				}
@@ -99,7 +99,7 @@ node('master') {
 		}
 		//Create Replica RDS Instance
 		if ((includeReplica == 'true') && (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply')) {
-			dir(terraformDirectoryRDS) {
+			dir(terraformDirReplicaRDS) {
 				stage('RDS Init') {
 					terraform_rds_init()
 				}
@@ -165,7 +165,7 @@ node('master') {
 		}
 		//Destroy Replica RDS Instance
 		if ((includeReplica == 'true') && (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy')) {
-			dir(terraformDirectoryRDS) {
+			dir(terraformDirReplicaRDS) {
 				stage('RDS Init') {
 					terraform_rds_init()
 				}
@@ -187,7 +187,7 @@ node('master') {
 		}
 		//Destroy Master RDS Instance
 		if ((includeMaster == 'true') && (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy')) {
-			dir(terraformDirectoryRDS) {
+			dir(terraformDirMasterRDS) {
 				stage('RDS Init') {
 					terraform_rds_init()
 				}
