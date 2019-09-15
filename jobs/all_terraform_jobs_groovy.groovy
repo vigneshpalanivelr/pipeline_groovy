@@ -43,7 +43,7 @@ pipelineJob('tf-1-rds-db-build-job') {
                 choiceParam('db_read_replica'		, ['true','false']      	, '')
                 choiceParam('db_apply_changes'		, ['true','false']      	, '')
                 choiceParam('includeMaster'		, ['true','false']      	, '')
-                stringParam('db_source_identifier'		, 'test-instance'       	, 'source instance to replicate')
+                stringParam('db_source_identifier'	, 'test-instance'       	, 'source instance to replicate')
                 choiceParam('includeReplica'		, ['true','false']      	, '')
                 stringParam('db_route53_name'		, 'test-instance'		, '''TF-STATE : Statefile for Route53 Name<br>
 			db_route53_name-dns.tfstate''')
