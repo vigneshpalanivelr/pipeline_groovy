@@ -77,7 +77,7 @@ node('master') {
 		if ((includeMaster == 'true') && (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply')) {
 			dir(terraformDirMasterRDS) {
 				stage('RDS Init') {
-					terraform_rds_init()
+					terraform_master_init()
 				}
 				if (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply') {
 					stage('RDS Plan'){
@@ -101,7 +101,7 @@ node('master') {
 		if ((includeReplica == 'true') && (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply')) {
 			dir(terraformDirReplicaRDS) {
 				stage('RDS Init') {
-					terraform_rds_init()
+					terraform_replica_init()
 				}
 				if (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply') {
 					stage('RDS Plan'){
@@ -167,7 +167,7 @@ node('master') {
 		if ((includeReplica == 'true') && (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy')) {
 			dir(terraformDirReplicaRDS) {
 				stage('RDS Init') {
-					terraform_rds_init()
+					terraform_replica_init()
 				}
 				if (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy') {
 					stage('RDS Destroy Plan') {
@@ -189,7 +189,7 @@ node('master') {
 		if ((includeMaster == 'true') && (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy')) {
 			dir(terraformDirMasterRDS) {
 				stage('RDS Init') {
-					terraform_rds_init()
+					terraform_master_init()
 				}
 				if (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy') {
 					stage('RDS Destroy Plan') {
@@ -268,11 +268,20 @@ def terraform_destroy() {
 	sh "terraform apply -no-color -input=false tfdestroy"
 }
 
-//RDS Instance init/load remote state function
-def terraform_rds_init() {
+//RDS Instance init/load remote state function for Master RDS
+def terraform_master_init() {
 	withEnv(["GIT_ASKPASS=${WORKSPACE}/askp-${BUILD_TAG}"]){
 		withCredentials([usernamePassword(credentialsId: gitCreds, usernameVariable: 'STASH_USERNAME', passwordVariable: 'STASH_PASSWORD')]) {
 			sh "terraform init -no-color -input=false -upgrade=true -backend=true -force-copy -backend-config='bucket=${tfstateBucket}' -backend-config='key=${tfstateBucketPrefixRDS}/${db_identifier}.tfstate'"
+		}
+	}
+}
+
+//RDS Instance init/load remote state function for Replica RDS
+def terraform_master_init() {
+	withEnv(["GIT_ASKPASS=${WORKSPACE}/askp-${BUILD_TAG}"]){
+		withCredentials([usernamePassword(credentialsId: gitCreds, usernameVariable: 'STASH_USERNAME', passwordVariable: 'STASH_PASSWORD')]) {
+			sh "terraform init -no-color -input=false -upgrade=true -backend=true -force-copy -backend-config='bucket=${tfstateBucket}' -backend-config='key=${tfstateBucketPrefixRDS}/${db_identifier}-rr.tfstate'"
 		}
 	}
 }
