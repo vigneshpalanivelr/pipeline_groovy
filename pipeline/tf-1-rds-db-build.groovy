@@ -74,7 +74,7 @@ node('master') {
 	stage('Checkout') {
 		checkout()
 		//Create Master RDS Instance
-		if ((includeMaster == 'true') && (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply')) {
+		if ((action == 'master') && (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply')) {
 			dir(terraformDirMasterRDS) {
 				stage('RDS Init') {
 					terraform_master_init()
@@ -98,7 +98,7 @@ node('master') {
 			}
 		}
 		//Create Replica RDS Instance
-		if ((includeReplica == 'true') && (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply')) {
+		if ((action == 'replica') && (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply')) {
 			dir(terraformDirReplicaRDS) {
 				stage('RDS Init') {
 					terraform_replica_init()
@@ -164,7 +164,7 @@ node('master') {
 			}
 		}
 		//Destroy Replica RDS Instance
-		if ((includeReplica == 'true') && (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy')) {
+		if ((action == 'replica') && (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy')) {
 			dir(terraformDirReplicaRDS) {
 				stage('RDS Init') {
 					terraform_replica_init()
@@ -186,7 +186,7 @@ node('master') {
 			}
 		}
 		//Destroy Master RDS Instance
-		if ((includeMaster == 'true') && (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy')) {
+		if ((action == 'master') && (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy')) {
 			dir(terraformDirMasterRDS) {
 				stage('RDS Init') {
 					terraform_master_init()
@@ -243,16 +243,17 @@ def set_env_variables() {
 	env.TF_VAR_db_engine            	= "${db_engine}"
 	env.TF_VAR_db_engine_version    	= "${db_engine_version}"
 	env.TF_VAR_db_engine_major_version	= "${db_engine_major_version}"
+	env.TF_VAR_db_instance_class    	= "${db_instance_class}"
 	env.TF_VAR_db_identifier        	= "${db_identifier}"
 	env.TF_VAR_db_source_identifier		= "${db_source_identifier}"
-	env.TF_VAR_db_instance_class    	= "${db_instance_class}"
 	env.TF_VAR_db_rds			= "${db_rds}"
 	env.TF_VAR_db_name              	= "${db_name}"
 	env.TF_VAR_db_username          	= "${db_username}"
 	env.TF_VAR_db_allocated_storage 	= "${db_allocated_storage}"
 	env.TF_VAR_db_multi_az          	= "${db_multi_az}"
-	env.TF_VAR_db_read_replica		= "${db_read_replica}"
 	env.TF_VAR_db_apply_immediately		= "${db_apply_changes}"
+	env.TF_VAR_db_availability_zone    	= "${db_availability_zone}"
+	env.TF_VAR_action			= "${action}"
 	env.TF_VAR_db_route53_name		= "${db_route53_name}"
 }
 def terraform_plan(global_tfvars,first_tfvars) {
