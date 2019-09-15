@@ -74,7 +74,7 @@ node('master') {
 	stage('Checkout') {
 		checkout()
 		//Create Master RDS Instance
-		if ((db_action == 'master' || db_action == 'promote-as-master') && (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply')) {
+		if ((db_action == 'master') && (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply')) {
 			dir(terraformDirMasterRDS) {
 				stage('RDS Init') {
 					terraform_master_init()
@@ -98,7 +98,7 @@ node('master') {
 			}
 		}
 		//Create Replica RDS Instance
-		if ((db_action == 'replica' || db_action == 'promote') && (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply')) {
+		if ((db_action != 'master') && (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply')) {
 			dir(terraformDirReplicaRDS) {
 				stage('RDS Init') {
 					terraform_master_init()
