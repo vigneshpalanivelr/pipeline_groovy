@@ -4,7 +4,6 @@
 *	gitCreds
 *	tfstateBucket
 *	tfstateBucketPrefix
-
 *	db_family
 *	db_engine
 *	db_engine_version
@@ -19,33 +18,28 @@
 *	db_read_replica
 *	db_apply_changes
 *	db_route53_name
-
 *	includeInstance
 *	includeInstanceDNS
 *	terraformApplyPlan
-
 Error on pipeline
 	local variable	: Use def keyword
 	global variable	: No def keyword
 	sqlserver-ex	: Engine sqlserver-ex does not support encryption at rest
 	sqlserver-web 	: DBName must be null for engine
 	sqlserver-se	: DBName must be null for engine
-
 Recommendations and Error on Terraform
-	Creating RR	: DBSubnetGroupNotAllowedFault: DbSubnetGroupName should not be specified for read replicas that are created in the same region as the master
-	Creating RR	: Cannot change master user password on an RDS postgres Read Replica because it uses physical replication and therefore cannot differ from its parent.
-	Creating RR	: InvalidDBInstanceState: DB Backups not supported on a read replica for engine postgres
+	Creating RR		: DBSubnetGroupNotAllowedFault: DbSubnetGroupName should not be specified for read replicas that are created in the same region as the master
+	Creating RR		: Cannot change master user password on an RDS postgres Read Replica because it uses physical replication and therefore cannot differ from its parent.
+	Creating RR		: InvalidDBInstanceState: DB Backups not supported on a read replica for engine postgres
 	Recommending RR	: Change or Disable Availability zone variable in RR
 	Recommending RR	: Disable Username and Database
 	Destroying RR	: DB Instance FinalSnapshotIdentifier is required when a final snapshot is required
-
 Steps
 	1)	Create RDS Instance
 	2)	Create RDS DNS
 	3)	Destroy RDS DNS
 	4)	Destroy RDS Instance
 	5)	Defined all the required functions
-
 Pending Implementation
 	1)	Creating CW Alarms
 	2)	Creating Application DBA user
@@ -53,17 +47,18 @@ Pending Implementation
 
 node('master') {
 
-	terraformDirectoryRDS	= "modules/all_modules/rds_module"
+	terraformDirMasterRDS	= "modules/all_modules/rds_module"
+	terraformDirReplicaRDS	= "modules/all_modules/rds_replica_module"
 	terraformDirectoryDNS	= "modules/all_modules/rds_dns_module"
 
-	global_tfvars   	= "../../../variables/global_vars.tfvars"
-	rds_tfvars      	= "../../../variables/rds_vars.tfvars"
-	rds_dns_tfvars		= "../../../variables/rds_dns_vars.tfvars"
+	global_tfvars			= "../../../variables/global_vars.tfvars"
+	rds_tfvars				= "../../../variables/rds_vars.tfvars"
+	rds_dns_tfvars			= "../../../variables/rds_dns_vars.tfvars"
 
-	db_rds 			= (db_engine		=~ /[a-zA-Z]+/)[0]
+	db_rds					= (db_engine			=~ /[a-zA-Z]+/)[0]
 	db_engine_major_version = (db_engine_version	=~ /\d+.\d+/)[0]
 	
-	date 			= new Date()
+	date					= new Date()
 	println date
 	
 
@@ -94,7 +89,7 @@ node('master') {
 						approval()
 					}
 					stage('RDS Apply') {
-						terraform_rds_apply()
+						terraform_apply()
 					}
 				}
 			}
@@ -116,7 +111,7 @@ node('master') {
 						approval()
 					}
 					stage('DNS Apply') {
-						terraform_dns_apply()
+						terraform_apply()
 					}
 				}
 			}
@@ -138,7 +133,7 @@ node('master') {
 						approval()
 					}
 					stage('DNS Destroy') {
-						terraform_dns_destroy()
+						terraform_destroy()
 					}
 				}
 			}
@@ -163,7 +158,7 @@ node('master') {
 						approval()
 					}
 					stage('RDS Destroy') {
-						terraform_rds_destroy()
+						terraform_destroy()
 					}
 				}
 			}
@@ -203,15 +198,21 @@ def set_env_variables() {
 	env.TF_VAR_db_engine_version    	= "${db_engine_version}"
 	env.TF_VAR_db_identifier        	= "${db_identifier}"
 	env.TF_VAR_db_instance_class    	= "${db_instance_class}"
-	env.TF_VAR_db_rds			= "${db_rds}"
+	env.TF_VAR_db_rds					= "${db_rds}"
 	env.TF_VAR_db_name              	= "${db_name}"
 	env.TF_VAR_db_username          	= "${db_username}"
 	env.TF_VAR_db_allocated_storage 	= "${db_allocated_storage}"
 	env.TF_VAR_db_multi_az          	= "${db_multi_az}"
 	env.TF_VAR_db_engine_major_version	= "${db_engine_major_version}"
-	env.TF_VAR_db_read_replica		= "${db_read_replica}"
+	env.TF_VAR_db_read_replica			= "${db_read_replica}"
 	env.TF_VAR_db_apply_immediately		= "${db_apply_changes}"
-	env.TF_VAR_db_route53_name		= "${db_route53_name}"
+	env.TF_VAR_db_route53_name			= "${db_route53_name}"
+}
+def terraform_apply() {
+	sh "terraform apply -no-color -input=false tfplan"
+}
+def terraform_destroy() {
+	sh "terraform apply -no-color -input=false tfdestroy"
 }
 
 //RDS Instance creation-destroy functions
@@ -225,14 +226,9 @@ def terraform_rds_init() {
 def terraform_rds_plan(global_tfvars,rds_tfvars) {
 	sh "terraform plan -no-color -out=tfplan -input=false -var-file=${global_tfvars} -var-file=${rds_tfvars}"
 }
-def terraform_rds_apply() {
-	sh "terraform apply -no-color -input=false tfplan"
-}
+
 def terraform_rds_plan_destroy(global_tfvars,rds_tfvars) {
 	sh "terraform plan -destroy -no-color -out=tfdestroy -input=false -var-file=${global_tfvars} -var-file=${rds_tfvars}"
-}
-def terraform_rds_destroy() {
-	sh "terraform apply -no-color -input=false tfdestroy"
 }
 
 //RDS DNS creation/destroy functions
@@ -246,12 +242,6 @@ def terraform_dns_init() {
 def terraform_dns_plan(global_tfvars,rds_dns_tfvars) {
 	sh "terraform plan -no-color -out=tfplan -input=false -var-file=${global_tfvars} -var-file=${rds_dns_tfvars}"
 }
-def terraform_dns_apply() {
-	sh "terraform apply -no-color -input=false tfplan"
-}
 def terraform_dns_plan_destroy(global_tfvars,rds_dns_tfvars) {
 	sh "terraform plan -destroy -no-color -out=tfdestroy -input=false -var-file=${global_tfvars} -var-file=${rds_dns_tfvars}"
-}
-def terraform_dns_destroy() {
-	sh "terraform apply -no-color -input=false tfdestroy"
 }
