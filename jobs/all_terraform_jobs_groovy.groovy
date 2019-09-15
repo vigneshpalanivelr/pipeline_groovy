@@ -43,7 +43,7 @@ pipelineJob('tf-1-rds-db-build-job') {
                 choiceParam('db_multi_az'               , ['false','true']      	, '')
 		choiceParam('db_apply_changes'		, ['true','false']      	, '')
 		choiceParam('db_availability_zone'	, ['ap-south-1a','ap-south-1c']	, 'either a or b')
-                choiceParam('action'			, ['master','replica','promote','promote-as-master'], '')
+                choiceParam('db_action'			, ['master','replica','promote','promote-as-master'], '')
                 choiceParam('includeInstance'		, ['true','false']      	, '')
                 stringParam('db_source_identifier'	, 'test-instance'       	, 'source instance to replicate')
                 stringParam('db_route53_name'		, 'test-instance'		, '''TF-STATE : Statefile for Route53 Name<br>
