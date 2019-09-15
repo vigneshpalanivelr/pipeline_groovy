@@ -101,7 +101,7 @@ node('master') {
 		if ((action == 'replica') && (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply')) {
 			dir(terraformDirReplicaRDS) {
 				stage('RDS Init') {
-					terraform_replica_init()
+					terraform_master_init()
 				}
 				if (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply') {
 					stage('RDS Plan'){
