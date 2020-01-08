@@ -1,5 +1,4 @@
 nestedView('seed-jobs') {
-	views {
 		description('All Seed Jobs')
 		jobs {
 			name('admin-seed-job')
@@ -12,7 +11,6 @@ nestedView('seed-jobs') {
 			lastFailure()
 			lastDuration()
 			buildButton()
-		}
 	}
 }
 nestedView('terraform-jobs') {
