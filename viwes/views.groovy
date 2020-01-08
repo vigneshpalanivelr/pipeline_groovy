@@ -1,21 +1,25 @@
 nestedView('seed-jobs') {
-		description('All Seed Jobs')
-		jobs {
-			name('admin-seed-job')
+	views {
+		listView('seed-jobs') {
+			description('All Seed Jobs')
+			jobs {
+				name('admin-seed-job')
+			}
+			columns {
+				status()
+				weather()
+				name()
+				lastSuccess()
+				lastFailure()
+				lastDuration()
+				buildButton()
+			}
 		}
-		columns {
-			status()
-			weather()
-			name()
-			lastSuccess()
-			lastFailure()
-			lastDuration()
-			buildButton()
 	}
 }
 nestedView('terraform-jobs') {
 	views {
-		nestedView('rds') {
+		listView('rds') {
 			views {
 				description('All Terraform Jobs')
 				jobs {
