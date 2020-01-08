@@ -1,14 +1,15 @@
 def terraformRepo       		= "https://github.com/vigneshpalanivelr/terraform_practice_codes.git"
 def terraformBranch     		= "master"
-def gitCreds            		= "GitCred"
-def tfStateBucket			= "terraform-tfstate-mumbai"
+def gitCreds            		= "gitCreds"
+def awsAccount				= "210315133748"
+def tfStateBucket			= "terraform-tfstate-mumba-1"
 def tfStateBucketPrefixRDS		= "rds_module"
 def tfStateBucketPrefixR53		= "r53_module"
 def tfStateBucketPrefixR53ac		= "r53ac_module"
 def tfStateBucketPrefixKMS		= "kms_module"
 
 // RDS DB Build Generic Job
-pipelineJob('tf-1-rds-db-build-job') {
+pipelineJob('tf-rds-db-build-1-job') {
         description('''Building AWS RDS Instances 1) PostgreSQL 2) Oracle 3) MySQL 4) MariaDB <br>
 <br>Instructions for Creating:
 		    <br>&emsp 1) Creates Master Instance&emsp&emsp&emsp&emsp&emsp&emsp&emsp&emsp&ensp TF-STATE : InstanceId.tfstate
@@ -26,13 +27,14 @@ pipelineJob('tf-1-rds-db-build-job') {
                 choiceParam('gitRepo'                   , [terraformRepo]       	, '')
                 choiceParam('gitBranch'                 , [terraformBranch]     	, '')
                 choiceParam('gitCreds'                  , [gitCreds]            	, '')
+		choiceParam('awsAccount'		, [awsAccount]			, '')
                 choiceParam('tfstateBucket'             , [tfStateBucket]      		, 'TF State Bucket'             	)
                 choiceParam('tfstateBucketPrefixRDS'	, [tfStateBucketPrefixRDS]	, 'TF State Bucket Prefix - RDS'	)
                 choiceParam('tfstateBucketPrefixDNS'    , [tfStateBucketPrefixR53ac]	, 'TF State Bucket Prefix - DNS')
                 stringParam('db_family'                 , 'postgres9.6,oracle-se1-11.2'	, '')
                 stringParam('db_engine'                 , 'postgres,oracle-se1'		, '')
                 stringParam('db_engine_version'         , '9.6.11,11.2.0.4.v21'		, '')
-                choiceParam('db_instance_class'         , ['db.t2.small']       	, '')
+                choiceParam('db_instance_class'         , ['db.t2.small','db.t2.micro']	, '')
                 stringParam('db_identifier'             , 'test-instance'       	, '''Name : name-(pgsql|oracle|mysql|mariadb)-rds + rr<br>
 			TF-STATE : Statefile for Instance<br>
 			db_identifier.tfstate''')
@@ -64,13 +66,14 @@ pipelineJob('tf-1-rds-db-build-job') {
 }
 
 // Route53 Zone Creation
-pipelineJob('tf-1-route53-zone-build-job') {
+pipelineJob('tf-route53-zone-build-1-job') {
         description('Building AWS Route53 Zone Creation')
         logRotator(-1,-1)
         parameters{
                 choiceParam('gitRepo'                   , [terraformRepo]       	, '')
                 choiceParam('gitBranch'                 , [terraformBranch]     	, '')
                 choiceParam('gitCreds'                  , [gitCreds]            	, '')
+		choiceParam('awsAccount'		, [awsAccount]			, '')
                 choiceParam('tfstateBucket'             , [tfStateBucket]      		, 'TF State Bucket'             )
                 choiceParam('tfstateBucketPrefix'       , [tfStateBucketPrefixR53]	, 'TF State Bucket Prefix'      )
 		stringParam('r53_zone_name'		, 'vignesh-private.zone.com'	, '')
@@ -87,13 +90,14 @@ pipelineJob('tf-1-route53-zone-build-job') {
 }
 
 // Route53 A-record and CNAME Creation
-pipelineJob('tf-1-route53ac-record-build-job') {
+pipelineJob('tf-route53ac-record-build-1-job') {
         description('Building AWS Route53 Record Creation')
         logRotator(-1,-1)
         parameters{
                 choiceParam('gitRepo'                   , [terraformRepo]       	, '')
                 choiceParam('gitBranch'                 , [terraformBranch]     	, '')
                 choiceParam('gitCreds'                  , [gitCreds]            	, '')
+		choiceParam('awsAccount'		, [awsAccount]			, '')
                 choiceParam('tfstateBucket'             , [tfStateBucket]      		, 'TF State Bucket'             )
                 choiceParam('tfstateBucketPrefix'       , [tfStateBucketPrefixR53ac]	, 'TF State Bucket Prefix'      )
 		stringParam('r53_zone_name'		, 'vignesh-private-zone'	, 'zone name')
@@ -112,13 +116,14 @@ pipelineJob('tf-1-route53ac-record-build-job') {
 }
 
 // AWS KMS Key Creation
-pipelineJob('tf-1-kms-key-build-job') {
+pipelineJob('tf-kms-key-build-1-job') {
         description('Building AWS KMS key creation')
         logRotator(-1,-1)
         parameters{
                 choiceParam('gitRepo'                   , [terraformRepo]       	, '')
                 choiceParam('gitBranch'                 , [terraformBranch]     	, '')
                 choiceParam('gitCreds'                  , [gitCreds]            	, '')
+		choiceParam('awsAccount'		, [awsAccount]			, '')
                 choiceParam('tfstateBucket'             , [tfStateBucket]      		, 'TF State Bucket'             )
                 choiceParam('tfstateBucketPrefix'       , [tfStateBucketPrefixKMS]	, 'TF State Bucket Prefix'      )
 		stringParam('kms_key_name'		, 'custome-key'			, '')
