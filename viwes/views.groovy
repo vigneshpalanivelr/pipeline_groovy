@@ -23,7 +23,7 @@ nestedView('terraform-jobs') {
 			views {
 				description('All Terraform Jobs')
 				jobs {
-					regex('/rds-*-deploy')
+					regex('/rds-*')
 				}
 				columns {
 					status()
