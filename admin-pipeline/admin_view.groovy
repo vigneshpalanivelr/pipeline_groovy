@@ -4,7 +4,6 @@ nestedView('seed-jobs') {
 			views {
 				description('All Seed Jobs')
 				jobs {
-//					name('admin-seed-job')
 					regex('/admin-*')
 				}
 				columns {
