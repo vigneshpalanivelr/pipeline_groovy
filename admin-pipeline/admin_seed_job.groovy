@@ -1,3 +1,10 @@
+/*
+*	jobDSL_repo
+*	jobDSL_branch
+*	jobDSL_creds
+*	jobDSL_scripts
+*/
+
 node('master') {
         stage('Clone & Checkout') {
                 checkout([
