@@ -38,6 +38,10 @@ nestedView('terraform-jobs') {
                                 }
                         }
                 }
+	}
+}
+nestedView('practice-jobs') {
+	views {
 		listView('practice') {
 			views {
 				description('All Jenkins Practice Jobs')
