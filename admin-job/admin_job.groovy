@@ -28,20 +28,3 @@ pipelineJob("admin-seed-job") {
 		}
 	}
 }
-
-//Admin View Job
-pipelineJob("admin-view") {
-        description('Job To Create All Admin Seed Jobs')
-        parameters {
-                choiceParam("job_dsl_repo"      , [pipelineGroovyStack] , "Job DSL Repo")
-                choiceParam("job_dsl_branch"    , [pipelineGroovyBranch], "Job DSL Branch")
-                choiceParam("job_dsl_repo_cred" , [GitCreds]            , "Job DSL Cred")
-                choiceParam("job_dsl_path"      , [viewJobDSL]          , "Location of Job DSL Groovy Script")
-        }
-        definition {
-                cps {
-                        script(readFileFromWorkspace(viewJobDSL))
-                        sandbox()
-                }
-        }
-}
