@@ -15,10 +15,10 @@ def seedJobDSL			=	"admin-pipeline/admin_seed_job.groovy"
 pipelineJob("admin-seed-job") {
 	description('Job To Create All Admin Seed Jobs')
 	parameters {
-		choiceParam("job_dsl_repo"	, [pipelineGroovyStack]	, "Job DSL Repo")
-		choiceParam("job_dsl_branch"	, [pipelineGroovyBranch], "Job DSL Branch")
-		choiceParam("job_dsl_repo_cred"	, [GitCreds]		, "Job DSL Cred")
-		choiceParam("job_dsl_path"	, [seedJobDSL]		, "Location of Job DSL Groovy Script")
+		choiceParam("jobDSL_repo"	, [pipelineGroovyStack]	, "Job DSL Repo")
+		choiceParam("jobDSL_branch"	, [pipelineGroovyBranch], "Job DSL Branch")
+		choiceParam("jobDSL_repo_cred"	, [GitCreds]		, "Job DSL Cred")
+		choiceParam("jobDSL_path"	, [seedJobDSL]		, "Location of Job DSL Groovy Script")
 	}
 	definition {
 		cps {
