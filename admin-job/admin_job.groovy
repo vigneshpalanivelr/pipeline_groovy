@@ -20,6 +20,7 @@ pipelineJob("admin-seed-job") {
 		choiceParam("jobDSL_branch"	, [pipelineGroovyBranch], "Job DSL Branch")
 		choiceParam("jobDSL_creds"	, [GitCreds]		, "Job DSL Cred")
 		choiceParam("jobDSL_path"	, [seedJobDSL]		, "Location of Job DSL Groovy Script")
+		choiceParam("jobDSL_scripts"	, [jobDSL]		, "Location of Job DSL Groovy Script")
 	}
 	definition {
 		cps {
