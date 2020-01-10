@@ -4,7 +4,7 @@ nestedView('seed-jobs') {
                         views {
                                 description('All Seed Jobs')
                                 jobs {
-                                        regex('/admin-*')
+                                        regex('/admin-*-job/')
                                 }
                                 columns {
                                         status()
@@ -25,7 +25,7 @@ nestedView('terraform-jobs') {
                         views {
                                 description('All Terraform Jobs')
                                 jobs {
-                                        regex('/tf-rds-*')
+                                        regex('/tf-rds-*-job/')
                                 }
                                 columns {
                                         status()
@@ -42,7 +42,7 @@ nestedView('terraform-jobs') {
 			views {
 				description('All Jenkins Practice Jobs')
 				jobs {
-					regex('/practice-*')
+					regex('/practice-*-job/')
 				}
 				columns {
 					status()
