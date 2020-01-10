@@ -38,6 +38,40 @@ nestedView('terraform-jobs') {
                                 }
                         }
                 }
+		listView('r53') {
+			views {
+				description('All Terraform Jobs')
+				jobs {
+					regex(/tf-route.*/)
+				}
+				columns {
+					status()
+					weather()
+					name()
+					lastSuccess()
+					lastFailure()
+					lastDuration()
+					buildButton()
+				}
+			}
+		}
+		listView('kms') {
+			views {
+				description('All Terraform Jobs')
+				jobs {
+					regex(/tf-kms.*/)
+				}
+				columns {
+					status()
+					weather()
+					name()
+					lastSuccess()
+					lastFailure()
+					lastDuration()
+					buildButton()
+				}
+			}
+		}
 	}
 }
 nestedView('practice-jobs') {
