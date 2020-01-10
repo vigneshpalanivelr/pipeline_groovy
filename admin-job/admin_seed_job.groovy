@@ -1,9 +1,9 @@
 /*
-1)	Add GitHub Credentials in the Jenkins Credentials	(Name : gitCreds)
-2)      Create a Freestyle Job					(Name : Master-Job)
-3)      It Generates 2 Seed Jobs
-		1. admin-view
-		2. admin-seed-job
+1) Add GitHub Credentials in the Jenkins Credentials	(Name : gitCreds)
+2) Create a Freestyle Job					(Name : Master-Job)
+3) It Generates 2 Seed Jobs
+	1. admin-view
+	2. admin-seed-job
 */
 
 def pipelineGroovyStack		=	"https://github.com/vigneshpalanivelr/pipeline_groovy.git"
@@ -25,10 +25,10 @@ pipelineJob("admin-seed-job") {
 			remote {
 				name("origin")
  				url("\$job_dsl_repo")
-				credentials("\$job_dsl_repo_cred")
+				credentials(\$job_dsl_repo_cred)
 			}
 		}
-    }
+	}
 	steps {
 		dsl {
 			external("\$job_dsl_path")
