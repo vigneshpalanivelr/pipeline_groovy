@@ -1,19 +1,22 @@
 /*
-1)	Create a Freestyle Job
-2)	Add all the JOB DSL scripts
+1)	Add GitHub Credentials in the Jenkins Credentials	(Name : gitCreds)
+2)      Create a Freestyle Job					(Name : Master-Job)
+3)      It Generates 2 Seed Jobs
+		1. admin-view
+		2. admin-seed-job
 */
 
 def pipelineGroovyStack		=	"https://github.com/vigneshpalanivelr/pipeline_groovy.git"
 def pipelineGroovyBranch	=	"master"
-def GitCred			= 	"GitCred"
+def GitCreds			= 	"gitCreds"
 def groovyPath			=	"jobs/**/*.groovy"
 
-job("admin-seed-job") {
+pipeline("admin-seed-job") {
 	description('Job To Create All Admin Seed Jobs')
 	parameters {
 		choiceParam("job_dsl_repo"	, [pipelineGroovyStack]	, "Job DSL Repo")
 		choiceParam("job_dsl_branch"	, [pipelineGroovyBranch], "Job DSL Branch")
-		choiceParam("job_dsl_repo_cred"	, [GitCred]		, "Job DSL Cred")
+		choiceParam("job_dsl_repo_cred"	, [GitCreds]		, "Job DSL Cred")
 		choiceParam("job_dsl_path"	, [groovyPath]		, "Location of Job DSL Groovy Script")
 	}
 	scm {
@@ -22,7 +25,7 @@ job("admin-seed-job") {
 			remote {
 				name("origin")
  				url("\$job_dsl_repo")
-				credentials(GitCred)
+				credentials($job_dsl_repo_cred)
 			}
 		}
     }

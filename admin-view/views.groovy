@@ -3,7 +3,8 @@ nestedView('seed-jobs') {
 		listView('seed-jobs') {
 			description('All Seed Jobs')
 			jobs {
-				name('admin-seed-job')
+//				name('admin-seed-job')
+				regex('/admin-*')
 			}
 			columns {
 				status()
