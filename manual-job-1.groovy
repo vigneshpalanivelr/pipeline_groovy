@@ -4,7 +4,7 @@ pipeline {
         choice(name: 'jobDSL_repo'	    , choices: ['https://github.com/vigneshpalanivelr/pipeline_groovy.git']	, description: 'Job DSL Repo')
         choice(name: 'jobDSL_branch'	, choices: ['master']							                        , description: 'Job DSL Branch')
         choice(name: 'jobDSL_creds' 	, choices: ['gitCreds']							                        , description: 'Job DSL Cred')
-        choice(name: 'jobDSL_path'	    , choices: ['admin-job/*.groovy']					                    , description: 'Location of Job DSL View Groovy Script')
+        choice(name: 'jobDSL_path'	    , choices: ['admin-job/admin_job.groovy']					                    , description: 'Location of Job DSL View Groovy Script')
     }
 	stages {
 	    stage('Clean Workspace') {
