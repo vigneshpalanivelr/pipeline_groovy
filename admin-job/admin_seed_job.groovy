@@ -11,7 +11,7 @@ def pipelineGroovyBranch	=	"master"
 def GitCreds			= 	"gitCreds"
 def groovyPath			=	"jobs/**/*.groovy"
 
-pipeline("admin-seed-job") {
+pipelineJob("admin-seed-job") {
 	description('Job To Create All Admin Seed Jobs')
 	parameters {
 		choiceParam("job_dsl_repo"	, [pipelineGroovyStack]	, "Job DSL Repo")
