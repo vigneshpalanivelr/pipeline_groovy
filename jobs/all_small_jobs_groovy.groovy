@@ -1,8 +1,8 @@
 def terraformRepo	=	"https://github.com/vigneshpalanivelr/terraform_practice_codes.git"
 def terraformBranch	=	"master"
-def gitCreds		=	"GitCred"
+def gitCreds		=	"GitCreds"
 
-pipelineJob("1.1-how_to_use_jenkins_credentials_build_job") {
+pipelineJob("practice-1.1-how-to-use-jenkins-credentials-build-job") {
 	description ('Explains how to use Credentials for Build Jobs')
 	logRotator(-1,-1)
 	parameters {
@@ -18,7 +18,7 @@ pipelineJob("1.1-how_to_use_jenkins_credentials_build_job") {
 	}
 }
 
-pipelineJob("2.1-how_to_use_jenkins_approval_build_job") {
+pipelineJob("practice-2.1-how-to-use-jenkins-approval-build-job") {
 	description('Explains how to use Jenins Approval for Build Jobs')
 	logRotator(-1,-1)
 	parameters{
@@ -34,7 +34,7 @@ pipelineJob("2.1-how_to_use_jenkins_approval_build_job") {
 	}
 }
 
-pipelineJob("3.1-how_to_git_clone_checkout_build_job") {
+pipelineJob("practice-3.1-how-to-git-clone-checkout-build-job") {
 	description('Explains how to use Jenins Approval for Build Jobs')
 	logRotator(-1,-1)
 	parameters{

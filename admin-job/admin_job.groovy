@@ -10,6 +10,7 @@ def pipelineGroovyStack		=	"https://github.com/vigneshpalanivelr/pipeline_groovy
 def pipelineGroovyBranch	=	"master"
 def GitCreds			= 	"gitCreds"
 def seedJobDSL			=	"admin-pipeline/admin_seed_job.groovy"
+def jobDSL			=	"jobs/**/*.groovy"
 
 //Admin Seed Job
 pipelineJob("admin-seed-job") {

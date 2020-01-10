@@ -25,7 +25,7 @@ nestedView('terraform-jobs') {
                         views {
                                 description('All Terraform Jobs')
                                 jobs {
-                                        regex('/rds-*')
+                                        regex('/tf-rds-*')
                                 }
                                 columns {
                                         status()
@@ -38,6 +38,23 @@ nestedView('terraform-jobs') {
                                 }
                         }
                 }
+		listView('practice') {
+			views {
+				description('All Jenkins Practice Jobs')
+				jobs {
+					regex('/practice-*')
+				}
+				columns {
+					status()
+					weather()
+					name()
+					lastSuccess()
+					lastFailure()
+					lastDuration()
+					buildButton()
+				}
+			}
+		}
         }
 }
 
