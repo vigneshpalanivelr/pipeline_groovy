@@ -25,7 +25,7 @@ pipelineJob("admin-seed-job") {
 			remote {
 				name("origin")
  				url("\$job_dsl_repo")
-				credentials($job_dsl_repo_cred)
+				credentials(GitCreds)
 			}
 		}
 	}
