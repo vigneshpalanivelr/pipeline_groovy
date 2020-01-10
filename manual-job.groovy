@@ -7,6 +7,13 @@ pipeline {
         choice(name: 'jobDSL_path'	    , choices: ['admin-job/*.groovy']					                    , description: 'Location of Job DSL View Groovy Script')
     }
 	stages {
+	    stage('Clean Workspace') {
+			steps {
+				script {
+                    cleanWs()
+				}
+			}
+        }
 		stage('Clone Repo') {
 			steps {
 				script {
@@ -30,15 +37,9 @@ pipeline {
 		stage('Execute View Groovy') {
 			steps {
 				script {
-					try {
-        			                jobDsl targets : jobDSL_path
-					}
-					catch(Exception Error) {
-						echo Error
-						exit(100)
-					}
+                    jobDsl targets : jobDSL_path
 				}
 			}
-	        }
+        }
 	}
 }
