@@ -17,7 +17,7 @@ pipelineJob("admin-seed-job") {
 	parameters {
 		choiceParam("jobDSL_repo"	, [pipelineGroovyStack]	, "Job DSL Repo")
 		choiceParam("jobDSL_branch"	, [pipelineGroovyBranch], "Job DSL Branch")
-		choiceParam("jobDSL_repo_cred"	, [GitCreds]		, "Job DSL Cred")
+		choiceParam("jobDSL_creds"	, [GitCreds]		, "Job DSL Cred")
 		choiceParam("jobDSL_path"	, [seedJobDSL]		, "Location of Job DSL Groovy Script")
 	}
 	definition {
