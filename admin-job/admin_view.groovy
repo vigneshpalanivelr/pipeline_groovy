@@ -1,3 +1,20 @@
+nestedView('master-seed-jobs') {
+	views {
+		description('Master Seed Jobs')
+		jobs {
+			regex(/master-seed-.*/)
+		}
+		columns {
+			status()
+			weather()
+			name()
+			lastSuccess()
+			lastFailure()
+			lastDuration()
+			buildButton()
+		}
+	}
+}
 nestedView('seed-jobs') {
         views {
                 listView('seed-jobs') {
