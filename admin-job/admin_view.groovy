@@ -95,13 +95,13 @@ nestedView('practice-jobs') {
 		}
         }
 }
-nestedView('master-seed-jobs') {
+nestedView('master-jobs') {
         views {
-                listView('master-seed-jobs') {
+                listView('master-jobs') {
                         views {
-                                description('Master Seed Jobs')
+                                description('Master Jobs')
                                 jobs {
-                                        regex(/master-seed-.*/)
+                                        regex(/master-.*job/)
                                 }
                                 columns {
                                         status()
