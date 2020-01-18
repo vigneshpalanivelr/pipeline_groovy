@@ -1,20 +1,3 @@
-nestedView('master-seed-jobs') {
-	views {
-		description('Master Seed Jobs')
-		jobs {
-			regex(/master-seed-.*/)
-		}
-		columns {
-			status()
-			weather()
-			name()
-			lastSuccess()
-			lastFailure()
-			lastDuration()
-			buildButton()
-		}
-	}
-}
 nestedView('seed-jobs') {
         views {
                 listView('seed-jobs') {
@@ -112,4 +95,24 @@ nestedView('practice-jobs') {
 		}
         }
 }
-
+nestedView('master-seed-jobs') {
+        views {
+                listView('master-seed-jobs') {
+                        views {
+                                description('Master Seed Jobs')
+                                jobs {
+                                        regex(/master-seed-.*/)
+                                }
+                                columns {
+                                        status()
+                                        weather()
+                                        name()
+                                        lastSuccess()
+                                        lastFailure()
+                                        lastDuration()
+                                        buildButton()
+                                }
+                        }
+                }
+        }
+}
