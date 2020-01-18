@@ -1,6 +1,6 @@
 def terraformRepo       		= "https://github.com/vigneshpalanivelr/terraform_practice_codes.git"
 def terraformBranch     		= "master"
-def gitCreds            		= "GitCreds"
+def gitCreds            		= "gitCreds"
 def tfStateBucket			= "terraform-tfstate-mumbai"
 def tfStateBucketPrefixRDS		= "rds_module"
 def tfStateBucketPrefixR53		= "r53_module"
