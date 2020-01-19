@@ -2,6 +2,7 @@
 *	gitRepo
 *	gitBranch
 *	gitCreds
+*	awsAccount
 *	tfstateBucket
 *	tfstateBucketPrefix
 
@@ -239,6 +240,7 @@ def checkout() {
 	])
 }
 def set_env_variables() {
+	env.TF_VAR_aws_account_num            	= "${awsAccount}"
 	env.TF_VAR_db_family            	= "${db_family}"
 	env.TF_VAR_db_engine            	= "${db_engine}"
 	env.TF_VAR_db_engine_version    	= "${db_engine_version}"
