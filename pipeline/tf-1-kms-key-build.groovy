@@ -2,6 +2,7 @@
 *	gitRepo
 *	gitBranch
 *	gitCreds
+*	awsAccount
 *	tfstateBucket
 *	tfstateBucketPrefix
 
@@ -95,6 +96,7 @@ def checkout() {
 
 def set_env_variables() {
 	env.TF_VAR_kms_key_name		= "${kms_key_name}"
+	env.TF_VAR_aws_account_num	= "${awsAccount}"
 }
 
 def terraform_init() {
