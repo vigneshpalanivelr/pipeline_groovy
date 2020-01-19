@@ -1,6 +1,7 @@
 def terraformRepo       		= "https://github.com/vigneshpalanivelr/terraform_practice_codes.git"
 def terraformBranch     		= "master"
 def gitCreds            		= "gitCreds"
+def awsAccount				= "210315133748"
 def tfStateBucket			= "terraform-tfstate-mumba-1"
 def tfStateBucketPrefixRDS		= "rds_module"
 def tfStateBucketPrefixR53		= "r53_module"
@@ -26,6 +27,7 @@ pipelineJob('tf-rds-db-build-1-job') {
                 choiceParam('gitRepo'                   , [terraformRepo]       	, '')
                 choiceParam('gitBranch'                 , [terraformBranch]     	, '')
                 choiceParam('gitCreds'                  , [gitCreds]            	, '')
+		choiceParam('awsAccount'		, [awsAccount]			, '')
                 choiceParam('tfstateBucket'             , [tfStateBucket]      		, 'TF State Bucket'             	)
                 choiceParam('tfstateBucketPrefixRDS'	, [tfStateBucketPrefixRDS]	, 'TF State Bucket Prefix - RDS'	)
                 choiceParam('tfstateBucketPrefixDNS'    , [tfStateBucketPrefixR53ac]	, 'TF State Bucket Prefix - DNS')
@@ -71,6 +73,7 @@ pipelineJob('tf-route53-zone-build-1-job') {
                 choiceParam('gitRepo'                   , [terraformRepo]       	, '')
                 choiceParam('gitBranch'                 , [terraformBranch]     	, '')
                 choiceParam('gitCreds'                  , [gitCreds]            	, '')
+		choiceParam('awsAccount'		, [awsAccount]			, '')
                 choiceParam('tfstateBucket'             , [tfStateBucket]      		, 'TF State Bucket'             )
                 choiceParam('tfstateBucketPrefix'       , [tfStateBucketPrefixR53]	, 'TF State Bucket Prefix'      )
 		stringParam('r53_zone_name'		, 'vignesh-private.zone.com'	, '')
@@ -94,6 +97,7 @@ pipelineJob('tf-route53ac-record-build-1-job') {
                 choiceParam('gitRepo'                   , [terraformRepo]       	, '')
                 choiceParam('gitBranch'                 , [terraformBranch]     	, '')
                 choiceParam('gitCreds'                  , [gitCreds]            	, '')
+		choiceParam('awsAccount'		, [awsAccount]			, '')
                 choiceParam('tfstateBucket'             , [tfStateBucket]      		, 'TF State Bucket'             )
                 choiceParam('tfstateBucketPrefix'       , [tfStateBucketPrefixR53ac]	, 'TF State Bucket Prefix'      )
 		stringParam('r53_zone_name'		, 'vignesh-private-zone'	, 'zone name')
@@ -119,6 +123,7 @@ pipelineJob('tf-kms-key-build-1-job') {
                 choiceParam('gitRepo'                   , [terraformRepo]       	, '')
                 choiceParam('gitBranch'                 , [terraformBranch]     	, '')
                 choiceParam('gitCreds'                  , [gitCreds]            	, '')
+		choiceParam('awsAccount'		, [awsAccount]			, '')
                 choiceParam('tfstateBucket'             , [tfStateBucket]      		, 'TF State Bucket'             )
                 choiceParam('tfstateBucketPrefix'       , [tfStateBucketPrefixKMS]	, 'TF State Bucket Prefix'      )
 		stringParam('kms_key_name'		, 'custome-key'			, '')
