@@ -34,7 +34,7 @@ pipelineJob('tf-rds-db-build-1-job') {
                 stringParam('db_family'                 , 'postgres9.6,oracle-se1-11.2'	, '')
                 stringParam('db_engine'                 , 'postgres,oracle-se1'		, '')
                 stringParam('db_engine_version'         , '9.6.11,11.2.0.4.v21'		, '')
-                choiceParam('db_instance_class'         , ['db.t2.small']       	, '')
+                choiceParam('db_instance_class'         , ['db.t2.small','db.t2.micro']	, '')
                 stringParam('db_identifier'             , 'test-instance'       	, '''Name : name-(pgsql|oracle|mysql|mariadb)-rds + rr<br>
 			TF-STATE : Statefile for Instance<br>
 			db_identifier.tfstate''')
