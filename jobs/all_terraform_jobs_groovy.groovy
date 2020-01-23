@@ -60,7 +60,7 @@ pipelineJob('tf-rds-db-build-1-job') {
         }
         definition {
                 cps {
-                        script(readFileFromWorkspace('pipeline/tf-1-rds-db-build.groovy'))
+                        script(readFileFromWorkspace('pipeline/tf-rds-db-build-1.groovy'))
                         sandbox()
                 }
         }
@@ -84,7 +84,7 @@ pipelineJob('tf-route53-zone-build-1-job') {
 	}
         definition {
                 cps {
-                        script(readFileFromWorkspace('pipeline/tf-1-route53-zone-build.groovy'))
+                        script(readFileFromWorkspace('pipeline/tf-route53-zone-build-1.groovy'))
                         sandbox()
                 }
         }
@@ -110,7 +110,7 @@ pipelineJob('tf-route53ac-record-build-1-job') {
 	}
         definition {
                 cps {
-                        script(readFileFromWorkspace('pipeline/tf-1-route53ac-record-build.groovy'))
+                        script(readFileFromWorkspace('pipeline/tf-route53ac-record-build-1.groovy'))
                         sandbox()
                 }
         }
@@ -133,7 +133,7 @@ pipelineJob('tf-kms-key-build-1-job') {
 	}
         definition {
                 cps {
-                        script(readFileFromWorkspace('pipeline/tf-1-kms-key-build.groovy'))
+                        script(readFileFromWorkspace('pipeline/tf-kms-key-build-1.groovy'))
                         sandbox()
                 }
         }
@@ -157,7 +157,7 @@ pipelineJob('tf-eni-build-1-job') {
 	}
         definition {
                 cps {
-                        script(readFileFromWorkspace('pipeline/tf-eni-build.groovy'))
+                        script(readFileFromWorkspace('pipeline/tf-eni-build-1.groovy'))
                         sandbox()
                 }
         }
