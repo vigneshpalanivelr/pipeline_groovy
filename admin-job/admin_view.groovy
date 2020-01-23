@@ -72,6 +72,23 @@ nestedView('terraform-jobs') {
 				}
 			}
 		}
+		listView('eni') {
+			views {
+				description('All Terraform Jobs')
+				jobs {
+					regex(/tf-eni.*/)
+				}
+				columns {
+					status()
+					weather()
+					name()
+					lastSuccess()
+					lastFailure()
+					lastDuration()
+					buildButton()
+				}
+			}
+		}
 	}
 }
 nestedView('practice-jobs') {

@@ -7,6 +7,7 @@ def tfStateBucketPrefixRDS		= "rds_module"
 def tfStateBucketPrefixR53		= "r53_module"
 def tfStateBucketPrefixR53ac		= "r53ac_module"
 def tfStateBucketPrefixKMS		= "kms_module"
+def tfStateBucketPrefixENI		= "eni_module"
 
 // RDS DB Build Generic Job
 pipelineJob('tf-rds-db-build-1-job') {
@@ -59,7 +60,7 @@ pipelineJob('tf-rds-db-build-1-job') {
         }
         definition {
                 cps {
-                        script(readFileFromWorkspace('pipeline/tf-1-rds-db-build.groovy'))
+                        script(readFileFromWorkspace('pipeline/tf-rds-db-build-1.groovy'))
                         sandbox()
                 }
         }
@@ -83,7 +84,7 @@ pipelineJob('tf-route53-zone-build-1-job') {
 	}
         definition {
                 cps {
-                        script(readFileFromWorkspace('pipeline/tf-1-route53-zone-build.groovy'))
+                        script(readFileFromWorkspace('pipeline/tf-route53-zone-build-1.groovy'))
                         sandbox()
                 }
         }
@@ -109,7 +110,7 @@ pipelineJob('tf-route53ac-record-build-1-job') {
 	}
         definition {
                 cps {
-                        script(readFileFromWorkspace('pipeline/tf-1-route53ac-record-build.groovy'))
+                        script(readFileFromWorkspace('pipeline/tf-route53ac-record-build-1.groovy'))
                         sandbox()
                 }
         }
@@ -132,7 +133,31 @@ pipelineJob('tf-kms-key-build-1-job') {
 	}
         definition {
                 cps {
-                        script(readFileFromWorkspace('pipeline/tf-1-kms-key-build.groovy'))
+                        script(readFileFromWorkspace('pipeline/tf-kms-key-build-1.groovy'))
+                        sandbox()
+                }
+        }
+}
+
+// AWS ENI Creation
+pipelineJob('tf-eni-build-1-job') {
+        description('Building AWS KMS key creation')
+        logRotator(-1,-1)
+        parameters{
+                choiceParam('gitRepo'                   , [terraformRepo]       	, '')
+                choiceParam('gitBranch'                 , [terraformBranch]     	, '')
+                choiceParam('gitCreds'                  , [gitCreds]            	, '')
+		choiceParam('awsAccount'		, [awsAccount]			, '')
+                choiceParam('tfstateBucket'             , [tfStateBucket]      		, 'TF State Bucket'             )
+                choiceParam('tfstateBucketPrefix'       , [tfStateBucketPrefixENI]	, 'TF State Bucket Prefix'      )
+		stringParam('subnet'			, 'default-1'			, 'Subnet Name')
+		stringParam('instance_name'		, 'test-instance'		, '')
+		choiceParam('includeENI'		, ['true','false']      	, '')
+		choiceParam('terraformApplyPlan'        , ['plan','apply','plan-destroy','destroy']	, '')
+	}
+        definition {
+                cps {
+                        script(readFileFromWorkspace('pipeline/tf-eni-build-1.groovy'))
                         sandbox()
                 }
         }
