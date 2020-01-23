@@ -7,7 +7,7 @@
 *	tfstateBucketPrefix
 
 *	subnet
-* instance_name
+*	instance_name
 
 *	includeENI
 *	terraformApplyPlan
@@ -15,9 +15,9 @@
 
 node ('master'){
 	terraformDirectory	= "modules/all_modules/${tfstateBucketPrefix}"
-	global_tfvars   	  = "../../../variables/global_vars.tfvars"
-	ec2_eni_tfvars		  = "../../../variables/ec2_eni_vars.tfvars"
-	date 			          = new Date()
+	global_tfvars		= "../../../variables/global_vars.tfvars"
+	ec2_eni_tfvars		= "../../../variables/ec2_eni_vars.tfvars"
+	date				= new Date()
 
 	println date
 
@@ -80,27 +80,24 @@ def approval() {
 def checkout() {
 	checkout([
 		$class                            : 'GitSCM', 
-		branches                          : [[name: gitBranch ]], 
+		branches                          : [[name		: gitBranch ]], 
 		doGenerateSubmoduleConfigurations : false, 
 		clearWorkspace                    : true,
-		extensions                        : [
-      [
-        $class              : 'CleanCheckout'], 
-      [
-			  $class              : 'SubmoduleOption', 
-        disableSubmodules   : false, 
-        parentCredentials   : true, 
-        recursiveSubmodules : true, 
-        reference           : '', 
-        trackingSubmodules  : false]], 
-    submoduleCfg                      : [], 
-		userRemoteConfigs                 : [[credentialsId: gitCreds, url: gitRepo]]])
+		extensions                        : [[$class	: 'CleanCheckout' ],[
+			$class					: 'SubmoduleOption', 
+			disableSubmodules		: false,
+			parentCredentials		: true,
+			recursiveSubmodules		: true,
+			reference				: '',
+			trackingSubmodules		: false]],
+		submoduleCfg				: [],
+		userRemoteConfigs			: [[credentialsId: gitCreds, url: gitRepo]]])
 }
 
 def set_env_variables() {
-	env.TF_VAR_instance_name		= "${instance_name}"
+	env.TF_VAR_instance_name	= "${instance_name}"
 	env.TF_VAR_aws_account_num	= "${awsAccount}"
-  env.TF_VAR_subnet           = "${subnet}"
+	env.TF_VAR_subnet           = "${subnet}"
 }
 
 def terraform_init() {
