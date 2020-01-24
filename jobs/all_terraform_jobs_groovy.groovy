@@ -173,7 +173,7 @@ pipelineJob('tf-ebs-build-1-job') {
 		choiceParam('gitCreds'				, [gitCreds]					, '')
 		choiceParam('awsAccount'			, [awsAccount]					, '')
 		choiceParam('tfstateBucket'			, [tfStateBucket]				, 'TF State Bucket'             )
-		choiceParam('tfstateBucketPrefix'	, [tfStateBucketPrefixENI]		, 'TF State Bucket Prefix'      )
+		choiceParam('tfstateBucketPrefix'	, [tfStateBucketPrefixEBS]		, 'TF State Bucket Prefix'      )
 		stringParam('ebs_name'				, ''							, '')
 		choiceParam('ebs_availability_zone'	, ['ap-south-1a','ap-south-1c']	, 'EBS Availability Zone'		)
 		stringParam('ebs_size'				, ''							, 'in GB')
