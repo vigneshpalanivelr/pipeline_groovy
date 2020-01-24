@@ -18,7 +18,7 @@
 node ('master'){
 	terraformDirectory	= "modules/all_modules/${tfstateBucketPrefix}"
 	global_tfvars		= "../../../variables/global_vars.tfvars"
-	ebs_tfvars		    = "../../../variables/ebs_vars.tfvars"
+	ebs_tfvars		    = "../../../variables/ebs_volume_vars.tfvars"
 	date				= new Date()
 
 	println date
