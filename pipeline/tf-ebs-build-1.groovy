@@ -8,8 +8,8 @@
 
 *	ebs_name
 *	ebs_availability_zone
-*   ebs_size
-*   ebs_type
+*	ebs_size
+*	ebs_type
 
 *	includeEBS
 *	terraformApplyPlan
