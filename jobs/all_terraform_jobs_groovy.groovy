@@ -178,7 +178,7 @@ pipelineJob('tf-ebs-build-1-job') {
 		choiceParam('ebs_availability_zone'	, ['ap-south-1a','ap-south-1c']	, 'EBS Availability Zone'		)
 		stringParam('ebs_size'				, ''							, 'in GB')
 		choiceParam('ebs_type'				, ['gp2','standard','io1','sc1','st1']		, '')
-		choiceParam('includeENI'			, ['true','false']				, '')
+		choiceParam('includeEBS'			, ['true','false']				, '')
 		choiceParam('terraformApplyPlan'	, ['plan','apply','plan-destroy','destroy']	, '')
 	}
 	definition {
