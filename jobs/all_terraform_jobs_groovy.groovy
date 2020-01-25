@@ -9,6 +9,7 @@ def tfStateBucketPrefixR53ac	= "r53ac_module"
 def tfStateBucketPrefixKMS		= "kms_module"
 def tfStateBucketPrefixENI		= "eni_module"
 def tfStateBucketPrefixEBS		= "ebs_module"
+def tfStateBucketPrefixEC2		= "ec2_module"
 
 // RDS DB Build Generic Job
 pipelineJob('tf-rds-db-build-1-job') {
@@ -150,7 +151,7 @@ pipelineJob('tf-eni-build-1-job') {
 		choiceParam('awsAccount'			, [awsAccount]					, '')
 		choiceParam('tfstateBucket'			, [tfStateBucket]				, 'TF State Bucket'             )
 		choiceParam('tfstateBucketPrefix'	, [tfStateBucketPrefixENI]		, 'TF State Bucket Prefix'      )
-		stringParam('subnet'				, 'default-1'					, 'Subnet Name'					)
+		stringParam('eni_subnet'			, 'default-1'					, 'ENI Subnet'					)
 		stringParam('instance_name'			, 'test-instance'				, '')
 		choiceParam('includeENI'			, ['true','false']				, '')
 		choiceParam('terraformApplyPlan'	, ['plan','apply','plan-destroy','destroy']	, '')
@@ -178,12 +179,43 @@ pipelineJob('tf-ebs-build-1-job') {
 		choiceParam('ebs_availability_zone'	, ['ap-south-1a','ap-south-1c']	, 'EBS Availability Zone'		)
 		stringParam('ebs_size'				, ''							, 'in GB')
 		choiceParam('ebs_type'				, ['gp2','standard','io1','sc1','st1']		, '')
+		stringParam('ebs_iops'				, '0'							, '')
+		choiceParam('ebs_encrypted'			, ['false','true']				, '')
 		choiceParam('includeEBS'			, ['true','false']				, '')
 		choiceParam('terraformApplyPlan'	, ['plan','apply','plan-destroy','destroy']	, '')
 	}
 	definition {
 		cps {
 			script(readFileFromWorkspace('pipeline/tf-ebs-build-1.groovy'))
+			sandbox()
+		}
+	}
+}
+
+// AWS EC2 Creation
+pipelineJob('tf-ec2-build-1-job') {
+	description('Building AWS EC2 creation')
+	logRotator(-1,-1)
+	parameters{
+		choiceParam('gitRepo'				, [terraformRepo]				, '')
+		choiceParam('gitBranch'				, [terraformBranch]				, '')
+		choiceParam('gitCreds'				, [gitCreds]					, '')
+		choiceParam('awsAccount'			, [awsAccount]					, '')
+		choiceParam('tfstateBucket'			, [tfStateBucket]				, 'TF State Bucket'             )
+		choiceParam('tfstateBucketPrefix'	, [tfStateBucketPrefixEC2]		, 'TF State Bucket Prefix'      )
+		stringParam('instance_name'			, 'test-instance'				, '')
+		stringParam('eni_subnet'			, 'default-1'					, 'ENI Subnet'					)
+		choiceParam('includeENI'			, ['true','false']				, '')
+		stringParam('ebs_name'				, ''							, '')
+		choiceParam('ebs_availability_zone'	, ['ap-south-1a','ap-south-1c']	, 'EBS Availability Zone'		)
+		stringParam('ebs_size'				, ''							, 'in GB')
+		choiceParam('ebs_type'				, ['gp2','standard','io1','sc1','st1']		, '')
+		choiceParam('includeEBS'			, ['true','false']				, '')
+		choiceParam('terraformApplyPlan'	, ['plan','apply','plan-destroy','destroy']	, '')
+	}
+	definition {
+		cps {
+			script(readFileFromWorkspace('pipeline/tf-ec2-build-1.groovy'))
 			sandbox()
 		}
 	}
