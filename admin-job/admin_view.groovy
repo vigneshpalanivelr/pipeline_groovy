@@ -106,6 +106,23 @@ nestedView('terraform-jobs') {
 				}
 			}
 		}
+		listView('ec2') {
+			views {
+				description('All Terraform Jobs')
+				jobs {
+					regex(/tf-ec2.*/)
+				}
+				columns {
+					status()
+					weather()
+					name()
+					lastSuccess()
+					lastFailure()
+					lastDuration()
+					buildButton()
+				}
+			}
+		}
 	}
 }
 nestedView('practice-jobs') {
