@@ -12,6 +12,8 @@
 *	ebs_availability_zone
 *	ebs_size
 *	ebs_type
+*	ebs_iops
+*	ebs_encrypted
 
 *	includeENI
 *	includeEBS
@@ -138,6 +140,8 @@ def checkout() {
 }
 
 def set_env_variables() {
+	env.TF_VAR_instance_name			= "${instance_name}"
+	env.TF_VAR_eni_subnet				= "${eni_subnet}"
 	env.TF_VAR_ebs_name					= "${ebs_name}"
 	env.TF_VAR_aws_account_num			= "${awsAccount}"
 	env.TF_VAR_ebs_availability_zone	= "${ebs_availability_zone}"
