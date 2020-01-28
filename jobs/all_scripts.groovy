@@ -6,8 +6,8 @@ def gitCreds        = "gitCreds"
 pipelineJob('playbook-provisioning-job') {
 	logRotator (-1,-1)
 	parameters {
-		choiceParam('gitRepo'					, [terraformRepo]							, '')
-		choiceParam('gitBranch'					, [terraformBranch]							, '')
+		choiceParam('gitRepo'					, [scriptsRepo]								, '')
+		choiceParam('gitBranch'					, [scriptsBranch]							, '')
 		choiceParam('gitCreds'					, [gitCreds]								, '')
 		choiceParam('scriptType'				, ['select','ansible','python','pgsql']		, '')
 		stringParam('playbook'					, 'site.yml'								, '')
