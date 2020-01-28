@@ -4,14 +4,14 @@ def gitCreds        = "gitCreds"
 
 // RDS DB Build Generic Job
 pipelineJob('playbook-provisioning-job') {
-    logRotator (-1,-1)
+	logRotator (-1,-1)
 	parameters {
-        choiceParam('gitRepo'					, [terraformRepo]				, '')
-		choiceParam('gitBranch'					, [terraformBranch]				, '')
-		choiceParam('gitCreds'					, [gitCreds]					, '')
-        choiceParam('scriptType'				, ['select','ansible','python','pgsql']					, '')
+		choiceParam('gitRepo'					, [terraformRepo]							, '')
+		choiceParam('gitBranch'					, [terraformBranch]							, '')
+		choiceParam('gitCreds'					, [gitCreds]								, '')
+		choiceParam('scriptType'				, ['select','ansible','python','pgsql']		, '')
     }
-    definition {
+	definition {
 		cps {
 			script(readFileFromWorkspace('pipeline/playbook-provisioning.groovy'))
 			sandbox()
