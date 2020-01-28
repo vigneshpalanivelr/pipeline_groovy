@@ -166,4 +166,24 @@ nestedView('master-jobs') {
 			}
 		}
 	}
+nestedView('playbooks') {
+	views {
+		listView('ansible-playbooks') {
+			views {
+				description('Ansible Playbooks')
+				jobs {
+					regex(/playbook-.*job/)
+				}
+				columns {
+					status()
+					weather()
+					name()
+					lastSuccess()
+					lastFailure()
+					lastDuration()
+					buildButton()
+				}
+			}
+		}
+	}
 }
