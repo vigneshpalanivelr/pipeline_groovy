@@ -26,7 +26,7 @@ node ('master') {
 		stage('Playbook Execution') {
 			ansiColor('xterm') {
 				ansiblePlaybook(
-					playbook        : "${playbook}',
+					playbook        : "${playbook}",
 					tags            : "${playbookTags}"
 					colorized       : true
 				)
