@@ -10,6 +10,8 @@ pipelineJob('playbook-provisioning-job') {
 		choiceParam('gitBranch'					, [terraformBranch]							, '')
 		choiceParam('gitCreds'					, [gitCreds]								, '')
 		choiceParam('scriptType'				, ['select','ansible','python','pgsql']		, '')
+		stringParam('playbook'					, 'site.yml'								, '')
+		stringParam('playbookTags'				, ''										, '')
     }
 	definition {
 		cps {
