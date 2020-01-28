@@ -166,6 +166,7 @@ nestedView('master-jobs') {
 			}
 		}
 	}
+}
 nestedView('playbooks') {
 	views {
 		listView('ansible-playbooks') {
