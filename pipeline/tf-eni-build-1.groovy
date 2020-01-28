@@ -6,7 +6,8 @@
 *	tfstateBucket
 *	tfstateBucketPrefix
 
-*	subnet
+*	eni_subnet
+*	eni_security_group
 *	instance_name
 
 *	includeENI
@@ -95,9 +96,10 @@ def checkout() {
 }
 
 def set_env_variables() {
-	env.TF_VAR_instance_name	= "${instance_name}"
-	env.TF_VAR_aws_account_num	= "${awsAccount}"
-	env.TF_VAR_subnet           = "${subnet}"
+	env.TF_VAR_instance_name		= "${instance_name}"
+	env.TF_VAR_aws_account_num		= "${awsAccount}"
+	env.TF_VAR_eni_subnet			= "${eni_subnet}"
+	env.TF_VAR_eni_security_group	= "${eni_security_group}"
 }
 
 def terraform_init() {
