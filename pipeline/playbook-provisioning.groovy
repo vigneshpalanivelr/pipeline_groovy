@@ -25,7 +25,7 @@ node ('master') {
 	dir(scriptsDirectory) {
 		stage('Playbook Execution') {
 			ansiColor('xterm') {
-				ansiblePlaybook become: true, colorized: true, extras: 'group_name=root_group action=create_group', installation: 'Ansible', playbook: 'site.yml', tags: 'create_group'
+				ansiblePlaybook become: true, colorized: true, extras: extraVars, installation: 'Ansible', playbook: playbook, tags: playbookTags
 			}
 		}
 	}
