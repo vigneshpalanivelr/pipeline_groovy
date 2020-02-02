@@ -29,7 +29,7 @@ node ('master') {
 					playbook        : "${playbook}",
 					extraVars		: "${extraVars}",
 					tags            : "${playbookTags}",
-					colorized       : true
+					colorized       : true,
 					extras			: "${extraVars}"
 				)
 			}
