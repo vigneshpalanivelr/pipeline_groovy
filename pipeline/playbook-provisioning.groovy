@@ -25,7 +25,7 @@ node ('master') {
 	dir(scriptsDirectory) {
 		stage('Playbook Execution') {
 			ansiColor('xterm') {
-				ansiblePlaybook become: true, colorized: true, extras: extraVars, installation: 'Ansible', playbook: playbook, tags: playbookTags
+				ansiblePlaybook colorized: true, extras: extraVars, installation: 'Ansible', playbook: playbook, tags: playbookTags
 			}
 		}
 	}
