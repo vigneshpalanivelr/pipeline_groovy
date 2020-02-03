@@ -25,13 +25,7 @@ node ('master') {
 	dir(scriptsDirectory) {
 		stage('Playbook Execution') {
 			ansiColor('xterm') {
-				ansiblePlaybook(
-					playbook        : "${playbook}",
-					extraVars		: "${extraVars}",
-					tags            : "${playbookTags}",
-					colorized       : true,
-					extras			: "${extraVars}"
-				)
+				sh "/usr/bin/ansible-playbook ${playbook} --tags=${playbookTags} --extra-vars '${extraVars}'"
 			}
 		}
 	}
