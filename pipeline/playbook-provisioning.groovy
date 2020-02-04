@@ -37,15 +37,14 @@ node ('master') {
 						tags            : "${playbookTags}",
 						extras			: "${extras}",
 						colorized       : true
-						
-						# Example Options
+						//Example Options
 						//extras		: "-e group_name='root_group' -e action='create_group'",
 						//extraVars		: [group_name:"root_group", action:"create_group"],
 					)
 				}
 			}
 		}
-		# Example block
+		//Example block
 		/*
 		if (extraVars) {
 			stage('Playbook Execution with extravars') {
