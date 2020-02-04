@@ -28,7 +28,7 @@ node ('master') {
 	}
 	
 	dir(scriptsDirectory) {
-		if (extraVars) {
+		if (extras) {
 			stage('Playbook Execution') {
 				ansiColor('xterm') {
 					ansiblePlaybook(
