@@ -33,7 +33,7 @@ node ('master') {
 				ansiColor('xterm') {
 					ansiblePlaybook(
 						playbook        : "${playbook}",
-						inventory		: "${inventory}"
+						inventory		: "${inventory}",
 						tags            : "${playbookTags}",
 						extras			: "${extras}",
 						colorized       : true
