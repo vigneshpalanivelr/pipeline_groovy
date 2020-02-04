@@ -2,15 +2,20 @@
 *	gitRepo
 *	gitBranch
 *	gitCreds
+
 *	scriptType
 *	playbook
+*	inventory
 *	playbookTags
+*	extraVars
 */
 
 node ('master') {
 	scriptsDirectory    = "${scriptType}"
 	playbook            = "${playbook}"
+	inventory			= "${inventory}"
 	playbookTags        = "${playbookTags}"
+	extraVars			= "${extraVars}"
     
 	date				= new Date()
 	println date
@@ -23,9 +28,21 @@ node ('master') {
 	}
 	
 	dir(scriptsDirectory) {
-		stage('Playbook Execution') {
-			ansiColor('xterm') {
-				sh "/usr/bin/ansible-playbook ${playbook} --tags=${playbookTags} --extra-vars '${extraVars}'"
+		if (extraVars) {
+			stage('Playbook Execution with extravars') {
+				sh "/usr/bin/ansible-playbook ${playbook} --inventory ${inventory} --tags=${playbookTags} --extra-vars '${extraVars}'"
+			}
+		}
+		else {
+			stage('Playbook Execution without extravars') {
+				ansiColor('xterm') {
+					ansiblePlaybook(
+						playbook        : "${playbook}",
+						inventory		: "${inventory}"
+						tags            : "${playbookTags}",
+						colorized       : true
+					)
+				}
 			}
 		}
 	}
