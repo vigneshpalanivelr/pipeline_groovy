@@ -11,6 +11,7 @@ pipelineJob('playbook-provisioning-job') {
 		choiceParam('gitCreds'					, [gitCreds]								, '')
 		choiceParam('scriptType'				, ['select','ansible','python','pgsql']		, '')
 		stringParam('playbook'					, 'site.yml'								, '')
+		stringParam('inventory'					, 'inventory'								, '')
 		stringParam('extraVars'					, ''										, '')
 		stringParam('playbookTags'				, ''										, '')
     }
