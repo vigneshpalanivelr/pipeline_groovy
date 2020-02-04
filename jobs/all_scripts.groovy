@@ -12,7 +12,7 @@ pipelineJob('playbook-provisioning-job') {
 		choiceParam('scriptType'				, ['select','ansible','python','pgsql']		, '')
 		stringParam('playbook'					, 'site.yml'								, '')
 		stringParam('inventory'					, 'inventory'								, '')
-		stringParam('extraVars'					, ''										, '')
+		stringParam('extras'					, ''										, '')
 		stringParam('playbookTags'				, ''										, '')
     }
 	definition {
