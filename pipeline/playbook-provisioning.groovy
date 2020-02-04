@@ -15,7 +15,7 @@ node ('master') {
 	playbook            = "${playbook}"
 	inventory			= "${inventory}"
 	playbookTags        = "${playbookTags}"
-	extraVars			= "${extraVars}"
+	extras				= "${extras}"
     
 	date				= new Date()
 	println date
