@@ -3,7 +3,6 @@ def terraformBranch				= "master"
 def gitCreds					= "gitCreds"
 def awsAccount					= "210315133748"
 def tfStateBucket				= "terraform-tfstate-mumba-1"
-def 
 
 def tfStateBucketPrefixRDS		= "rds_module"
 def tfStateBucketPrefixR53		= "r53_module"
