@@ -3,6 +3,8 @@ def terraformBranch				= "master"
 def gitCreds					= "gitCreds"
 def awsAccount					= "210315133748"
 def tfStateBucket				= "terraform-tfstate-mumba-1"
+def 
+
 def tfStateBucketPrefixRDS		= "rds_module"
 def tfStateBucketPrefixR53		= "r53_module"
 def tfStateBucketPrefixR53ac	= "r53ac_module"
@@ -152,8 +154,9 @@ pipelineJob('tf-sg-build-1-job') {
 		choiceParam('awsAccount'			, [awsAccount]					, '')
 		choiceParam('tfstateBucket'			, [tfStateBucket]				, 'TF State Bucket'             )
 		choiceParam('tfstateBucketPrefix'	, [tfStateBucketPrefixSG]		, 'TF State Bucket Prefix'      )
-		stringParam('sg_group_name'			, ''							, 'name + sg (by default)'		)
-		stringParam('resource_name'			, ''							, 'SG Description'				)
+		stringParam('vpc_name'				, 'default-vpc'					, '')
+		stringParam('sg_group_name'			, 'test-instance'				, 'name + sg (by default)'		)
+		stringParam('resource_name'			, 'test-instance'				, 'SG Description'				)
 		choiceParam('includeSG'				, ['true','false']				, '')
 		choiceParam('terraformApplyPlan'	, ['plan','apply','plan-destroy','destroy']	, '')
 	}
