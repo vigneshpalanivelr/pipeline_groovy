@@ -6,18 +6,18 @@
 *	tfstateBucket
 *	tfstateBucketPrefix
 
-*	eni_subnet
-*	eni_security_group
-*	instance_name
+*	vpc_name
+*	sg_group_name
+*	resource_name
 
-*	includeENI
+*	includeEBS
 *	terraformApplyPlan
 */
 
 node ('master'){
 	terraformDirectory	= "modules/all_modules/${tfstateBucketPrefix}"
 	global_tfvars		= "../../../variables/global_vars.tfvars"
-	ec2_eni_tfvars		= "../../../variables/ec2_eni_vars.tfvars"
+	sg_tfvars		    = "../../../variables/sg_group_vars.tfvars"
 	date				= new Date()
 
 	println date
@@ -31,7 +31,7 @@ node ('master'){
 
 	stage('Checkout') {
 		checkout()
-		if (includeENI == 'true') {
+		if (includeSG == 'true') {
 			dir(terraformDirectory) {
 				stage('Remote State Init') {
 					terraform_init()
@@ -39,7 +39,7 @@ node ('master'){
 				if (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply') {
 					stage('Terraform Plan') {
 						set_env_variables()
-						terraform_plan(global_tfvars,ec2_eni_tfvars)
+						terraform_plan(global_tfvars,sg_tfvars)
 					}
 				}
 				if (terraformApplyPlan == 'apply') {
@@ -53,7 +53,7 @@ node ('master'){
 				if (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy') {
 					stage('Plan Destroy') {
 						set_env_variables()
-						terraform_plan_destroy(global_tfvars,ec2_eni_tfvars)
+						terraform_plan_destroy(global_tfvars,sg_tfvars)
 					}
 				}
 				if (terraformApplyPlan == 'destroy') {
@@ -96,32 +96,32 @@ def checkout() {
 }
 
 def set_env_variables() {
-	env.TF_VAR_resource_name	= "${resource_name}"
+	env.TF_VAR_aws_vpc_name		= "${vpc_name}"
 	env.TF_VAR_aws_account_num	= "${awsAccount}"
-	env.TF_VAR_eni_subnet		= "${eni_subnet}"
-	env.TF_VAR_sg_group_name	= "${sg_group_name}"
+	env.TF_VAR_sg_group_name    = "${sg_group_name}"
+	env.TF_VAR_resource_name	= "${resource_name}"
 }
 
 def terraform_init() {
 	withEnv(["GIT_ASKPASS=${WORKSPACE}/askp-${BUILD_TAG}"]){
 		withCredentials([usernamePassword(credentialsId: gitCreds, usernameVariable: 'STASH_USERNAME', passwordVariable: 'STASH_PASSWORD')]) {
-			sh "terraform init -no-color -input=false -upgrade=true -backend=true -force-copy -backend-config='bucket=${tfstateBucket}' -backend-config='key=${tfstateBucketPrefix}/${resource_name}-eni.tfstate'"
+			sh "terraform init -no-color -input=false -upgrade=true -backend=true -force-copy -backend-config='bucket=${tfstateBucket}' -backend-config='key=${tfstateBucketPrefix}/${sg_group_name}-sg.tfstate'"
 		}
 	}
 }
 
-def terraform_plan(global_tfvars,ec2_eni_tfvars) {
-	sh "terraform plan -no-color -out=tfplan -input=false -var-file=${global_tfvars} -var-file=${ec2_eni_tfvars}"
+def terraform_plan(global_tfvars,sg_tfvars) {
+	sh "terraform plan -no-color -out=tfplan -input=false -var-file=${global_tfvars} -var-file=${sg_tfvars}"
 }
 
 def terraform_apply() {
 	sh "terraform apply -no-color -input=false tfplan"
 }
 
-def terraform_plan_destroy(global_tfvars,ec2_eni_tfvars) {
-        sh "terraform plan -destroy -no-color -out=tfdestroy -input=false -var-file=${global_tfvars} -var-file=${ec2_eni_tfvars}"
+def terraform_plan_destroy(global_tfvars,sg_tfvars) {
+    sh "terraform plan -destroy -no-color -out=tfdestroy -input=false -var-file=${global_tfvars} -var-file=${sg_tfvars}"
 }
 
 def terraform_destroy() {
-        sh "terraform apply -no-color -input=false tfdestroy"
+    sh "terraform apply -no-color -input=false tfdestroy"
 }

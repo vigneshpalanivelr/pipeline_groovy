@@ -3,10 +3,12 @@ def terraformBranch				= "master"
 def gitCreds					= "gitCreds"
 def awsAccount					= "210315133748"
 def tfStateBucket				= "terraform-tfstate-mumba-1"
+
 def tfStateBucketPrefixRDS		= "rds_module"
 def tfStateBucketPrefixR53		= "r53_module"
 def tfStateBucketPrefixR53ac	= "r53ac_module"
 def tfStateBucketPrefixKMS		= "kms_module"
+def tfStateBucketPrefixSG		= "sg_module"
 def tfStateBucketPrefixENI		= "eni_module"
 def tfStateBucketPrefixEBS		= "ebs_module"
 def tfStateBucketPrefixEC2		= "ec2_module"
@@ -46,7 +48,7 @@ pipelineJob('tf-rds-db-build-1-job') {
 		choiceParam('db_allocated_storage'		, ['10']						, 'in GBs'						)
 		choiceParam('db_multi_az'				, ['false','true']				, '')
 		choiceParam('db_apply_changes'			, ['true','false']				, '')
-		choiceParam('db_availability_zone'		, ['ap-south-1a','ap-south-1c']	, 'either a or b'				)
+		choiceParam('db_availability_zone'		, ['ap-south-1a','ap-south-1b','ap-south-1c']	, ''			)
 		choiceParam('db_action'					, ['master','replica','promote'	,'promote-as-master'], ''		)
 		choiceParam('includeInstance'			, ['true','false']				, '')
 		stringParam('db_source_identifier'		, 'test-instance'				, 'source instance to replicate')
@@ -79,7 +81,7 @@ pipelineJob('tf-route53-zone-build-1-job') {
 		choiceParam('tfstateBucket'			, [tfStateBucket]			, 'TF State Bucket'             )
 		choiceParam('tfstateBucketPrefix'	, [tfStateBucketPrefixR53]	, 'TF State Bucket Prefix'      )
 		stringParam('r53_zone_name'			, 'vignesh-private.zone.com', '')
-		stringParam('vpc_name'				, 'Default_VPC'				, '')
+		stringParam('vpc_name'				, 'default-vpc'				, '')
 		choiceParam('includeR53Zone'		, ['true','false']			, '')
 		choiceParam('terraformApplyPlan'	, ['plan','apply','plan-destroy','destroy']	, '')
 	}
@@ -140,6 +142,31 @@ pipelineJob('tf-kms-key-build-1-job') {
 	}
 }
 
+// AWS SG Creation
+pipelineJob('tf-sg-build-1-job') {
+	description('Building AWS SG creation')
+	logRotator(-1,-1)
+	parameters{
+		choiceParam('gitRepo'				, [terraformRepo]				, '')
+		choiceParam('gitBranch'				, [terraformBranch]				, '')
+		choiceParam('gitCreds'				, [gitCreds]					, '')
+		choiceParam('awsAccount'			, [awsAccount]					, '')
+		choiceParam('tfstateBucket'			, [tfStateBucket]				, 'TF State Bucket'             )
+		choiceParam('tfstateBucketPrefix'	, [tfStateBucketPrefixSG]		, 'TF State Bucket Prefix'      )
+		stringParam('vpc_name'				, 'default-vpc'					, '')
+		stringParam('sg_group_name'			, 'test-instance'				, 'name + sg (by default)'		)
+		stringParam('resource_name'			, 'test-instance'				, 'SG Description'				)
+		choiceParam('includeSG'				, ['true','false']				, '')
+		choiceParam('terraformApplyPlan'	, ['plan','apply','plan-destroy','destroy']	, '')
+	}
+	definition {
+		cps {
+			script(readFileFromWorkspace('pipeline/tf-sg-build-1.groovy'))
+			sandbox()
+		}
+	}
+}
+
 // AWS ENI Creation
 pipelineJob('tf-eni-build-1-job') {
 	description('Building AWS ENI creation')
@@ -151,9 +178,9 @@ pipelineJob('tf-eni-build-1-job') {
 		choiceParam('awsAccount'			, [awsAccount]					, '')
 		choiceParam('tfstateBucket'			, [tfStateBucket]				, 'TF State Bucket'             )
 		choiceParam('tfstateBucketPrefix'	, [tfStateBucketPrefixENI]		, 'TF State Bucket Prefix'      )
-		stringParam('eni_subnet'			, 'default-subnet-1'			, 'ENI Subnet'					)
-		stringParam('eni_security_group'	, 'default-ec2-sg'				, 'ENI Security Group'			)
-		stringParam('instance_name'			, 'test-instance'				, '')
+		choiceParam('eni_subnet'			, ['default-subnet-1','default-subnet-2','default-subnet-3']	, 'ENI Subnet'	)
+		stringParam('sg_group_name'			, 'default-ec2-sg'				, 'ENI Security Group'			)
+		stringParam('resource_name'			, 'test-instance'				, '')
 		choiceParam('includeENI'			, ['true','false']				, '')
 		choiceParam('terraformApplyPlan'	, ['plan','apply','plan-destroy','destroy']	, '')
 	}
@@ -176,14 +203,10 @@ pipelineJob('tf-ebs-build-1-job') {
 		choiceParam('awsAccount'			, [awsAccount]					, '')
 		choiceParam('tfstateBucket'			, [tfStateBucket]				, 'TF State Bucket'             )
 		choiceParam('tfstateBucketPrefix'	, [tfStateBucketPrefixEBS]		, 'TF State Bucket Prefix'      )
-		stringParam('ebs_name'				, ''							, '')
-		choiceParam('ebs_availability_zone'	, ['ap-south-1a','ap-south-1c']	, 'EBS Availability Zone'		)
-		stringParam('ebs_size'				, ''							, 'in GB')
-		choiceParam('ebs_type'				, ['gp2','standard','io1','sc1','st1']		, '')
-		stringParam('ebs_iops'				, '0'							, '')
-		choiceParam('ebs_encrypted'			, ['false','true']				, '')
+		stringParam('ebs_name'				, 'test-instance'				, '')
+		choiceParam('ebs_availability_zone'	, ['ap-south-1a','ap-south-1b','ap-south-1c']	, '')
 		choiceParam('includeEBS'			, ['true','false']				, '')
-		choiceParam('terraformApplyPlan'	, ['plan','apply','plan-destroy','destroy']	, '')
+		choiceParam('terraformApplyPlan'	, ['plan','apply','plan-destroy','destroy']		, '')
 	}
 	definition {
 		cps {
@@ -204,16 +227,17 @@ pipelineJob('tf-ec2-build-1-job') {
 		choiceParam('awsAccount'			, [awsAccount]					, '')
 		choiceParam('tfstateBucket'			, [tfStateBucket]				, 'TF State Bucket'             )
 		choiceParam('tfstateBucketPrefix'	, [tfStateBucketPrefixEC2]		, 'TF State Bucket Prefix'      )
-		stringParam('instance_name'			, 'test-instance'				, '')
-		stringParam('eni_subnet'			, 'default-1'					, 'ENI Subnet'					)
 		choiceParam('includeENI'			, ['true','false']				, '')
-		stringParam('ebs_name'				, ''							, '')
-		choiceParam('ebs_availability_zone'	, ['ap-south-1a','ap-south-1c']	, 'EBS Availability Zone'		)
-		stringParam('ebs_size'				, ''							, 'in GB')
-		choiceParam('ebs_type'				, ['gp2','standard','io1','sc1','st1']		, '')
-		stringParam('ebs_iops'				, '0'							, '')
-		choiceParam('ebs_encrypted'			, ['false','true']				, '')
+		stringParam('ebs_name'				, 'test-instance'				, '')
 		choiceParam('includeEBS'			, ['true','false']				, '')
+		stringParam('vpc_name'				, 'default-vpc'					, '')
+		stringParam('sg_group_name'			, 'test-instance'				, 'name + sg (by default)'		)
+		choiceParam('includeSG'				, ['true','false']				, '')
+		stringParam('instance_name'			, 'test-instance'				, '')
+		stringParam('instance_type'			, 't2.micro'					, '')
+		choiceParam('AZ'					,['ap-south-1a','ap-south-1b','ap-south-1c']				, 'EBS | EC2')
+		choiceParam('subnet'				, ['default-subnet-1','default-subnet-2','default-subnet-3'], 'ENI | EC2')
+		choiceParam('includeEC2'			, ['true','false']				, '')
 		choiceParam('terraformApplyPlan'	, ['plan','apply','plan-destroy','destroy']	, '')
 	}
 	definition {
