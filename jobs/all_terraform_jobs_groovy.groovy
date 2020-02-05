@@ -81,7 +81,7 @@ pipelineJob('tf-route53-zone-build-1-job') {
 		choiceParam('tfstateBucket'			, [tfStateBucket]			, 'TF State Bucket'             )
 		choiceParam('tfstateBucketPrefix'	, [tfStateBucketPrefixR53]	, 'TF State Bucket Prefix'      )
 		stringParam('r53_zone_name'			, 'vignesh-private.zone.com', '')
-		stringParam('vpc_name'				, 'Default_VPC'				, '')
+		stringParam('vpc_name'				, 'default-vpc'				, '')
 		choiceParam('includeR53Zone'		, ['true','false']			, '')
 		choiceParam('terraformApplyPlan'	, ['plan','apply','plan-destroy','destroy']	, '')
 	}
