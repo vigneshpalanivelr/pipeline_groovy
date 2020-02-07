@@ -96,10 +96,10 @@ def checkout() {
 }
 
 def set_env_variables() {
-	env.TF_VAR_instance_name		= "${resource_name}"
-	env.TF_VAR_aws_account_num		= "${awsAccount}"
-	env.TF_VAR_eni_subnet			= "${eni_subnet}"
-	env.TF_VAR_eni_security_group	= "${sg_group_name}"
+	env.TF_VAR_resource_name	= "${resource_name}"
+	env.TF_VAR_aws_account_num	= "${awsAccount}"
+	env.TF_VAR_eni_subnet		= "${eni_subnet}"
+	env.TF_VAR_sg_group_name	= "${sg_group_name}"
 }
 
 def terraform_init() {
