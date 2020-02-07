@@ -48,7 +48,7 @@ pipelineJob('tf-rds-db-build-1-job') {
 		choiceParam('db_allocated_storage'		, ['10']						, 'in GBs'						)
 		choiceParam('db_multi_az'				, ['false','true']				, '')
 		choiceParam('db_apply_changes'			, ['true','false']				, '')
-		choiceParam('db_availability_zone'		, ['ap-south-1a','ap-south-1c']	, 'either a or b'				)
+		choiceParam('db_availability_zone'		, ['ap-south-1a','ap-south-1b','ap-south-1c']	, ''			)
 		choiceParam('db_action'					, ['master','replica','promote'	,'promote-as-master'], ''		)
 		choiceParam('includeInstance'			, ['true','false']				, '')
 		stringParam('db_source_identifier'		, 'test-instance'				, 'source instance to replicate')
@@ -204,9 +204,9 @@ pipelineJob('tf-ebs-build-1-job') {
 		choiceParam('tfstateBucket'			, [tfStateBucket]				, 'TF State Bucket'             )
 		choiceParam('tfstateBucketPrefix'	, [tfStateBucketPrefixEBS]		, 'TF State Bucket Prefix'      )
 		stringParam('ebs_name'				, 'test-instance'				, '')
-		choiceParam('ebs_availability_zone'	, ['ap-south-1a','ap-south-1b''ap-south-1c'], '')
+		choiceParam('ebs_availability_zone'	, ['ap-south-1a','ap-south-1b','ap-south-1c']	, '')
 		choiceParam('includeEBS'			, ['true','false']				, '')
-		choiceParam('terraformApplyPlan'	, ['plan','apply','plan-destroy','destroy']	, '')
+		choiceParam('terraformApplyPlan'	, ['plan','apply','plan-destroy','destroy']		, '')
 	}
 	definition {
 		cps {
@@ -235,7 +235,7 @@ pipelineJob('tf-ec2-build-1-job') {
 		choiceParam('includeSG'				, ['true','false']				, '')
 		stringParam('instance_name'			, 'test-instance'				, '')
 		stringParam('instance_type'			, 't2.micro'					, '')
-		choiceParam('AZ'					,['ap-south-1a','ap-south-1b''ap-south-1c']					, 'EBS | EC2')
+		choiceParam('AZ'					,['ap-south-1a','ap-south-1b','ap-south-1c']				, 'EBS | EC2')
 		choiceParam('subnet'				, ['default-subnet-1','default-subnet-2','default-subnet-3'], 'ENI | EC2')
 		choiceParam('includeEC2'			, ['true','false']				, '')
 		choiceParam('terraformApplyPlan'	, ['plan','apply','plan-destroy','destroy']	, '')
