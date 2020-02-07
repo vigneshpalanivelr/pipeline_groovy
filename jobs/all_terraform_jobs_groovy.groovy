@@ -179,8 +179,8 @@ pipelineJob('tf-eni-build-1-job') {
 		choiceParam('tfstateBucket'			, [tfStateBucket]				, 'TF State Bucket'             )
 		choiceParam('tfstateBucketPrefix'	, [tfStateBucketPrefixENI]		, 'TF State Bucket Prefix'      )
 		choiceParam('eni_subnet'			, ['default-subnet-1','default-subnet-2','default-subnet-3']	, 'ENI Subnet'	)
-		stringParam('eni_security_group'	, 'default-ec2-sg'				, 'ENI Security Group'			)
-		stringParam('instance_name'			, 'test-instance'				, '')
+		stringParam('sg_group_name'			, 'default-ec2-sg'				, 'ENI Security Group'			)
+		stringParam('resource_name'			, 'test-instance'				, '')
 		choiceParam('includeENI'			, ['true','false']				, '')
 		choiceParam('terraformApplyPlan'	, ['plan','apply','plan-destroy','destroy']	, '')
 	}
