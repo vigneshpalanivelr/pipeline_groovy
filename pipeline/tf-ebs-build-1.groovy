@@ -8,10 +8,6 @@
 
 *	ebs_name
 *	ebs_availability_zone
-*	ebs_size
-*	ebs_type
-*	ebs_iops
-*	ebs_encrypted
 
 *	includeEBS
 *	terraformApplyPlan
@@ -102,10 +98,6 @@ def set_env_variables() {
 	env.TF_VAR_ebs_name					= "${ebs_name}"
 	env.TF_VAR_aws_account_num			= "${awsAccount}"
 	env.TF_VAR_ebs_availability_zone	= "${ebs_availability_zone}"
-	env.TF_VAR_ebs_size					= "${ebs_size}"
-	env.TF_VAR_ebs_type					= "${ebs_type}"
-	env.TF_VAR_ebs_iops					= "${ebs_iops}"
-	env.TF_VAR_ebs_encrypted			= "${ebs_encrypted}"
 }
 
 def terraform_init() {
