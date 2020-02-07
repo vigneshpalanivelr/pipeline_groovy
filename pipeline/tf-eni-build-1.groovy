@@ -96,16 +96,16 @@ def checkout() {
 }
 
 def set_env_variables() {
-	env.TF_VAR_instance_name		= "${instance_name}"
+	env.TF_VAR_instance_name		= "${resource_name}"
 	env.TF_VAR_aws_account_num		= "${awsAccount}"
 	env.TF_VAR_eni_subnet			= "${eni_subnet}"
-	env.TF_VAR_eni_security_group	= "${eni_security_group}"
+	env.TF_VAR_eni_security_group	= "${sg_group_name}"
 }
 
 def terraform_init() {
 	withEnv(["GIT_ASKPASS=${WORKSPACE}/askp-${BUILD_TAG}"]){
 		withCredentials([usernamePassword(credentialsId: gitCreds, usernameVariable: 'STASH_USERNAME', passwordVariable: 'STASH_PASSWORD')]) {
-			sh "terraform init -no-color -input=false -upgrade=true -backend=true -force-copy -backend-config='bucket=${tfstateBucket}' -backend-config='key=${tfstateBucketPrefix}/${instance_name}-eni.tfstate'"
+			sh "terraform init -no-color -input=false -upgrade=true -backend=true -force-copy -backend-config='bucket=${tfstateBucket}' -backend-config='key=${tfstateBucketPrefix}/${resource_name}-eni.tfstate'"
 		}
 	}
 }
