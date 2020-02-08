@@ -38,7 +38,7 @@ node ('master'){
 				if (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply') {
 					stage('Terraform Plan') {
 						set_env_variables()
-						terraform_plan(global_tfvars,sg_tfvars)
+						terraform_plan(global_tfvars)
 					}
 				}
 				if (terraformApplyPlan == 'apply') {
@@ -52,7 +52,7 @@ node ('master'){
 				if (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy') {
 					stage('Plan Destroy') {
 						set_env_variables()
-						terraform_plan_destroy(global_tfvars,sg_tfvars)
+						terraform_plan_destroy(global_tfvars)
 					}
 				}
 				if (terraformApplyPlan == 'destroy') {
@@ -109,8 +109,8 @@ def terraform_init() {
 	}
 }
 
-def terraform_plan(global_tfvars,sg_tfvars) {
-	sh "terraform plan -no-color -out=tfplan -input=false -var-file=${global_tfvars} -var-file=${sg_tfvars}"
+def terraform_plan(global_tfvars) {
+	sh "terraform plan -no-color -out=tfplan -input=false -var-file=${global_tfvars}"
 }
 
 def terraform_apply() {
@@ -118,7 +118,7 @@ def terraform_apply() {
 }
 
 def terraform_plan_destroy(global_tfvars,sg_tfvars) {
-    sh "terraform plan -destroy -no-color -out=tfdestroy -input=false -var-file=${global_tfvars} -var-file=${sg_tfvars}"
+    sh "terraform plan -destroy -no-color -out=tfdestroy -input=false -var-file=${global_tfvars}"
 }
 
 def terraform_destroy() {
