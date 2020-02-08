@@ -117,7 +117,7 @@ def terraform_apply() {
 	sh "terraform apply -no-color -input=false tfplan"
 }
 
-def terraform_plan_destroy(global_tfvars,sg_tfvars) {
+def terraform_plan_destroy(global_tfvars) {
     sh "terraform plan -destroy -no-color -out=tfdestroy -input=false -var-file=${global_tfvars}"
 }
 
