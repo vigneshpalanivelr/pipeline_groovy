@@ -134,6 +134,7 @@ def checkout() {
 }
 
 def set_env_variables() {
+	env.TF_VAR_aws_account_num		= "${aws_account_num}"
 	env.TF_VAR_s3_bucket_name		= "${s3_bucket_name}"
 	env.TF_VAR_s3_log_bucket_name	= "${s3_log_bucket_name}"
 	env.TF_VAR_s3_versioning		= "${s3_versioning}"
