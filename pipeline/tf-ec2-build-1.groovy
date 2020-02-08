@@ -31,11 +31,12 @@ node ('master'){
 	terraformDirectoryEC2	= "modules/all_modules/${tfstateBucketPrefixEC2}"
     
 	global_tfvars           = "../../../variables/global_vars.tfvars"
-    ec2_eni_tfvars          = "../../../variables/ec2_eni_vars.tfvars"
-	ebs_tfvars              = "../../../variables/ebs_volume_vars.tfvars"
+	sg_tfvars				= "../../../variables/sg_vars.tfvars"
+	ec2_eni_tfvars			= "../../../variables/ec2_eni_vars.tfvars"
+	ebs_tfvars				= "../../../variables/ebs_volume_vars.tfvars"
 	ec2_tfvars				= "../../../variables/ec2_instance_vars.tfvars"
 	
-    date                    = new Date()
+	date                    = new Date()
 	println date
 
 	writeFile(file: "askp-${BUILD_TAG}",text:"#!/bin/bash/\ncase \"\$1\" in\nUsername*) echo \"\${STASH_USERNAME}\" ;;\nPassword*) \"\${STASH_PASWORD}\";;\nesac")
@@ -55,7 +56,7 @@ node ('master'){
 				if (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply') {
 					stage('Terraform SG Plan') {
 						set_env_variables()
-						terraform_plan(global_tfvars)
+						terraform_plan(global_tfvars,sg_tfvars)
 					}
 				}
 				if (terraformApplyPlan == 'apply') {
@@ -69,7 +70,7 @@ node ('master'){
 				if (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy') {
 					stage('Plan SG Destroy') {
 						set_env_variables()
-						terraform_plan_destroy(global_tfvars)
+						terraform_plan_destroy(global_tfvars,sg_tfvars)
 					}
 				}
 				if (terraformApplyPlan == 'destroy') {
@@ -238,7 +239,7 @@ def terraform_init(module,stack) {
 	}
 }
 
-def terraform_plan(global_tfvars,any_tfvars = null) {
+def terraform_plan(global_tfvars,any_tfvars) {
 	sh "terraform plan -no-color -out=tfplan -input=false -var-file=${global_tfvars} -var-file=${any_tfvars}"
 }
 
@@ -246,7 +247,7 @@ def terraform_apply() {
 	sh "terraform apply -no-color -input=false tfplan"
 }
 
-def terraform_plan_destroy(global_tfvars,any_tfvars = null) {
+def terraform_plan_destroy(global_tfvars,any_tfvars) {
     sh "terraform plan -destroy -no-color -out=tfdestroy -input=false -var-file=${global_tfvars} -var-file=${any_tfvars}"
 }
 
