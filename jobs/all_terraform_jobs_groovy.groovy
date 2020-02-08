@@ -133,6 +133,7 @@ pipelineJob('tf-s3-build-1-job') {
 		choiceParam('tfstateBucket'			, [tfStateBucket]				, 'TF State Bucket'             )
 		choiceParam('tfstateBucketPrefix'	, [tfStateBucketPrefixS3]		, 'TF State Bucket Prefix'      )
 		stringParam('s3_bucket_name'		, ''							, '')
+		choiceParam('s3_versioning'			, ['true','false']				, '')
 		choiceParam('includeS3Bucket'		, ['true','false']				, '')
 		stringParam('s3_log_bucket_name'	, ''							, '')
 		choiceParam('includeS3LogBucket'	, ['true','false']				, '')
