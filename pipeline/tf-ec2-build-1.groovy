@@ -4,29 +4,36 @@
 *	gitCreds
 *	awsAccount
 *	tfstateBucket
-*	tfstateBucketPrefix
+*	tfstateBucketPrefixSG
+*	tfstateBucketPrefixENI
+*	tfstateBucketPrefixEBS
+*	tfstateBucketPrefixEC2
 
 *	instance_name
-*	eni_subnet
 *	ebs_name
-*	ebs_availability_zone
-*	ebs_size
-*	ebs_type
-*	ebs_iops
-*	ebs_encrypted
+*	vpc_name
+*	sg_group_name
+*	instance_type
+*	AZ
+*	subnet
 
+*	includeSG
 *	includeENI
 *	includeEBS
+*	includeEC2
 *	terraformApplyPlan
 */
 
 node ('master'){
-	terraformDirectoryENI	= "modules/all_modules/eni_module"
-    terraformDirectoryEBS	= "modules/all_modules/ebs_module"
+	terraformDirectorySG	= "modules/all_modules/${tfstateBucketPrefixSG}"
+	terraformDirectoryENI	= "modules/all_modules/${tfstateBucketPrefixENI}"
+	terraformDirectoryEBS	= "modules/all_modules/${tfstateBucketPrefixEBS}"
+	terraformDirectoryEC2	= "modules/all_modules/${tfstateBucketPrefixEC2}"
     
 	global_tfvars           = "../../../variables/global_vars.tfvars"
     ec2_eni_tfvars          = "../../../variables/ec2_eni_vars.tfvars"
 	ebs_tfvars              = "../../../variables/ebs_volume_vars.tfvars"
+	ec2_tfvars				= "../../../variables/ec2_instance_vars.tfvars"
 	
     date                    = new Date()
 	println date
@@ -40,10 +47,45 @@ node ('master'){
 
 	stage('Checkout') {
 		checkout()
+		if (includeSG == 'true') {
+			dir(terraformDirectorySG) {
+				stage('Remote State Init') {
+					terraform_init(tfstateBucketPrefixSG,'sg')
+				}
+				if (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply') {
+					stage('Terraform SG Plan') {
+						set_env_variables()
+						terraform_plan(global_tfvars)
+					}
+				}
+				if (terraformApplyPlan == 'apply') {
+					stage('Approve SG Plan') {
+						approval()
+					}
+					stage('Terraform SG Apply') {
+						terraform_apply()
+					}
+				}
+				if (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy') {
+					stage('Plan SG Destroy') {
+						set_env_variables()
+						terraform_plan_destroy(global_tfvars)
+					}
+				}
+				if (terraformApplyPlan == 'destroy') {
+					stage('Approve SG Destroy') {
+						approval()
+					}
+					stage('SG Destroy') {
+						terraform_destroy()
+					}
+				}
+			}
+		}
 		if (includeENI == 'true') {
 			dir(terraformDirectoryENI) {
 				stage('Remote State Init') {
-					terraform_init('eni_module','eni')
+					terraform_init(tfstateBucketPrefixENI,'eni')
 				}
 				if (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply') {
 					stage('Terraform ENI Plan') {
@@ -76,9 +118,9 @@ node ('master'){
 			}
 		}
         if (includeEBS == 'true') {
-            dir(terraformDirectoryEBS) {
+            dir(terraformDirectoryEC2) {
                 stage('Remote State Init') {
-					terraform_init('ebs_module','ebs-volumes')
+					terraform_init(tfstateBucketPrefixEBS,'ebs-volumes')
 				}
 				if (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply') {
 					stage('Terraform EBS Plan') {
@@ -105,6 +147,41 @@ node ('master'){
 						approval()
 					}
 					stage('EBS Destroy') {
+						terraform_destroy()
+					}
+				}
+            }
+        }
+		if (includeEC2 == 'true') {
+            dir(terraformDirectoryEBS) {
+                stage('Remote State Init') {
+					terraform_init(tfstateBucketPrefixEC2,'ec2-instance')
+				}
+				if (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply') {
+					stage('Terraform EC2 Plan') {
+						set_env_variables()
+						terraform_plan(global_tfvars,ec2_tfvars)
+					}
+				}
+				if (terraformApplyPlan == 'apply') {
+					stage('Approve EC2 Plan') {
+						approval()
+					}
+					stage('Terraform EC2 Apply') {
+						terraform_apply()
+					}
+				}
+				if (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy') {
+					stage('Plan EC2 Destroy') {
+						set_env_variables()
+						terraform_plan_destroy(global_tfvars,ec2_tfvars)
+					}
+				}
+				if (terraformApplyPlan == 'destroy') {
+					stage('Approve EC2 Destroy') {
+						approval()
+					}
+					stage('EC2 Destroy') {
 						terraform_destroy()
 					}
 				}
@@ -140,15 +217,17 @@ def checkout() {
 }
 
 def set_env_variables() {
-	env.TF_VAR_instance_name			= "${instance_name}"
-	env.TF_VAR_eni_subnet				= "${eni_subnet}"
-	env.TF_VAR_ebs_name					= "${ebs_name}"
 	env.TF_VAR_aws_account_num			= "${awsAccount}"
-	env.TF_VAR_ebs_availability_zone	= "${ebs_availability_zone}"
-	env.TF_VAR_ebs_size					= "${ebs_size}"
-	env.TF_VAR_ebs_type					= "${ebs_type}"
-	env.TF_VAR_ebs_iops					= "${ebs_iops}"
-	env.TF_VAR_ebs_encrypted			= "${ebs_encrypted}"
+	env.TF_VAR_ec2_instance_name		= "${instance_name}"
+	env.TF_VAR_resource_name			= "${instance_name}"
+	env.TF_VAR_ebs_name					= "${ebs_name}"
+	env.TF_VAR_aws_vpc_name				= "${vpc_name}"
+	env.TF_VAR_vpc_subnet_name			= "${subnet}"
+	env.TF_VAR_sg_group_name			= "${sg_group_name}"
+	env.TF_VAR_ec2_sg_name				= "${sg_group_name}"
+	env.TF_VAR_ec2_instance_type		= "${instance_type}"
+	env.TF_VAR_ec2_az					= "${AZ}"
+	env.TF_VAR_ebs_az					= "${AZ}"
 }
 
 def terraform_init(module,stack) {
@@ -159,7 +238,7 @@ def terraform_init(module,stack) {
 	}
 }
 
-def terraform_plan(global_tfvars,any_tfvars) {
+def terraform_plan(global_tfvars,any_tfvars = null) {
 	sh "terraform plan -no-color -out=tfplan -input=false -var-file=${global_tfvars} -var-file=${any_tfvars}"
 }
 
@@ -167,7 +246,7 @@ def terraform_apply() {
 	sh "terraform apply -no-color -input=false tfplan"
 }
 
-def terraform_plan_destroy(global_tfvars,any_tfvars) {
+def terraform_plan_destroy(global_tfvars,any_tfvars = null) {
     sh "terraform plan -destroy -no-color -out=tfdestroy -input=false -var-file=${global_tfvars} -var-file=${any_tfvars}"
 }
 
