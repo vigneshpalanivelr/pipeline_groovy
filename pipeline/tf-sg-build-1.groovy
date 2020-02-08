@@ -17,7 +17,6 @@
 node ('master'){
 	terraformDirectory	= "modules/all_modules/${tfstateBucketPrefix}"
 	global_tfvars		= "../../../variables/global_vars.tfvars"
-	sg_tfvars		    = "../../../variables/sg_group_vars.tfvars"
 	date				= new Date()
 
 	println date
