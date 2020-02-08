@@ -119,7 +119,7 @@ node ('master'){
 			}
 		}
         if (includeEBS == 'true') {
-            dir(terraformDirectoryEC2) {
+            dir(terraformDirectoryEBS) {
                 stage('Remote State Init') {
 					terraform_init(tfstateBucketPrefixEBS,'ebs-volumes')
 				}
@@ -154,7 +154,7 @@ node ('master'){
             }
         }
 		if (includeEC2 == 'true') {
-            dir(terraformDirectoryEBS) {
+            dir(terraformDirectoryEC2) {
                 stage('Remote State Init') {
 					terraform_init(tfstateBucketPrefixEC2,'ec2-instance')
 				}
