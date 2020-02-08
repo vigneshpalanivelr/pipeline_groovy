@@ -3,19 +3,25 @@
 *	gitBranch
 *	gitCreds
 *	tfstateBucket
-*	tfstateBucketPrefix
+*	awsAccount
+*	tfstateBucketPrefixS3
+*	tfstateBucketPrefixS3L
 
-*	kms_key_name
+*	s3_bucket_name
+*	s3_log_bucket_name
+*	s3_versioning
 
-*	includeKMSKey
+*	includeS3Bucket
+*	includeS3LogBucket
 *	terraformApplyPlan
 */
 
 node ('master'){
-	terraformDirectory	= "modules/all_modules/${tfstateBucketPrefix}"
+	terraformDirectoryS3	= "modules/all_modules/${tfstateBucketPrefixS3}"
+	terraformDirectoryS3Log	= "modules/all_modules/${tfstateBucketPrefixS3L}"
 	global_tfvars   	= "../../../variables/global_vars.tfvars"
 	s3_storage_tfvars	= "../../../variables/s3_storage_vars.tfvars"
-	date 			= new Date()
+	date 				= new Date()
 
 	println date
 
@@ -28,10 +34,45 @@ node ('master'){
 
 	stage('Checkout') {
 		checkout()
-		if (includeKMSKey == 'true') {
-			dir(terraformDirectory) {
+		if (includeS3LogBucket == 'true') {
+			dir(terraformDirectoryS3Log) {
 				stage('Remote State Init') {
-					terraform_init()
+					terraform_init(tfstateBucketPrefixS3L,s3_log_bucket_name)
+				}
+				if (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply') {
+					stage('Terraform Plan S3 Log Bucket') {
+						set_env_variables()
+						terraform_plan(global_tfvars,s3_storage_tfvars)
+					}
+				}
+				if (terraformApplyPlan == 'apply') {
+					stage('Approve Plan') {
+						approval()
+					}
+					stage('Terraform Apply') {
+						terraform_apply()
+					}
+				}
+				if (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy') {
+					stage('Plan Destroy') {
+						set_env_variables()
+						terraform_plan_destroy(global_tfvars,s3_storage_tfvars)
+					}
+				}
+				if (terraformApplyPlan == 'destroy') {
+					stage('Approve Destroy') {
+						approval()
+					}
+					stage('Destroy') {
+						terraform_destroy()
+					}
+				}
+			}
+		}
+		if (includeS3Bucket == 'true') {
+			dir(terraformDirectoryS3) {
+				stage('Remote State Init') {
+					terraform_init(tfstateBucketPrefixS3,s3_bucket_name)
 				}
 				if (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply') {
 					stage('Terraform Plan') {
@@ -94,12 +135,13 @@ def checkout() {
 }
 
 def set_env_variables() {
+	env.TF_VAR_aws_account_num		= "${awsAccount}"
 	env.TF_VAR_s3_bucket_name		= "${s3_bucket_name}"
-	env.TF_VAR_s3_log_bucket_name		= "${s3_log_bucket_name}"
+	env.TF_VAR_s3_log_bucket_name	= "${s3_log_bucket_name}"
 	env.TF_VAR_s3_versioning		= "${s3_versioning}"
 }
 
-def terraform_init() {
+def terraform_init(tfstateBucketPrefix,s3_bucket_name) {
 	withEnv(["GIT_ASKPASS=${WORKSPACE}/askp-${BUILD_TAG}"]){
 		withCredentials([usernamePassword(credentialsId: gitCreds, usernameVariable: 'STASH_USERNAME', passwordVariable: 'STASH_PASSWORD')]) {
 			sh "terraform init -no-color -input=false -upgrade=true -backend=true -force-copy -backend-config='bucket=${tfstateBucket}' -backend-config='key=${tfstateBucketPrefix}/${s3_bucket_name}-bucket.tfstate'"
@@ -122,4 +164,3 @@ def terraform_plan_destroy(global_tfvars,s3_storage_tfvars) {
 def terraform_destroy() {
         sh "terraform apply -no-color -input=false tfdestroy"
 }
-

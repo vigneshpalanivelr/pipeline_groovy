@@ -1,17 +1,21 @@
-def terraformRepo				= "https://github.com/vigneshpalanivelr/terraform_practice_codes.git"
-def terraformBranch				= "master"
-def gitCreds					= "gitCreds"
-def awsAccount					= "210315133748"
-def tfStateBucket				= "terraform-tfstate-mumba-1"
+def terraformRepo					= "https://github.com/vigneshpalanivelr/terraform_practice_codes.git"
+def terraformBranch					= "master"
+def gitCreds						= "gitCreds"
+def awsAccount						= "210315133748"
+def tfStateBucket					= "terraform-tfstate-mumba-1"
 
-def tfStateBucketPrefixRDS		= "rds_module"
-def tfStateBucketPrefixR53		= "r53_module"
-def tfStateBucketPrefixR53ac	= "r53ac_module"
-def tfStateBucketPrefixKMS		= "kms_module"
-def tfStateBucketPrefixSG		= "sg_module"
-def tfStateBucketPrefixENI		= "eni_module"
-def tfStateBucketPrefixEBS		= "ebs_module"
-def tfStateBucketPrefixEC2		= "ec2_module"
+def tfStateBucketPrefixS3			= "s3_module"
+def tfStateBucketPrefixS3Log		= "s3_log_module"
+def tfStateBucketPrefixRDS			= "rds_module"
+def tfStateBucketPrefixR53			= "r53_module"
+def tfStateBucketPrefixR53ac		= "r53ac_module"
+def tfStateBucketPrefixKMS			= "kms_module"
+def tfStateBucketPrefixSG			= "sg_module"
+def tfStateBucketPrefixSGRule		= "sg_rule_module"
+def tfStateBucketPrefixENI			= "eni_module"
+def tfStateBucketPrefixEBS			= "ebs_module"
+def tfStateBucketPrefixEBSAttach	= "ebs_attachment_module"
+def tfStateBucketPrefixEC2			= "ec2_module"
 
 // RDS DB Build Generic Job
 pipelineJob('tf-rds-db-build-1-job') {
@@ -119,6 +123,33 @@ pipelineJob('tf-route53ac-record-build-1-job') {
 	}
 }
 
+// AWS S3 Bucket and S3 Log Bucket Creation
+pipelineJob('tf-s3-build-1-job') {
+	description('Building AWS KMS key creation')
+	logRotator(-1,-1)
+	parameters{
+		choiceParam('gitRepo'				, [terraformRepo]				, '')
+		choiceParam('gitBranch'				, [terraformBranch]				, '')
+		choiceParam('gitCreds'				, [gitCreds]					, '')
+		choiceParam('awsAccount'			, [awsAccount]					, '')
+		choiceParam('tfstateBucket'			, [tfStateBucket]				, 'TF State Bucket'					)
+		choiceParam('tfstateBucketPrefixS3'	, [tfStateBucketPrefixS3]		, 'TF State Bucket Prefix S3'		)
+		choiceParam('tfstateBucketPrefixS3L', [tfStateBucketPrefixS3Log]	, 'TF State Bucket Prefix S3 Log'	)
+		stringParam('s3_bucket_name'		, ''							, '')
+		choiceParam('s3_versioning'			, ['true','false']				, '')
+		choiceParam('includeS3Bucket'		, ['true','false']				, '')
+		stringParam('s3_log_bucket_name'	, ''							, '')
+		choiceParam('includeS3LogBucket'	, ['true','false']				, '')
+		choiceParam('terraformApplyPlan'	, ['plan','apply','plan-destroy','destroy']	, '')
+	}
+	definition {
+		cps {
+			script(readFileFromWorkspace('pipeline/tf-s3-build-1.groovy'))
+			sandbox()
+		}
+	}
+}
+
 // AWS KMS Key Creation
 pipelineJob('tf-kms-key-build-1-job') {
 	description('Building AWS KMS key creation')
@@ -152,11 +183,13 @@ pipelineJob('tf-sg-build-1-job') {
 		choiceParam('gitCreds'				, [gitCreds]					, '')
 		choiceParam('awsAccount'			, [awsAccount]					, '')
 		choiceParam('tfstateBucket'			, [tfStateBucket]				, 'TF State Bucket'             )
-		choiceParam('tfstateBucketPrefix'	, [tfStateBucketPrefixSG]		, 'TF State Bucket Prefix'      )
+		choiceParam('tfstateBucketPrefixSG'	, [tfStateBucketPrefixSG]		, 'TF State Bucket Prefix'      )
+		choiceParam('tfstateBucketPrefixSGR', [tfStateBucketPrefixSGRule]	, 'TF State Bucket Prefix'      )
 		stringParam('vpc_name'				, 'default-vpc'					, '')
 		stringParam('sg_group_name'			, 'test-instance'				, 'name + sg (by default)'		)
 		stringParam('resource_name'			, 'test-instance'				, 'SG Description'				)
 		choiceParam('includeSG'				, ['true','false']				, '')
+		choiceParam('includeSGRule'			, ['true','false']				, '')
 		choiceParam('terraformApplyPlan'	, ['plan','apply','plan-destroy','destroy']	, '')
 	}
 	definition {
@@ -197,16 +230,19 @@ pipelineJob('tf-ebs-build-1-job') {
 	description('Building AWS EBS Volume creation')
 	logRotator(-1,-1)
 	parameters{
-		choiceParam('gitRepo'				, [terraformRepo]				, '')
-		choiceParam('gitBranch'				, [terraformBranch]				, '')
-		choiceParam('gitCreds'				, [gitCreds]					, '')
-		choiceParam('awsAccount'			, [awsAccount]					, '')
-		choiceParam('tfstateBucket'			, [tfStateBucket]				, 'TF State Bucket'             )
-		choiceParam('tfstateBucketPrefix'	, [tfStateBucketPrefixEBS]		, 'TF State Bucket Prefix'      )
-		stringParam('ebs_name'				, 'test-instance'				, '')
-		choiceParam('ebs_availability_zone'	, ['ap-south-1a','ap-south-1b','ap-south-1c']	, '')
-		choiceParam('includeEBS'			, ['true','false']				, '')
-		choiceParam('terraformApplyPlan'	, ['plan','apply','plan-destroy','destroy']		, '')
+		choiceParam('gitRepo'					, [terraformRepo]					, '')
+		choiceParam('gitBranch'					, [terraformBranch]					, '')
+		choiceParam('gitCreds'					, [gitCreds]						, '')
+		choiceParam('awsAccount'				, [awsAccount]						, '')
+		choiceParam('tfstateBucket'				, [tfStateBucket]					, 'TF State Bucket'				)
+		choiceParam('tfstateBucketPrefixEBS'	, [tfStateBucketPrefixEBS]			, 'TF State Bucket Prefix'		)
+		choiceParam('tfstateBucketPrefixEBSA'	, [tfStateBucketPrefixEBSAttach]	, 'TF State Bucket Prefix'		)
+		stringParam('resource_name'				, 'test-instance'					, '')
+		stringParam('ebs_volume_count'			, '3'								, '')
+		choiceParam('ebs_az'					, ['ap-south-1a','ap-south-1b','ap-south-1c']	, '')
+		choiceParam('includeEBS'				, ['true','false']					, '')
+		choiceParam('includeEBSAttach'			, ['true','false']					, '')
+		choiceParam('terraformApplyPlan'		, ['plan','apply','plan-destroy','destroy']		, '')
 	}
 	definition {
 		cps {
@@ -221,24 +257,33 @@ pipelineJob('tf-ec2-build-1-job') {
 	description('Building AWS EC2 creation')
 	logRotator(-1,-1)
 	parameters{
-		choiceParam('gitRepo'				, [terraformRepo]				, '')
-		choiceParam('gitBranch'				, [terraformBranch]				, '')
-		choiceParam('gitCreds'				, [gitCreds]					, '')
-		choiceParam('awsAccount'			, [awsAccount]					, '')
-		choiceParam('tfstateBucket'			, [tfStateBucket]				, 'TF State Bucket'             )
-		choiceParam('tfstateBucketPrefix'	, [tfStateBucketPrefixEC2]		, 'TF State Bucket Prefix'      )
-		choiceParam('includeENI'			, ['true','false']				, '')
-		stringParam('ebs_name'				, 'test-instance'				, '')
-		choiceParam('includeEBS'			, ['true','false']				, '')
-		stringParam('vpc_name'				, 'default-vpc'					, '')
-		stringParam('sg_group_name'			, 'test-instance'				, 'name + sg (by default)'		)
-		choiceParam('includeSG'				, ['true','false']				, '')
-		stringParam('instance_name'			, 'test-instance'				, '')
-		stringParam('instance_type'			, 't2.micro'					, '')
-		choiceParam('AZ'					,['ap-south-1a','ap-south-1b','ap-south-1c']				, 'EBS | EC2')
-		choiceParam('subnet'				, ['default-subnet-1','default-subnet-2','default-subnet-3'], 'ENI | EC2')
-		choiceParam('includeEC2'			, ['true','false']				, '')
-		choiceParam('terraformApplyPlan'	, ['plan','apply','plan-destroy','destroy']	, '')
+		choiceParam('gitRepo'					, [terraformRepo]					, '')
+		choiceParam('gitBranch'					, [terraformBranch]					, '')
+		choiceParam('gitCreds'					, [gitCreds]						, '')
+		choiceParam('awsAccount'				, [awsAccount]						, '')
+		choiceParam('tfstateBucket'				, [tfStateBucket]					, 'TF State Bucket'             )
+		choiceParam('tfstateBucketPrefixSG'		, [tfStateBucketPrefixSG]			, 'TF State Bucket Prefix'      )
+		choiceParam('tfstateBucketPrefixSGR'	, [tfStateBucketPrefixSGRule]		, 'TF State Bucket Prefix'      )
+		choiceParam('tfstateBucketPrefixENI'	, [tfStateBucketPrefixENI]			, 'TF State Bucket Prefix'      )
+		choiceParam('tfstateBucketPrefixEBS'	, [tfStateBucketPrefixEBS]			, 'TF State Bucket Prefix'      )
+		choiceParam('tfstateBucketPrefixEBSA'	, [tfStateBucketPrefixEBSAttach]	, 'TF State Bucket Prefix'		)
+		choiceParam('tfstateBucketPrefixEC2'	, [tfStateBucketPrefixEC2]			, 'TF State Bucket Prefix'      )
+		stringParam('instance_name'				, 'test-instance'					, '')
+		stringParam('ebs_volume_count'			, '3'								, '')
+		stringParam('vpc_name'					, 'default-vpc'						, '')
+		stringParam('sg_group_name'				, 'test-instance'					, 'name + sg (by default)'		)
+		stringParam('instance_type'				, 't2.micro'						, '')
+		choiceParam('root_user'					, ['vignesh']						, 'Login Cred')
+		choiceParam('root_passwd'				, ['vignesh']						, 'Login Cred')
+		choiceParam('AZ'						, ['ap-south-1a','ap-south-1b','ap-south-1c']				, 'EBS | EC2')
+		choiceParam('subnet'					, ['default-subnet-1','default-subnet-2','default-subnet-3'], 'ENI | EC2')
+		choiceParam('includeSG'					, ['true','false']					, '')
+		choiceParam('includeSGRule'				, ['true','false']					, '')
+		choiceParam('includeENI'				, ['true','false']					, '')
+		choiceParam('includeEBS'				, ['true','false']					, '')
+		choiceParam('includeEBSAttach'			, ['true','false']					, '')
+		choiceParam('includeEC2'				, ['true','false']					, '')
+		choiceParam('terraformApplyPlan'		, ['plan','apply','plan-destroy','destroy']	, '')
 	}
 	definition {
 		cps {

@@ -4,22 +4,28 @@
 *	gitCreds
 *	awsAccount
 *	tfstateBucket
-*	tfstateBucketPrefix
+*	tfstateBucketPrefixSG
+*	tfstateBucketPrefixSGR
 
 *	vpc_name
 *	sg_group_name
 *	resource_name
 
-*	includeEBS
+*	includeSG
+*	includeSGRule
 *	terraformApplyPlan
 */
 
 node ('master'){
-	terraformDirectory	= "modules/all_modules/${tfstateBucketPrefix}"
-	global_tfvars		= "../../../variables/global_vars.tfvars"
-	sg_tfvars		    = "../../../variables/sg_group_vars.tfvars"
-	date				= new Date()
-
+	terraformDirectorySG		= "modules/all_modules/${tfstateBucketPrefixSG}"
+	terraformDirectorySGRule	= "modules/all_modules/${tfstateBucketPrefixSGR}/${sg_group_name}-sg"
+	
+	global_tfvars				= "../../../variables/global_vars.tfvars"
+	sg_tfvars					= "../../../variables/sg_vars.tfvars"
+	rule_global_tfvars			= "../../../../variables/global_vars.tfvars"
+	rule_sg_tfvars				= "../../../../variables/sg_vars.tfvars"
+	
+	date						= new Date()
 	println date
 
 	writeFile(file: "askp-${BUILD_TAG}",text:"#!/bin/bash/\ncase \"\$1\" in\nUsername*) echo \"\${STASH_USERNAME}\" ;;\nPassword*) \"\${STASH_PASWORD}\";;\nesac")
@@ -32,9 +38,10 @@ node ('master'){
 	stage('Checkout') {
 		checkout()
 		if (includeSG == 'true') {
-			dir(terraformDirectory) {
+			dir(terraformDirectorySG) {
+				sh "tree"
 				stage('Remote State Init') {
-					terraform_init()
+					terraform_init(tfstateBucketPrefixSG,"sg")
 				}
 				if (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply') {
 					stage('Terraform Plan') {
@@ -54,6 +61,42 @@ node ('master'){
 					stage('Plan Destroy') {
 						set_env_variables()
 						terraform_plan_destroy(global_tfvars,sg_tfvars)
+					}
+				}
+				if (terraformApplyPlan == 'destroy') {
+					stage('Approve Destroy') {
+						approval()
+					}
+					stage('Destroy') {
+						terraform_destroy()
+					}
+				}
+			}
+		}
+		if (includeSGRule == 'true') {
+			dir(terraformDirectorySGRule) {
+				sh "tree"
+				stage('Remote State Init') {
+					terraform_init(tfstateBucketPrefixSGR,"sg-rule")
+				}
+				if (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply') {
+					stage('Terraform Plan') {
+						set_env_variables()
+						terraform_plan(rule_global_tfvars,rule_sg_tfvars)
+					}
+				}
+				if (terraformApplyPlan == 'apply') {
+					stage('Approve Plan') {
+						approval()
+					}
+					stage('Terraform Apply') {
+						terraform_apply()
+					}
+				}
+				if (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy') {
+					stage('Plan Destroy') {
+						set_env_variables()
+						terraform_plan_destroy(rule_global_tfvars,rule_sg_tfvars)
 					}
 				}
 				if (terraformApplyPlan == 'destroy') {
@@ -102,10 +145,10 @@ def set_env_variables() {
 	env.TF_VAR_resource_name	= "${resource_name}"
 }
 
-def terraform_init() {
+def terraform_init(module,stack) {
 	withEnv(["GIT_ASKPASS=${WORKSPACE}/askp-${BUILD_TAG}"]){
 		withCredentials([usernamePassword(credentialsId: gitCreds, usernameVariable: 'STASH_USERNAME', passwordVariable: 'STASH_PASSWORD')]) {
-			sh "terraform init -no-color -input=false -upgrade=true -backend=true -force-copy -backend-config='bucket=${tfstateBucket}' -backend-config='key=${tfstateBucketPrefix}/${sg_group_name}-sg.tfstate'"
+			sh "terraform init -no-color -input=false -upgrade=true -backend=true -force-copy -backend-config='bucket=${tfstateBucket}' -backend-config='key=${module}/${sg_group_name}-${stack}.tfstate'"
 		}
 	}
 }
