@@ -3,18 +3,21 @@
 *	gitBranch
 *	gitCreds
 *	tfstateBucket
-*	tfstateBucketPrefix
+*	tfstateBucketPrefixS3
 *	tfstateBucketPrefixS3L
+
 *	s3_bucket_name
 *	s3_log_bucket_name
 *	s3_versioning
+
 *	includeS3Bucket
 *	includeS3LogBucket
 *	terraformApplyPlan
 */
 
 node ('master'){
-	terraformDirectory	= "modules/all_modules/${tfstateBucketPrefix}"
+	terraformDirectoryS3	= "modules/all_modules/${tfstateBucketPrefixS3}"
+	terraformDirectoryS3Log	= "modules/all_modules/${tfstateBucketPrefixS3L}"
 	global_tfvars   	= "../../../variables/global_vars.tfvars"
 	s3_storage_tfvars	= "../../../variables/s3_storage_vars.tfvars"
 	date 				= new Date()
@@ -31,7 +34,7 @@ node ('master'){
 	stage('Checkout') {
 		checkout()
 		if (includeS3LogBucket == 'true') {
-			dir(terraformDirectory) {
+			dir(terraformDirectoryS3Log) {
 				stage('Remote State Init') {
 					terraform_init(tfstateBucketPrefixS3L,s3_log_bucket_name)
 				}
@@ -66,9 +69,9 @@ node ('master'){
 			}
 		}
 		if (includeS3Bucket == 'true') {
-			dir(terraformDirectory) {
+			dir(terraformDirectoryS3) {
 				stage('Remote State Init') {
-					terraform_init(tfstateBucketPrefix,s3_bucket_name)
+					terraform_init(tfstateBucketPrefixS3,s3_bucket_name)
 				}
 				if (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply') {
 					stage('Terraform Plan') {
