@@ -1,278 +1,161 @@
-def terraformRepo				= "https://github.com/vigneshpalanivelr/terraform_practice_codes.git"
-def terraformBranch				= "master"
-def gitCreds					= "gitCreds"
-def awsAccount					= "210315133748"
-def tfStateBucket				= "terraform-tfstate-mumba-1"
+/*
+*	gitRepo
+*	gitBranch
+*	gitCreds
+*	tfstateBucket
+*	tfstateBucketPrefix
+*	tfstateBucketPrefixS3L
+*	s3_bucket_name
+*	s3_log_bucket_name
+*	s3_versioning
+*	includeS3Bucket
+*	includeS3LogBucket
+*	terraformApplyPlan
+*/
 
-def tfStateBucketPrefixS3		= "s3_module"
-def tfStateBucketPrefixS3Log	= "s3_log_module"
-def tfStateBucketPrefixRDS		= "rds_module"
-def tfStateBucketPrefixR53		= "r53_module"
-def tfStateBucketPrefixR53ac	= "r53ac_module"
-def tfStateBucketPrefixKMS		= "kms_module"
-def tfStateBucketPrefixSG		= "sg_module"
-def tfStateBucketPrefixENI		= "eni_module"
-def tfStateBucketPrefixEBS		= "ebs_module"
-def tfStateBucketPrefixEC2		= "ec2_module"
+node ('master'){
+	terraformDirectory	= "modules/all_modules/${tfstateBucketPrefix}"
+	global_tfvars   	= "../../../variables/global_vars.tfvars"
+	s3_storage_tfvars	= "../../../variables/s3_storage_vars.tfvars"
+	date 				= new Date()
 
-// RDS DB Build Generic Job
-pipelineJob('tf-rds-db-build-1-job') {
-	description('''Building AWS RDS Instances 1) PostgreSQL 2) Oracle 3) MySQL 4) MariaDB <br><br>Instructions for Creating:
-	<br>&emsp 1) Creates Master Instance&emsp&emsp&emsp&emsp&emsp&emsp&emsp&emsp&ensp TF-STATE : InstanceId.tfstate
-	<br>&emsp 2) Creates Master Route53 DNS&emsp&emsp&emsp&emsp&emsp&emsp&nbsp TF-STATE : Route53-dns.tfstate
-	<br>&emsp 3) Creates Slave Instance&emsp&emsp&emsp&emsp&emsp&emsp&emsp&emsp&emsp&nbsp TF-STATE : InstanceId.tfstate
-	<br>&emsp 4) Creates Replica Route53 DNS&emsp&emsp&emsp&emsp&emsp&emsp TF-STATE : Route53-dns.tfstate
-	<br>Instructions for Destroying (Imp : Reverse Order):
-	<br>&emsp 4) Destroy Replica Route53 DNS&emsp&emsp&emsp&emsp&emsp&emsp TF-STATE : Route53-dns.tfstate
-	<br>&emsp 3) Destroy Slave Instance&emsp&emsp&emsp&emsp&emsp&emsp&emsp&emsp&emsp&nbsp TF-STATE : InstanceId.tfstate
-	<br>&emsp 2) Destroy Master Route53 DNS&emsp&emsp&emsp&emsp&emsp &emsp TF-STATE : Route53-dns.tfstate
-	<br>&emsp 1) Destroy Master Instance&emsp&emsp&emsp&emsp&emsp&emsp&emsp&emsp&ensp&nbsp TF-STATE : InstanceId.tfstate
-	''')
-	logRotator(-1,-1)
-	parameters{
-		choiceParam('gitRepo'					, [terraformRepo]				, '')
-		choiceParam('gitBranch'					, [terraformBranch]				, '')
-		choiceParam('gitCreds'					, [gitCreds]					, '')
-		choiceParam('awsAccount'				, [awsAccount]					, '')
-		choiceParam('tfstateBucket'				, [tfStateBucket]				, 'TF State Bucket'             	)
-		choiceParam('tfstateBucketPrefixRDS'	, [tfStateBucketPrefixRDS]		, 'TF State Bucket Prefix - RDS'	)
-		choiceParam('tfstateBucketPrefixDNS'	, [tfStateBucketPrefixR53ac]	, 'TF State Bucket Prefix - DNS'	)
-		stringParam('db_family'					, 'postgres9.6,oracle-se1-11.2'	, '')
-		stringParam('db_engine'					, 'postgres,oracle-se1'			, '')
-		stringParam('db_engine_version'			, '9.6.11,11.2.0.4.v21'			, '')
-		choiceParam('db_instance_class'			, ['db.t2.small','db.t2.micro']	, '')
-		stringParam('db_identifier'				, 'test-instance'				, '''Name : name-(pgsql|oracle|mysql|mariadb)-rds + rr<br>
-		TF-STATE : Statefile for Instance<br>
-		db_identifier.tfstate''')
-		choiceParam('db_name'					, ['DBNAME']					, '')
-		choiceParam('db_username'				, ['Administrator']				, '')
-		nonStoredPasswordParam('db_password'	, 'Do you think that you can see !!')
-		choiceParam('db_allocated_storage'		, ['10']						, 'in GBs'						)
-		choiceParam('db_multi_az'				, ['false','true']				, '')
-		choiceParam('db_apply_changes'			, ['true','false']				, '')
-		choiceParam('db_availability_zone'		, ['ap-south-1a','ap-south-1b','ap-south-1c']	, ''			)
-		choiceParam('db_action'					, ['master','replica','promote'	,'promote-as-master'], ''		)
-		choiceParam('includeInstance'			, ['true','false']				, '')
-		stringParam('db_source_identifier'		, 'test-instance'				, 'source instance to replicate')
-		stringParam('db_route53_name'			, 'test-instance'				, '''TF-STATE : Statefile for Route53 Name<br>
-		db_route53_name-dns.tfstate''')
-		choiceParam('includeInstanceDNS'		, ['false','true']				, '')
-		choiceParam('terraformApplyPlan'		, ['plan','apply','plan-destroy','destroy']	, '''
-		<br>&emsp plan&emsp&emsp&emsp&emsp: only plan to create 
-		<br>&emsp apply&emsp&emsp&emsp&ensp: will apply above plan 
-		<br>&emsp plan-destroy&nbsp&nbsp: only plan to destroy
-		<br>&emsp destroy&emsp&emsp&ensp&nbsp: will apply above plan-destroy''') 
+	println date
+
+	writeFile(file: "askp-${BUILD_TAG}",text:"#!/bin/bash/\ncase \"\$1\" in\nUsername*) echo \"\${STASH_USERNAME}\" ;;\nPassword*) \"\${STASH_PASWORD}\";;\nesac")
+	sh "chmod a+x askp-${BUILD_TAG}"
+
+	stage('Approval') {
+		approval()
 	}
-	definition {
-		cps {
-			script(readFileFromWorkspace('pipeline/tf-rds-db-build-1.groovy'))
-			sandbox()
+
+	stage('Checkout') {
+		checkout()
+		if (includeS3LogBucket == 'true') {
+			dir(terraformDirectory) {
+				stage('Remote State Init') {
+					terraform_init(tfstateBucketPrefixS3L,s3_log_bucket_name)
+				}
+				if (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply') {
+					stage('Terraform Plan S3 Log Bucket') {
+						set_env_variables()
+						terraform_plan(global_tfvars,s3_storage_tfvars)
+					}
+				}
+				if (terraformApplyPlan == 'apply') {
+					stage('Approve Plan') {
+						approval()
+					}
+					stage('Terraform Apply') {
+						terraform_apply()
+					}
+				}
+				if (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy') {
+					stage('Plan Destroy') {
+						set_env_variables()
+						terraform_plan_destroy(global_tfvars,s3_storage_tfvars)
+					}
+				}
+				if (terraformApplyPlan == 'destroy') {
+					stage('Approve Destroy') {
+						approval()
+					}
+					stage('Destroy') {
+						terraform_destroy()
+					}
+				}
+			}
+		}
+		if (includeS3Bucket == 'true') {
+			dir(terraformDirectory) {
+				stage('Remote State Init') {
+					terraform_init(tfstateBucketPrefix,s3_bucket_name)
+				}
+				if (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply') {
+					stage('Terraform Plan') {
+						set_env_variables()
+						terraform_plan(global_tfvars,s3_storage_tfvars)
+					}
+				}
+				if (terraformApplyPlan == 'apply') {
+					stage('Approve Plan') {
+						approval()
+					}
+					stage('Terraform Apply') {
+						terraform_apply()
+					}
+				}
+				if (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy') {
+					stage('Plan Destroy') {
+						set_env_variables()
+						terraform_plan_destroy(global_tfvars,s3_storage_tfvars)
+					}
+				}
+				if (terraformApplyPlan == 'destroy') {
+					stage('Approve Destroy') {
+						approval()
+					}
+					stage('Destroy') {
+						terraform_destroy()
+					}
+				}
+			}
 		}
 	}
 }
 
-// Route53 Zone Creation
-pipelineJob('tf-route53-zone-build-1-job') {
-	description('Building AWS Route53 Zone Creation')
-	logRotator(-1,-1)
-	parameters{
-		choiceParam('gitRepo'				, [terraformRepo]			, '')
-		choiceParam('gitBranch'				, [terraformBranch]			, '')
-		choiceParam('gitCreds'				, [gitCreds]				, '')
-		choiceParam('awsAccount'			, [awsAccount]				, '')
-		choiceParam('tfstateBucket'			, [tfStateBucket]			, 'TF State Bucket'             )
-		choiceParam('tfstateBucketPrefix'	, [tfStateBucketPrefixR53]	, 'TF State Bucket Prefix'      )
-		stringParam('r53_zone_name'			, 'vignesh-private.zone.com', '')
-		stringParam('vpc_name'				, 'default-vpc'				, '')
-		choiceParam('includeR53Zone'		, ['true','false']			, '')
-		choiceParam('terraformApplyPlan'	, ['plan','apply','plan-destroy','destroy']	, '')
+def approval() {
+	timeout(time: 1, unit: 'MINUTES') {
+		input(
+			id: 'Approval', message: 'Shall i continue ?', parameters: [[
+				$class:	'BooleanParameterDefinition', defaultValue: true, description: 'default to tick', name: 'Please confirm to proceed']]
+		)
 	}
-	definition {
-		cps {
-			script(readFileFromWorkspace('pipeline/tf-route53-zone-build-1.groovy'))
-			sandbox()
+}
+
+def checkout() {
+	checkout([
+		$class: 'GitSCM', 
+		branches: [[name: gitBranch ]], 
+		doGenerateSubmoduleConfigurations: false, 
+		clearWorkspace: true,
+		extensions: [
+			[$class: 'CleanCheckout'], [
+			$class: 'SubmoduleOption', 
+			disableSubmodules: false, 
+			parentCredentials: true, 
+			recursiveSubmodules: true, 
+			reference: '', trackingSubmodules: false]], 
+		submoduleCfg: [], 
+		userRemoteConfigs: [[credentialsId: gitCreds, url: gitRepo]]
+	])
+}
+
+def set_env_variables() {
+	env.TF_VAR_s3_bucket_name		= "${s3_bucket_name}"
+	env.TF_VAR_s3_log_bucket_name	= "${s3_log_bucket_name}"
+	env.TF_VAR_s3_versioning		= "${s3_versioning}"
+}
+
+def terraform_init(tfstateBucketPrefix,s3_bucket_name) {
+	withEnv(["GIT_ASKPASS=${WORKSPACE}/askp-${BUILD_TAG}"]){
+		withCredentials([usernamePassword(credentialsId: gitCreds, usernameVariable: 'STASH_USERNAME', passwordVariable: 'STASH_PASSWORD')]) {
+			sh "terraform init -no-color -input=false -upgrade=true -backend=true -force-copy -backend-config='bucket=${tfstateBucket}' -backend-config='key=${tfstateBucketPrefix}/${s3_bucket_name}-bucket.tfstate'"
 		}
 	}
 }
 
-// Route53 A-record and CNAME Creation
-pipelineJob('tf-route53ac-record-build-1-job') {
-	description('Building AWS Route53 Record Creation')
-	logRotator(-1,-1)
-	parameters{
-		choiceParam('gitRepo'				, [terraformRepo]				, '')
-		choiceParam('gitBranch'				, [terraformBranch]				, '')
-		choiceParam('gitCreds'				, [gitCreds]					, '')
-		choiceParam('awsAccount'			, [awsAccount]					, '')
-		choiceParam('tfstateBucket'			, [tfStateBucket]				, 'TF State Bucket'             )
-		choiceParam('tfstateBucketPrefix'	, [tfStateBucketPrefixR53ac]	, 'TF State Bucket Prefix'      )
-		stringParam('r53_zone_name'			, 'vignesh-private-zone'		, 'zone name'					)
-		stringParam('r53_record_name'		, 'postgres-r53,ec2-r53'		, 'route53 name'				)
-		stringParam('r53_records'			, ''							, 'ip-address | end-point'		)
-		choiceParam('r53_record_type'		, ['A','CNAME']					, 'A : ip-address | CNAME : end-point')
-		choiceParam('includeR53acRecord'	, ['true','false']				, '')
-		choiceParam('terraformApplyPlan'	, ['plan','apply','plan-destroy','destroy']	, '')
-	}
-	definition {
-		cps {
-			script(readFileFromWorkspace('pipeline/tf-route53ac-record-build-1.groovy'))
-			sandbox()
-		}
-	}
+def terraform_plan(global_tfvars,s3_storage_tfvars) {
+	sh "terraform plan -no-color -out=tfplan -input=false -var-file=${global_tfvars} -var-file=${s3_storage_tfvars}"
 }
 
-// AWS S3 Bucket and S3 Log Bucket Creation
-pipelineJob('tf-s3-build-1-job') {
-	description('Building AWS KMS key creation')
-	logRotator(-1,-1)
-	parameters{
-		choiceParam('gitRepo'				, [terraformRepo]				, '')
-		choiceParam('gitBranch'				, [terraformBranch]				, '')
-		choiceParam('gitCreds'				, [gitCreds]					, '')
-		choiceParam('awsAccount'			, [awsAccount]					, '')
-		choiceParam('tfstateBucket'			, [tfStateBucket]				, 'TF State Bucket'					)
-		choiceParam('tfstateBucketPrefixS3'	, [tfStateBucketPrefixS3]		, 'TF State Bucket Prefix S3'		)
-		choiceParam('tfstateBucketPrefixS3L', [tfStateBucketPrefixS3Log]	, 'TF State Bucket Prefix S3 Log'	)
-		stringParam('s3_bucket_name'		, ''							, '')
-		choiceParam('s3_versioning'			, ['true','false']				, '')
-		choiceParam('includeS3Bucket'		, ['true','false']				, '')
-		stringParam('s3_log_bucket_name'	, ''							, '')
-		choiceParam('includeS3LogBucket'	, ['true','false']				, '')
-		choiceParam('terraformApplyPlan'	, ['plan','apply','plan-destroy','destroy']	, '')
-	}
-	definition {
-		cps {
-			script(readFileFromWorkspace('pipeline/tf-s3-build-1.groovy'))
-			sandbox()
-		}
-	}
+def terraform_apply() {
+	sh "terraform apply -no-color -input=false tfplan"
 }
 
-// AWS KMS Key Creation
-pipelineJob('tf-kms-key-build-1-job') {
-	description('Building AWS KMS key creation')
-	logRotator(-1,-1)
-	parameters{
-		choiceParam('gitRepo'				, [terraformRepo]				, '')
-		choiceParam('gitBranch'				, [terraformBranch]				, '')
-		choiceParam('gitCreds'				, [gitCreds]					, '')
-		choiceParam('awsAccount'			, [awsAccount]					, '')
-		choiceParam('tfstateBucket'			, [tfStateBucket]				, 'TF State Bucket'             )
-		choiceParam('tfstateBucketPrefix'	, [tfStateBucketPrefixKMS]		, 'TF State Bucket Prefix'      )
-		stringParam('kms_key_name'			, 'custome-key'					, '')
-		choiceParam('includeKMSKey'			, ['true','false']				, '')
-		choiceParam('terraformApplyPlan'	, ['plan','apply','plan-destroy','destroy']	, '')
-	}
-	definition {
-		cps {
-			script(readFileFromWorkspace('pipeline/tf-kms-key-build-1.groovy'))
-			sandbox()
-		}
-	}
+def terraform_plan_destroy(global_tfvars,s3_storage_tfvars) {
+        sh "terraform plan -destroy -no-color -out=tfdestroy -input=false -var-file=${global_tfvars} -var-file=${s3_storage_tfvars}"
 }
 
-// AWS SG Creation
-pipelineJob('tf-sg-build-1-job') {
-	description('Building AWS SG creation')
-	logRotator(-1,-1)
-	parameters{
-		choiceParam('gitRepo'				, [terraformRepo]				, '')
-		choiceParam('gitBranch'				, [terraformBranch]				, '')
-		choiceParam('gitCreds'				, [gitCreds]					, '')
-		choiceParam('awsAccount'			, [awsAccount]					, '')
-		choiceParam('tfstateBucket'			, [tfStateBucket]				, 'TF State Bucket'             )
-		choiceParam('tfstateBucketPrefix'	, [tfStateBucketPrefixSG]		, 'TF State Bucket Prefix'      )
-		stringParam('vpc_name'				, 'default-vpc'					, '')
-		stringParam('sg_group_name'			, 'test-instance'				, 'name + sg (by default)'		)
-		stringParam('resource_name'			, 'test-instance'				, 'SG Description'				)
-		choiceParam('includeSG'				, ['true','false']				, '')
-		choiceParam('terraformApplyPlan'	, ['plan','apply','plan-destroy','destroy']	, '')
-	}
-	definition {
-		cps {
-			script(readFileFromWorkspace('pipeline/tf-sg-build-1.groovy'))
-			sandbox()
-		}
-	}
-}
-
-// AWS ENI Creation
-pipelineJob('tf-eni-build-1-job') {
-	description('Building AWS ENI creation')
-	logRotator(-1,-1)
-	parameters{
-		choiceParam('gitRepo'				, [terraformRepo]				, '')
-		choiceParam('gitBranch'				, [terraformBranch]				, '')
-		choiceParam('gitCreds'				, [gitCreds]					, '')
-		choiceParam('awsAccount'			, [awsAccount]					, '')
-		choiceParam('tfstateBucket'			, [tfStateBucket]				, 'TF State Bucket'             )
-		choiceParam('tfstateBucketPrefix'	, [tfStateBucketPrefixENI]		, 'TF State Bucket Prefix'      )
-		choiceParam('eni_subnet'			, ['default-subnet-1','default-subnet-2','default-subnet-3']	, 'ENI Subnet'	)
-		stringParam('sg_group_name'			, 'default-ec2-sg'				, 'ENI Security Group'			)
-		stringParam('resource_name'			, 'test-instance'				, '')
-		choiceParam('includeENI'			, ['true','false']				, '')
-		choiceParam('terraformApplyPlan'	, ['plan','apply','plan-destroy','destroy']	, '')
-	}
-	definition {
-		cps {
-			script(readFileFromWorkspace('pipeline/tf-eni-build-1.groovy'))
-			sandbox()
-		}
-	}
-}
-
-// AWS EBS Creation
-pipelineJob('tf-ebs-build-1-job') {
-	description('Building AWS EBS Volume creation')
-	logRotator(-1,-1)
-	parameters{
-		choiceParam('gitRepo'				, [terraformRepo]				, '')
-		choiceParam('gitBranch'				, [terraformBranch]				, '')
-		choiceParam('gitCreds'				, [gitCreds]					, '')
-		choiceParam('awsAccount'			, [awsAccount]					, '')
-		choiceParam('tfstateBucket'			, [tfStateBucket]				, 'TF State Bucket'             )
-		choiceParam('tfstateBucketPrefix'	, [tfStateBucketPrefixEBS]		, 'TF State Bucket Prefix'      )
-		stringParam('ebs_name'				, 'test-instance'				, '')
-		choiceParam('ebs_availability_zone'	, ['ap-south-1a','ap-south-1b','ap-south-1c']	, '')
-		choiceParam('includeEBS'			, ['true','false']				, '')
-		choiceParam('terraformApplyPlan'	, ['plan','apply','plan-destroy','destroy']		, '')
-	}
-	definition {
-		cps {
-			script(readFileFromWorkspace('pipeline/tf-ebs-build-1.groovy'))
-			sandbox()
-		}
-	}
-}
-
-// AWS EC2 Creation
-pipelineJob('tf-ec2-build-1-job') {
-	description('Building AWS EC2 creation')
-	logRotator(-1,-1)
-	parameters{
-		choiceParam('gitRepo'				, [terraformRepo]				, '')
-		choiceParam('gitBranch'				, [terraformBranch]				, '')
-		choiceParam('gitCreds'				, [gitCreds]					, '')
-		choiceParam('awsAccount'			, [awsAccount]					, '')
-		choiceParam('tfstateBucket'			, [tfStateBucket]				, 'TF State Bucket'             )
-		choiceParam('tfstateBucketPrefix'	, [tfStateBucketPrefixEC2]		, 'TF State Bucket Prefix'      )
-		choiceParam('includeENI'			, ['true','false']				, '')
-		stringParam('ebs_name'				, 'test-instance'				, '')
-		choiceParam('includeEBS'			, ['true','false']				, '')
-		stringParam('vpc_name'				, 'default-vpc'					, '')
-		stringParam('sg_group_name'			, 'test-instance'				, 'name + sg (by default)'		)
-		choiceParam('includeSG'				, ['true','false']				, '')
-		stringParam('instance_name'			, 'test-instance'				, '')
-		stringParam('instance_type'			, 't2.micro'					, '')
-		choiceParam('AZ'					,['ap-south-1a','ap-south-1b','ap-south-1c']				, 'EBS | EC2')
-		choiceParam('subnet'				, ['default-subnet-1','default-subnet-2','default-subnet-3'], 'ENI | EC2')
-		choiceParam('includeEC2'			, ['true','false']				, '')
-		choiceParam('terraformApplyPlan'	, ['plan','apply','plan-destroy','destroy']	, '')
-	}
-	definition {
-		cps {
-			script(readFileFromWorkspace('pipeline/tf-ec2-build-1.groovy'))
-			sandbox()
-		}
-	}
+def terraform_destroy() {
+        sh "terraform apply -no-color -input=false tfdestroy"
 }
