@@ -264,7 +264,7 @@ pipelineJob('tf-ec2-build-1-job') {
 		choiceParam('tfstateBucketPrefixEBS', [tfStateBucketPrefixEBS]		, 'TF State Bucket Prefix'      )
 		choiceParam('tfstateBucketPrefixEC2', [tfStateBucketPrefixEC2]		, 'TF State Bucket Prefix'      )
 		stringParam('instance_name'			, 'test-instance'				, '')
-		stringParam('ebs_name'				, 'test-instance'				, '')
+		stringParam('ebs_volume_count'		, '3'							, '')
 		stringParam('vpc_name'				, 'default-vpc'					, '')
 		stringParam('sg_group_name'			, 'test-instance'				, 'name + sg (by default)'		)
 		stringParam('instance_type'			, 't2.micro'					, '')
