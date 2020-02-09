@@ -186,6 +186,7 @@ pipelineJob('tf-sg-build-1-job') {
 		stringParam('sg_group_name'			, 'test-instance'				, 'name + sg (by default)'		)
 		stringParam('resource_name'			, 'test-instance'				, 'SG Description'				)
 		choiceParam('includeSG'				, ['true','false']				, '')
+		choiceParam('includeSGRule'			, ['true','false']				, '')
 		choiceParam('terraformApplyPlan'	, ['plan','apply','plan-destroy','destroy']	, '')
 	}
 	definition {
