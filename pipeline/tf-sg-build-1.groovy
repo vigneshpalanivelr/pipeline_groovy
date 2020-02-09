@@ -20,8 +20,10 @@ node ('master'){
 	terraformDirectorySG		= "modules/all_modules/${tfstateBucketPrefixSG}"
 	terraformDirectorySGRule	= "modules/all_modules/${tfstateBucketPrefixSGR}/${sg_group_name}-sg"
 	
-	global_tfvars				= "variables/global_vars.tfvars"
-	sg_tfvars					= "variables/sg_vars.tfvars"
+	global_tfvars				= "../../variables/global_vars.tfvars"
+	sg_tfvars					= "../../variables/sg_vars.tfvars"
+	rule_global_tfvars			= "../../../variables/global_vars.tfvars"
+	rule_sg_tfvars				= "../../../variables/sg_vars.tfvars"
 	
 	date						= new Date()
 	println date
@@ -78,7 +80,7 @@ node ('master'){
 				if (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply') {
 					stage('Terraform Plan') {
 						set_env_variables()
-						terraform_plan(global_tfvars,sg_tfvars)
+						terraform_plan(rule_global_tfvars,rule_sg_tfvars)
 					}
 				}
 				if (terraformApplyPlan == 'apply') {
@@ -92,7 +94,7 @@ node ('master'){
 				if (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy') {
 					stage('Plan Destroy') {
 						set_env_variables()
-						terraform_plan_destroy(global_tfvars,sg_tfvars)
+						terraform_plan_destroy(rule_global_tfvars,rule_sg_tfvars)
 					}
 				}
 				if (terraformApplyPlan == 'destroy') {
