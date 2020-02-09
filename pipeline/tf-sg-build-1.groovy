@@ -20,10 +20,10 @@ node ('master'){
 	terraformDirectorySG		= "modules/all_modules/${tfstateBucketPrefixSG}"
 	terraformDirectorySGRule	= "modules/all_modules/${tfstateBucketPrefixSGR}/${sg_group_name}-sg"
 	
-	global_tfvars				= "../../variables/global_vars.tfvars"
-	sg_tfvars					= "../../variables/sg_vars.tfvars"
-	rule_global_tfvars			= "../../../variables/global_vars.tfvars"
-	rule_sg_tfvars				= "../../../variables/sg_vars.tfvars"
+	global_tfvars				= "../../../variables/global_vars.tfvars"
+	sg_tfvars					= "../../../variables/sg_vars.tfvars"
+	rule_global_tfvars			= "../../../../variables/global_vars.tfvars"
+	rule_sg_tfvars				= "../../../../variables/sg_vars.tfvars"
 	
 	date						= new Date()
 	println date
@@ -39,6 +39,7 @@ node ('master'){
 		checkout()
 		if (includeSG == 'true') {
 			dir(terraformDirectorySG) {
+				sh "tree"
 				stage('Remote State Init') {
 					terraform_init(tfstateBucketPrefixSG,"sg")
 				}
@@ -74,6 +75,7 @@ node ('master'){
 		}
 		if (includeSGRule == 'true') {
 			dir(terraformDirectorySGRule) {
+				sh "tree"
 				stage('Remote State Init') {
 					terraform_init(tfstateBucketPrefixSGR,"sg-rule")
 				}
