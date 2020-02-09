@@ -35,6 +35,7 @@ node ('master'){
     
 	global_tfvars           	= "../../../variables/global_vars.tfvars"
 	sg_tfvars					= "../../../variables/sg_vars.tfvars"
+	sg_rule_tfvars				= "../../../../variables/sg_vars.tfvars"
 	ec2_eni_tfvars				= "../../../variables/ec2_eni_vars.tfvars"
 	ebs_tfvars					= "../../../variables/ebs_volume_vars.tfvars"
 	ec2_tfvars					= "../../../variables/ec2_instance_vars.tfvars"
@@ -94,7 +95,7 @@ node ('master'){
 				if (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply') {
 					stage('Terraform SG Plan') {
 						set_env_variables()
-						terraform_plan(global_tfvars,sg_tfvars)
+						terraform_plan(global_tfvars,sg_rule_tfvars)
 					}
 				}
 				if (terraformApplyPlan == 'apply') {
@@ -108,7 +109,7 @@ node ('master'){
 				if (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy') {
 					stage('Plan SG Destroy') {
 						set_env_variables()
-						terraform_plan_destroy(global_tfvars,sg_tfvars)
+						terraform_plan_destroy(global_tfvars,sg_rule_tfvars)
 					}
 				}
 				if (terraformApplyPlan == 'destroy') {
