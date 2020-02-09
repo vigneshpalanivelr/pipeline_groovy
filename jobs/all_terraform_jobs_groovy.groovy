@@ -235,8 +235,9 @@ pipelineJob('tf-ebs-build-1-job') {
 		choiceParam('awsAccount'			, [awsAccount]					, '')
 		choiceParam('tfstateBucket'			, [tfStateBucket]				, 'TF State Bucket'             )
 		choiceParam('tfstateBucketPrefix'	, [tfStateBucketPrefixEBS]		, 'TF State Bucket Prefix'      )
-		stringParam('ebs_name'				, 'test-instance'				, '')
-		choiceParam('ebs_availability_zone'	, ['ap-south-1a','ap-south-1b','ap-south-1c']	, '')
+		stringParam('resource_name'			, 'test-instance'				, '')
+		stringParam('ebs_volume_count'		, ''							, '')
+		choiceParam('ebs_az'				, ['ap-south-1a','ap-south-1b','ap-south-1c']	, '')
 		choiceParam('includeEBS'			, ['true','false']				, '')
 		choiceParam('terraformApplyPlan'	, ['plan','apply','plan-destroy','destroy']		, '')
 	}
