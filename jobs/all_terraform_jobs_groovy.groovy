@@ -11,6 +11,7 @@ def tfStateBucketPrefixR53		= "r53_module"
 def tfStateBucketPrefixR53ac	= "r53ac_module"
 def tfStateBucketPrefixKMS		= "kms_module"
 def tfStateBucketPrefixSG		= "sg_module"
+def tfStateBucketPrefixSGRule	= "sg_rule_module"
 def tfStateBucketPrefixENI		= "eni_module"
 def tfStateBucketPrefixEBS		= "ebs_module"
 def tfStateBucketPrefixEC2		= "ec2_module"
@@ -181,7 +182,8 @@ pipelineJob('tf-sg-build-1-job') {
 		choiceParam('gitCreds'				, [gitCreds]					, '')
 		choiceParam('awsAccount'			, [awsAccount]					, '')
 		choiceParam('tfstateBucket'			, [tfStateBucket]				, 'TF State Bucket'             )
-		choiceParam('tfstateBucketPrefix'	, [tfStateBucketPrefixSG]		, 'TF State Bucket Prefix'      )
+		choiceParam('tfstateBucketPrefixSG'	, [tfStateBucketPrefixSG]		, 'TF State Bucket Prefix'      )
+		choiceParam('tfstateBucketPrefixSGR', [tfStateBucketPrefixSGRule]	, 'TF State Bucket Prefix'      )
 		stringParam('vpc_name'				, 'default-vpc'					, '')
 		stringParam('sg_group_name'			, 'test-instance'				, 'name + sg (by default)'		)
 		stringParam('resource_name'			, 'test-instance'				, 'SG Description'				)
