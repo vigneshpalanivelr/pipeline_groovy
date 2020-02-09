@@ -5,6 +5,7 @@
 *	awsAccount
 *	tfstateBucket
 *	tfstateBucketPrefixSG
+*	tfstateBucketPrefixSGR
 *	tfstateBucketPrefixENI
 *	tfstateBucketPrefixEBS
 *	tfstateBucketPrefixEC2
@@ -18,6 +19,7 @@
 *	subnet
 
 *	includeSG
+*	includeSGRule
 *	includeENI
 *	includeEBS
 *	includeEC2
@@ -25,18 +27,19 @@
 */
 
 node ('master'){
-	terraformDirectorySG	= "modules/all_modules/${tfstateBucketPrefixSG}"
-	terraformDirectoryENI	= "modules/all_modules/${tfstateBucketPrefixENI}"
-	terraformDirectoryEBS	= "modules/all_modules/${tfstateBucketPrefixEBS}"
-	terraformDirectoryEC2	= "modules/all_modules/${tfstateBucketPrefixEC2}"
+	terraformDirectorySG		= "modules/all_modules/${tfstateBucketPrefixSG}"
+	terraformDirectorySGRule	= "modules/all_modules/${tfstateBucketPrefixSGR}"
+	terraformDirectoryENI		= "modules/all_modules/${tfstateBucketPrefixENI}"
+	terraformDirectoryEBS		= "modules/all_modules/${tfstateBucketPrefixEBS}"
+	terraformDirectoryEC2		= "modules/all_modules/${tfstateBucketPrefixEC2}"
     
-	global_tfvars           = "../../../variables/global_vars.tfvars"
-	sg_tfvars				= "../../../variables/sg_vars.tfvars"
-	ec2_eni_tfvars			= "../../../variables/ec2_eni_vars.tfvars"
-	ebs_tfvars				= "../../../variables/ebs_volume_vars.tfvars"
-	ec2_tfvars				= "../../../variables/ec2_instance_vars.tfvars"
+	global_tfvars           	= "../../../variables/global_vars.tfvars"
+	sg_tfvars					= "../../../variables/sg_vars.tfvars"
+	ec2_eni_tfvars				= "../../../variables/ec2_eni_vars.tfvars"
+	ebs_tfvars					= "../../../variables/ebs_volume_vars.tfvars"
+	ec2_tfvars					= "../../../variables/ec2_instance_vars.tfvars"
 	
-	date                    = new Date()
+	date                    	= new Date()
 	println date
 
 	writeFile(file: "askp-${BUILD_TAG}",text:"#!/bin/bash/\ncase \"\$1\" in\nUsername*) echo \"\${STASH_USERNAME}\" ;;\nPassword*) \"\${STASH_PASWORD}\";;\nesac")
@@ -52,6 +55,41 @@ node ('master'){
 			dir(terraformDirectorySG) {
 				stage('Remote State Init') {
 					terraform_init(tfstateBucketPrefixSG,'sg')
+				}
+				if (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply') {
+					stage('Terraform SG Plan') {
+						set_env_variables()
+						terraform_plan(global_tfvars,sg_tfvars)
+					}
+				}
+				if (terraformApplyPlan == 'apply') {
+					stage('Approve SG Plan') {
+						approval()
+					}
+					stage('Terraform SG Apply') {
+						terraform_apply()
+					}
+				}
+				if (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy') {
+					stage('Plan SG Destroy') {
+						set_env_variables()
+						terraform_plan_destroy(global_tfvars,sg_tfvars)
+					}
+				}
+				if (terraformApplyPlan == 'destroy') {
+					stage('Approve SG Destroy') {
+						approval()
+					}
+					stage('SG Destroy') {
+						terraform_destroy()
+					}
+				}
+			}
+		}
+		if (includeSGRule == 'true') {
+			dir(terraformDirectorySGRule) {
+				stage('Remote State Init') {
+					terraform_init(tfstateBucketPrefixSGR,'sg-rule')
 				}
 				if (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply') {
 					stage('Terraform SG Plan') {
