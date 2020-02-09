@@ -28,7 +28,7 @@
 
 node ('master'){
 	terraformDirectorySG		= "modules/all_modules/${tfstateBucketPrefixSG}"
-	terraformDirectorySGRule	= "modules/all_modules/${tfstateBucketPrefixSGR}"
+	terraformDirectorySGRule	= "modules/all_modules/${tfstateBucketPrefixSGR}/${instance_name}-sg"
 	terraformDirectoryENI		= "modules/all_modules/${tfstateBucketPrefixENI}"
 	terraformDirectoryEBS		= "modules/all_modules/${tfstateBucketPrefixEBS}"
 	terraformDirectoryEC2		= "modules/all_modules/${tfstateBucketPrefixEC2}"
