@@ -6,8 +6,9 @@
 *	tfstateBucket
 *	tfstateBucketPrefix
 
-*	ebs_name
-*	ebs_availability_zone
+*	ebs_volume_count
+*	ebs_az
+*	resource_name
 
 *	includeEBS
 *	terraformApplyPlan
@@ -17,8 +18,8 @@ node ('master'){
 	terraformDirectory	= "modules/all_modules/${tfstateBucketPrefix}"
 	global_tfvars		= "../../../variables/global_vars.tfvars"
 	ebs_tfvars		    = "../../../variables/ebs_volume_vars.tfvars"
+	
 	date				= new Date()
-
 	println date
 
 	writeFile(file: "askp-${BUILD_TAG}",text:"#!/bin/bash/\ncase \"\$1\" in\nUsername*) echo \"\${STASH_USERNAME}\" ;;\nPassword*) \"\${STASH_PASWORD}\";;\nesac")
@@ -95,15 +96,16 @@ def checkout() {
 }
 
 def set_env_variables() {
-	env.TF_VAR_ebs_name					= "${ebs_name}"
 	env.TF_VAR_aws_account_num			= "${awsAccount}"
-	env.TF_VAR_ebs_availability_zone	= "${ebs_availability_zone}"
+	env.TF_VAR_ebs_volume_count			= "${ebs_volume_count}"
+	env.TF_VAR_ebs_az					= "${ebs_az}"
+	env.TF_VAR_resource_name			= "${resource_name}"
 }
 
 def terraform_init() {
 	withEnv(["GIT_ASKPASS=${WORKSPACE}/askp-${BUILD_TAG}"]){
 		withCredentials([usernamePassword(credentialsId: gitCreds, usernameVariable: 'STASH_USERNAME', passwordVariable: 'STASH_PASSWORD')]) {
-			sh "terraform init -no-color -input=false -upgrade=true -backend=true -force-copy -backend-config='bucket=${tfstateBucket}' -backend-config='key=${tfstateBucketPrefix}/${ebs_name}-ebs.tfstate'"
+			sh "terraform init -no-color -input=false -upgrade=true -backend=true -force-copy -backend-config='bucket=${tfstateBucket}' -backend-config='key=${tfstateBucketPrefix}/${resource_name}-ebs.tfstate'"
 		}
 	}
 }
