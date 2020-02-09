@@ -10,7 +10,7 @@
 *	tfstateBucketPrefixEC2
 
 *	instance_name
-*	ebs_name
+*	ebs_volume_count
 *	vpc_name
 *	sg_group_name
 *	instance_type
@@ -221,7 +221,7 @@ def set_env_variables() {
 	env.TF_VAR_aws_account_num			= "${awsAccount}"
 	env.TF_VAR_ec2_instance_name		= "${instance_name}"
 	env.TF_VAR_resource_name			= "${instance_name}"
-	env.TF_VAR_ebs_name					= "${ebs_name}"
+	env.TF_VAR_ebs_volume_count			= "${ebs_volume_count}"
 	env.TF_VAR_aws_vpc_name				= "${vpc_name}"
 	env.TF_VAR_vpc_subnet_name			= "${subnet}"
 	env.TF_VAR_sg_group_name			= "${sg_group_name}"
