@@ -33,8 +33,9 @@ node ('master'){
 	terraformDirectoryEBS		= "modules/all_modules/${tfstateBucketPrefixEBS}"
 	terraformDirectoryEC2		= "modules/all_modules/${tfstateBucketPrefixEC2}"
     
-	global_tfvars           	= "../../../variables/global_vars.tfvars"
+	global_tfvars				= "../../../variables/global_vars.tfvars"
 	sg_tfvars					= "../../../variables/sg_vars.tfvars"
+	global_tfvars				= "../../../../variables/global_vars.tfvars"
 	sg_rule_tfvars				= "../../../../variables/sg_vars.tfvars"
 	ec2_eni_tfvars				= "../../../variables/ec2_eni_vars.tfvars"
 	ebs_tfvars					= "../../../variables/ebs_volume_vars.tfvars"
