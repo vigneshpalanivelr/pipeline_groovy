@@ -182,7 +182,7 @@ node ('master'){
 				}
 			}
 		}
-		# Destroy Starts
+		// Destroy Starts
 		if (includeEBSAttach == 'true') {
             dir(terraformDirectoryEBSAttach) {
 				if (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy') {
