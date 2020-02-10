@@ -75,6 +75,9 @@ node ('master'){
 					}
 				}
 				if (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy') {
+					stage('Remote State Init') {
+						terraform_init(resource_name,'ebs-attach')
+					}
 					stage('Plan Destroy') {
 						set_env_variables()
 						terraform_plan_destroy(global_tfvars,ebs_tfvars)
