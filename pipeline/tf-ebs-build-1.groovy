@@ -148,6 +148,7 @@ def set_env_variables() {
 	env.TF_VAR_ebs_volume_count			= "${ebs_volume_count}"
 	env.TF_VAR_ebs_az					= "${ebs_az}"
 	env.TF_VAR_resource_name			= "${resource_name}"
+	env.TF_VAR_ebs_key_state_prefix		= "${tfstateBucketPrefixEBS}"
 }
 
 def terraform_init(module,stack) {
