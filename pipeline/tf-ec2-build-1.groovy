@@ -350,6 +350,7 @@ def set_env_variables() {
 	env.TF_VAR_ec2_instance_type		= "${instance_type}"
 	env.TF_VAR_ec2_az					= "${AZ}"
 	env.TF_VAR_ebs_az					= "${AZ}"
+	env.TF_VAR_ebs_key_state_prefix		= "${tfstateBucketPrefixEBS}"
 }
 
 def terraform_init(module,stack) {
