@@ -273,6 +273,8 @@ pipelineJob('tf-ec2-build-1-job') {
 		stringParam('vpc_name'					, 'default-vpc'						, '')
 		stringParam('sg_group_name'				, 'test-instance'					, 'name + sg (by default)'		)
 		stringParam('instance_type'				, 't2.micro'						, '')
+		choiceParam('root_user'					, ['vignesh']						, 'Login Cred')
+		choiceParam('root_passwd'				, ['vignesh']						, 'Login Cred')
 		choiceParam('AZ'						, ['ap-south-1a','ap-south-1b','ap-south-1c']				, 'EBS | EC2')
 		choiceParam('subnet'					, ['default-subnet-1','default-subnet-2','default-subnet-3'], 'ENI | EC2')
 		choiceParam('includeSG'					, ['true','false']					, '')
