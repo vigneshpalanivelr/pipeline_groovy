@@ -348,6 +348,8 @@ def set_env_variables() {
 	env.TF_VAR_sg_group_name			= "${sg_group_name}"
 	env.TF_VAR_ec2_sg_name				= "${sg_group_name}"
 	env.TF_VAR_ec2_instance_type		= "${instance_type}"
+	env.TF_VAR_root_user				= "${root_user}"
+	env.TF_VAR_root_passwd				= "${root_passwd}"
 	env.TF_VAR_ec2_az					= "${AZ}"
 	env.TF_VAR_ebs_az					= "${AZ}"
 	env.TF_VAR_ebs_key_state_prefix		= "${tfstateBucketPrefixEBS}"
