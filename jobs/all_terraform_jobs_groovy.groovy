@@ -4,6 +4,7 @@ def gitCreds						= "gitCreds"
 def awsAccount						= "210315133748"
 def tfStateBucket					= "terraform-tfstate-mumba-1"
 
+def tfStateBucketPrefixSNS			= "sns_module"
 def tfStateBucketPrefixS3			= "s3_module"
 def tfStateBucketPrefixS3Log		= "s3_log_module"
 def tfStateBucketPrefixRDS			= "rds_module"
@@ -173,6 +174,31 @@ pipelineJob('tf-kms-key-build-1-job') {
 	}
 }
 
+// AWS SNS Topic Creation
+pipelineJob('tf-sns-build-1-job') {
+	description('Building AWS KMS key creation')
+	logRotator(-1,-1)
+	parameters{
+		choiceParam('gitRepo'				, [terraformRepo]				, '')
+		choiceParam('gitBranch'				, [terraformBranch]				, '')
+		choiceParam('gitCreds'				, [gitCreds]					, '')
+		choiceParam('awsAccount'			, [awsAccount]					, '')
+		choiceParam('tfstateBucket'			, [tfStateBucket]				, 'TF State Bucket'             )
+		choiceParam('tfstateBucketPrefix'	, [tfStateBucketPrefixSNS]		, 'TF State Bucket Prefix'      )
+		stringParam('sns_topic_name'		, 'test-sns-topic'				, '')
+		choiceParam('sns_protocol'			, ['email','sms']				, '')
+		choiceParam('sns_endpoint'			, ['vignesh1650@gmail.com']		, '')
+		choiceParam('includeSNS'			, ['true','false']				, '')
+		choiceParam('terraformApplyPlan'	, ['plan','apply','plan-destroy','destroy']	, '')
+	}
+	definition {
+		cps {
+			script(readFileFromWorkspace('pipeline/tf-sns-build-1.groovy'))
+			sandbox()
+		}
+	}
+}
+
 // AWS SG Creation
 pipelineJob('tf-sg-build-1-job') {
 	description('Building AWS SG creation')
@@ -269,14 +295,15 @@ pipelineJob('tf-ec2-build-1-job') {
 		choiceParam('tfstateBucketPrefixEBSA'	, [tfStateBucketPrefixEBSAttach]	, 'TF State Bucket Prefix'		)
 		choiceParam('tfstateBucketPrefixEC2'	, [tfStateBucketPrefixEC2]			, 'TF State Bucket Prefix'      )
 		stringParam('instance_name'				, 'test-instance'					, '')
-		stringParam('ebs_volume_count'			, '3'								, '')
 		stringParam('vpc_name'					, 'default-vpc'						, '')
 		stringParam('sg_group_name'				, 'test-instance'					, 'name + sg (by default)'		)
 		stringParam('instance_type'				, 't2.micro'						, '')
-		choiceParam('root_user'					, ['vignesh']						, 'Login Cred')
-		choiceParam('root_passwd'				, ['vignesh']						, 'Login Cred')
 		choiceParam('AZ'						, ['ap-south-1a','ap-south-1b','ap-south-1c']				, 'EBS | EC2')
 		choiceParam('subnet'					, ['default-subnet-1','default-subnet-2','default-subnet-3'], 'ENI | EC2')
+		stringParam('ebs_volume_count'			, '3'								, '')
+		stringParam('ec2_ami_regex'				, 'RHEL-7.7'						, '')
+		choiceParam('root_user'					, ['vignesh']						, 'Login Cred')
+		choiceParam('root_passwd'				, ['vignesh']						, 'Login Cred')
 		choiceParam('includeSG'					, ['true','false']					, '')
 		choiceParam('includeSGRule'				, ['true','false']					, '')
 		choiceParam('includeENI'				, ['true','false']					, '')

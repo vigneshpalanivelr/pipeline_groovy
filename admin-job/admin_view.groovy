@@ -140,6 +140,40 @@ nestedView('terraform-jobs') {
 				}
 			}
 		}
+		listView('s3') {
+			views {
+				description('All Terraform Jobs')
+				jobs {
+					regex(/tf-s3.*/)
+				}
+				columns {
+					status()
+					weather()
+					name()
+					lastSuccess()
+					lastFailure()
+					lastDuration()
+					buildButton()
+				}
+			}
+		}
+		listView('sns') {
+			views {
+				description('All Terraform Jobs')
+				jobs {
+					regex(/tf-sns.*/)
+				}
+				columns {
+					status()
+					weather()
+					name()
+					lastSuccess()
+					lastFailure()
+					lastDuration()
+					buildButton()
+				}
+			}
+		}
 	}
 }
 nestedView('practice-jobs') {
