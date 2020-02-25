@@ -40,8 +40,8 @@ node ('master'){
 	terraformDirectoryEC2CW			= "modules/all_modules/${tfstateBucketPrefixEC2CW}/cw_ec2"
     
 	global_tfvars					= "../../../variables/global_vars.tfvars"
+	global_2_tfvars					= "../../../../variables/global_vars.tfvars"
 	sg_tfvars						= "../../../variables/sg_vars.tfvars"
-	global_sg_rule_tfvars			= "../../../../variables/global_vars.tfvars"
 	sg_rule_tfvars					= "../../../../variables/sg_vars.tfvars"
 	ec2_eni_tfvars					= "../../../variables/ec2_eni_vars.tfvars"
 	ebs_tfvars						= "../../../variables/ebs_volume_vars.tfvars"
@@ -83,7 +83,7 @@ node ('master'){
 					stage('SG-R Init Apply') {
 						terraform_init(tfstateBucketPrefixSGR,'sg-rule')
 						set_env_variables()
-						terraform_plan(global_sg_rule_tfvars,sg_rule_tfvars)
+						terraform_plan(global_2_tfvars,sg_rule_tfvars)
 					}
 				}
 				if (terraformApplyPlan == 'apply') {
@@ -168,7 +168,7 @@ node ('master'){
 					stage('CW Init Plan') {
 						terraform_init(tfstateBucketPrefixEC2CW + '/cw_ec2','cw-alarm')
 						set_env_variables()
-						terraform_plan(global_tfvars,cw_tfvars)
+						terraform_plan(global_2_tfvars,cw_tfvars)
 					}
 				}
 				if (terraformApplyPlan == 'apply') {
@@ -188,7 +188,7 @@ node ('master'){
 					stage('CW-D Init Plan') {
 						terraform_init(tfstateBucketPrefixEC2CW + '/cw_ec2','cw-alarm')
 						set_env_variables()
-						terraform_plan_destroy(global_tfvars,cw_tfvars)
+						terraform_plan_destroy(global_2_tfvars,cw_tfvars)
 					}
 				}
 				if (terraformApplyPlan == 'apply') {
@@ -273,7 +273,7 @@ node ('master'){
 					stage('SG-R Init Plan') {
 						terraform_init(tfstateBucketPrefixSGR,'sg-rule')
 						set_env_variables()
-						terraform_plan_destroy(global_sg_rule_tfvars,sg_rule_tfvars)
+						terraform_plan_destroy(global_2_tfvars,sg_rule_tfvars)
 					}
 				}
 				if (terraformApplyPlan == 'destroy') {
