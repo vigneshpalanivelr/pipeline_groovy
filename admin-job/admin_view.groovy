@@ -140,6 +140,23 @@ nestedView('terraform-jobs') {
 				}
 			}
 		}
+		listView('cw') {
+			views {
+				description('All Terraform Jobs')
+				jobs {
+					regex(/tf-cw.*/)
+				}
+				columns {
+					status()
+					weather()
+					name()
+					lastSuccess()
+					lastFailure()
+					lastDuration()
+					buildButton()
+				}
+			}
+		}
 		listView('s3') {
 			views {
 				description('All Terraform Jobs')

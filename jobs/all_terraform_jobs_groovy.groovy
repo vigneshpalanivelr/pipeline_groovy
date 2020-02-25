@@ -4,19 +4,20 @@ def gitCreds						= "gitCreds"
 def awsAccount						= "210315133748"
 def tfStateBucket					= "terraform-tfstate-mumba-1"
 
-def tfStateBucketPrefixSNS			= "sns_module"
 def tfStateBucketPrefixS3			= "s3_module"
 def tfStateBucketPrefixS3Log		= "s3_log_module"
 def tfStateBucketPrefixRDS			= "rds_module"
 def tfStateBucketPrefixR53			= "r53_module"
 def tfStateBucketPrefixR53ac		= "r53ac_module"
 def tfStateBucketPrefixKMS			= "kms_module"
+def tfStateBucketPrefixSNS			= "sns_module"
 def tfStateBucketPrefixSG			= "sg_module"
 def tfStateBucketPrefixSGRule		= "sg_rule_module"
 def tfStateBucketPrefixENI			= "eni_module"
 def tfStateBucketPrefixEBS			= "ebs_module"
 def tfStateBucketPrefixEBSAttach	= "ebs_attachment_module"
 def tfStateBucketPrefixEC2			= "ec2_module"
+def tfStateBucketPrefixEC2CW		= "cw_module"
 
 // RDS DB Build Generic Job
 pipelineJob('tf-rds-db-build-1-job') {
@@ -278,6 +279,29 @@ pipelineJob('tf-ebs-build-1-job') {
 	}
 }
 
+// AWS CW Alarm Configuration
+pipelineJob('tf-cw-build-1-job') {
+	description('Building AWS EBS Volume creation')
+	logRotator(-1,-1)
+	parameters{
+		choiceParam('gitRepo'					, [terraformRepo]					, '')
+		choiceParam('gitBranch'					, [terraformBranch]					, '')
+		choiceParam('gitCreds'					, [gitCreds]						, '')
+		choiceParam('awsAccount'				, [awsAccount]						, '')
+		choiceParam('tfstateBucket'				, [tfStateBucket]					, 'TF State Bucket'				)
+		choiceParam('tfStateBucketPrefixCW'		, [tfStateBucketPrefixEC2CW]		, 'TF State Bucket Prefix'		)
+		stringParam('resource_name'				, 'test-instance'					, '')
+		choiceParam('includeCW'					, ['true','false']					, '')
+		choiceParam('terraformApplyPlan'		, ['plan','apply','plan-destroy','destroy']		, '')
+	}
+	definition {
+		cps {
+			script(readFileFromWorkspace('pipeline/tf-cw-build-1.groovy'))
+			sandbox()
+		}
+	}
+}
+
 // AWS EC2 Creation
 pipelineJob('tf-ec2-build-1-job') {
 	description('Building AWS EC2 creation')
@@ -292,8 +316,9 @@ pipelineJob('tf-ec2-build-1-job') {
 		choiceParam('tfstateBucketPrefixSGR'	, [tfStateBucketPrefixSGRule]		, 'TF State Bucket Prefix'      )
 		choiceParam('tfstateBucketPrefixENI'	, [tfStateBucketPrefixENI]			, 'TF State Bucket Prefix'      )
 		choiceParam('tfstateBucketPrefixEBS'	, [tfStateBucketPrefixEBS]			, 'TF State Bucket Prefix'      )
-		choiceParam('tfstateBucketPrefixEBSA'	, [tfStateBucketPrefixEBSAttach]	, 'TF State Bucket Prefix'		)
 		choiceParam('tfstateBucketPrefixEC2'	, [tfStateBucketPrefixEC2]			, 'TF State Bucket Prefix'      )
+		choiceParam('tfstateBucketPrefixEBSA'	, [tfStateBucketPrefixEBSAttach]	, 'TF State Bucket Prefix'		)
+		choiceParam('tfstateBucketPrefixEC2CW'	, [tfStateBucketPrefixEC2CW]		, 'TF State Bucket Prefix'      )
 		stringParam('instance_name'				, 'test-instance'					, '')
 		stringParam('vpc_name'					, 'default-vpc'						, '')
 		stringParam('sg_group_name'				, 'test-instance'					, 'name + sg (by default)'		)
@@ -308,8 +333,9 @@ pipelineJob('tf-ec2-build-1-job') {
 		choiceParam('includeSGRule'				, ['true','false']					, '')
 		choiceParam('includeENI'				, ['true','false']					, '')
 		choiceParam('includeEBS'				, ['true','false']					, '')
-		choiceParam('includeEBSAttach'			, ['true','false']					, '')
 		choiceParam('includeEC2'				, ['true','false']					, '')
+		choiceParam('includeEBSAttach'			, ['true','false']					, '')
+		choiceParam('includeCW'					, ['true','false']					, '')
 		choiceParam('terraformApplyPlan'		, ['plan','apply','plan-destroy','destroy']	, '')
 	}
 	definition {
