@@ -15,7 +15,7 @@
 node ('master'){
 	terraformDirectoryCW		= "modules/all_modules/${tfstateBucketPrefixEC2CW}/cw_ec2"
 	
-	global_tfvars				= "../../../variables/global_vars.tfvars"
+	global_tfvars				= "../../../../variables/global_vars.tfvars"
 	cw_tfvars					= "../../../../variables/cw_vars.tfvars"
 	
 	date						= new Date()
