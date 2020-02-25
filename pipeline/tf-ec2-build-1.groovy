@@ -191,7 +191,7 @@ node ('master'){
 						terraform_plan_destroy(global_2_tfvars,cw_tfvars)
 					}
 				}
-				if (terraformApplyPlan == 'apply') {
+				if (terraformApplyPlan == 'destroy') {
 					stage('CW-D Destroy') {
 						approval()
 						terraform_destroy()
