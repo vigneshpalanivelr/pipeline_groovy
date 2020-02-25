@@ -46,7 +46,7 @@ node ('master'){
 	ec2_eni_tfvars					= "../../../variables/ec2_eni_vars.tfvars"
 	ebs_tfvars						= "../../../variables/ebs_volume_vars.tfvars"
 	ec2_tfvars						= "../../../variables/ec2_instance_vars.tfvars"
-	cw_tfvars						= "../../../variables/cw_vars.tfvars"
+	cw_tfvars						= "../../../../variables/cw_vars.tfvars"
 	
 	date                    		= new Date()
 	println date
