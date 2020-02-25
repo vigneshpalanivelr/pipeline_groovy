@@ -8,8 +8,9 @@
 *	tfstateBucketPrefixSGR
 *	tfstateBucketPrefixENI
 *	tfstateBucketPrefixEBS
-*	tfstateBucketPrefixEBSA
 *	tfstateBucketPrefixEC2
+*	tfstateBucketPrefixEBSA
+*	tfstateBucketPrefixEC2CW
 
 *	instance_name
 *	ebs_volume_count
@@ -23,8 +24,9 @@
 *	includeSGRule
 *	includeENI
 *	includeEBS
-*	includeEBSAttach
 *	includeEC2
+*	includeEBSAttach
+*	includeCW
 *	terraformApplyPlan
 */
 
@@ -33,8 +35,9 @@ node ('master'){
 	terraformDirectorySGRule		= "modules/all_modules/${tfstateBucketPrefixSGR}/${instance_name}-sg"
 	terraformDirectoryENI			= "modules/all_modules/${tfstateBucketPrefixENI}"
 	terraformDirectoryEBS			= "modules/all_modules/${tfstateBucketPrefixEBS}"
-	terraformDirectoryEBSAttach		= "modules/all_modules/${tfstateBucketPrefixEBSA}"
 	terraformDirectoryEC2			= "modules/all_modules/${tfstateBucketPrefixEC2}"
+	terraformDirectoryEBSAttach		= "modules/all_modules/${tfstateBucketPrefixEBSA}"
+	terraformDirectoryEC2CW			= "modules/all_modules/${tfstateBucketPrefixEC2CW}/cw_ec2"
     
 	global_tfvars					= "../../../variables/global_vars.tfvars"
 	sg_tfvars						= "../../../variables/sg_vars.tfvars"
@@ -43,6 +46,7 @@ node ('master'){
 	ec2_eni_tfvars					= "../../../variables/ec2_eni_vars.tfvars"
 	ebs_tfvars						= "../../../variables/ebs_volume_vars.tfvars"
 	ec2_tfvars						= "../../../variables/ec2_instance_vars.tfvars"
+	cw_tfvars						= "../../../variables/cw_vars.tfvars"
 	
 	date                    		= new Date()
 	println date
@@ -59,19 +63,15 @@ node ('master'){
 		if (includeSG == 'true') {
 			dir(terraformDirectorySG) {
 				if (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply') {
-					stage('SG Init') {
+					stage('SG Init Plan') {
 						terraform_init(tfstateBucketPrefixSG,'sg')
-					}
-					stage('SG Plan') {
 						set_env_variables()
 						terraform_plan(global_tfvars,sg_tfvars)
 					}
 				}
 				if (terraformApplyPlan == 'apply') {
-					stage('Approve SG Plan') {
-						approval()
-					}
 					stage('SG Apply') {
+						approval()
 						terraform_apply()
 					}
 				}
@@ -80,19 +80,15 @@ node ('master'){
 		if (includeSGRule == 'true') {
 			dir(terraformDirectorySGRule) {
 				if (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply') {
-					stage('SGR Init') {
+					stage('SG-R Init Apply') {
 						terraform_init(tfstateBucketPrefixSGR,'sg-rule')
-					}
-					stage('SGR Plan') {
 						set_env_variables()
 						terraform_plan(global_sg_rule_tfvars,sg_rule_tfvars)
 					}
 				}
 				if (terraformApplyPlan == 'apply') {
-					stage('Approve SGR Plan') {
+					stage('SG-R Apply') {
 						approval()
-					}
-					stage('SGR Apply') {
 						terraform_apply()
 					}
 				}
@@ -101,19 +97,15 @@ node ('master'){
 		if (includeENI == 'true') {
 			dir(terraformDirectoryENI) {
 				if (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply') {
-					stage('ENI Init') {
+					stage('ENI Init Plan') {
 						terraform_init(tfstateBucketPrefixENI,'eni')
-					}
-					stage('ENI Plan') {
 						set_env_variables()
 						terraform_plan(global_tfvars,ec2_eni_tfvars)
 					}
 				}
 				if (terraformApplyPlan == 'apply') {
-					stage('Approve ENI Plan') {
-						approval()
-					}
 					stage('ENI Apply') {
+						approval()
 						terraform_apply()
 					}
 				}
@@ -122,19 +114,15 @@ node ('master'){
 		if (includeEBS == 'true') {
             dir(terraformDirectoryEBS) {
 				if (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply') {
-					stage('EBS Init') {
+					stage('EBS Init Plan') {
 						terraform_init(tfstateBucketPrefixEBS,'ebs-volumes')
-					}
-					stage('EBS Plan') {
 						set_env_variables()
 						terraform_plan(global_tfvars,ebs_tfvars)
 					}
 				}
 				if (terraformApplyPlan == 'apply') {
-					stage('Approve EBS Plan') {
-						approval()
-					}
 					stage('EBS Apply') {
+						approval()
 						terraform_apply()
 					}
 				}
@@ -143,19 +131,15 @@ node ('master'){
 		if (includeEC2 == 'true') {
             dir(terraformDirectoryEC2) {
 				if (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply') {
-					stage('EC2 Init') {
+					stage('EC2 Init Plan') {
 						terraform_init(tfstateBucketPrefixEC2,'ec2-instance')
-					}
-					stage('EC2 Plan') {
 						set_env_variables()
 						terraform_plan(global_tfvars,ec2_tfvars)
 					}
 				}
 				if (terraformApplyPlan == 'apply') {
-					stage('Approve EC2 Plan') {
-						approval()
-					}
 					stage('EC2 Apply') {
+						approval()
 						terraform_apply()
 					}
 				}
@@ -164,41 +148,69 @@ node ('master'){
 		if (includeEBSAttach == 'true') {
             dir(terraformDirectoryEBSAttach) {
 				if (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply') {
-					stage('EBS-A Init') {
+					stage('EBS-A Init Plan') {
 						terraform_init(tfstateBucketPrefixEBSA,'ebs-attach')
-					}
-					stage('EBS-A Plan') {
 						set_env_variables()
 						terraform_plan(global_tfvars,ebs_tfvars)
 					}
 				}
 				if (terraformApplyPlan == 'apply') {
-					stage('Approve EBS-A Plan') {
-						approval()
-					}
 					stage('EBS-A Apply') {
+						approval()
 						terraform_apply()
 					}
 				}
 			}
 		}
-		// Destroy Starts
+		if (includeCW == 'true') {
+            dir(terraformDirectoryEC2CW) {
+				if (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply') {
+					stage('CW Init Plan') {
+						terraform_init(tfstateBucketPrefixEC2CW + '/cw_ec2','cw-alarm')
+						set_env_variables()
+						terraform_plan(global_tfvars,cw_tfvars)
+					}
+				}
+				if (terraformApplyPlan == 'apply') {
+					stage('CW Apply') {
+						approval()
+						terraform_apply()
+					}
+				}
+			}
+		}
+		// ###################################################
+		// Destroy Starts 
+		// ###################################################
+		if (includeCW == 'true') {
+            dir(terraformDirectoryEC2CW) {
+				if (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy') {
+					stage('CW-D Init Plan') {
+						terraform_init(tfstateBucketPrefixEC2CW + '/cw_ec2','cw-alarm')
+						set_env_variables()
+						terraform_plan_destroy(global_tfvars,cw_tfvars)
+					}
+				}
+				if (terraformApplyPlan == 'apply') {
+					stage('CW-D Destroy') {
+						approval()
+						terraform_destroy()
+					}
+				}
+			}
+		}
 		if (includeEBSAttach == 'true') {
             dir(terraformDirectoryEBSAttach) {
 				if (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy') {
-					stage('EBS-A D Init') {
+					stage('EBS-A Init Plan') {
 						terraform_init(tfstateBucketPrefixEBSA,'ebs-attach')
-					}
-					stage('Plan EBS-A Destroy') {
 						set_env_variables()
 						terraform_plan_destroy(global_tfvars,ebs_tfvars)
 					}
 				}
 				if (terraformApplyPlan == 'destroy') {
-					stage('Approve EBS-A Destroy') {
-						approval()
-					}
 					stage('EBS-A Destroy') {
+						approval()
 						terraform_destroy()
 					}
 				}
@@ -207,19 +219,15 @@ node ('master'){
 		if (includeEC2 == 'true') {
             dir(terraformDirectoryEC2) {
 				if (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy') {
-					stage('EC2-D Init') {
-						terraform_init(tfstateBucketPrefixEC2,'ec2-instance')
-					}
-					stage('Plan EC2-D') {
+					stage('EC2-D Init Plan') {
+						terraform_init(tfstateBucketPrefixEC2,'ec2-instance'){
 						set_env_variables()
 						terraform_plan_destroy(global_tfvars,ec2_tfvars)
 					}
 				}
 				if (terraformApplyPlan == 'destroy') {
-					stage('Approve EC2-D') {
-						approval()
-					}
 					stage('EC2-D Destroy') {
+						approval()
 						terraform_destroy()
 					}
 				}
@@ -228,19 +236,15 @@ node ('master'){
 		if (includeEBS == 'true') {
             dir(terraformDirectoryEBS) {
 				if (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy') {
-					stage('EBS-D Init') {
+					stage('EBS-D Init Apply') {
 						terraform_init(tfstateBucketPrefixEBS,'ebs-volumes')
-					}
-					stage('Plan EBS-D') {
 						set_env_variables()
 						terraform_plan_destroy(global_tfvars,ebs_tfvars)
 					}
 				}
 				if (terraformApplyPlan == 'destroy') {
-					stage('Approve EBS-D') {
+					stage('EBS-D Destroy') {
 						approval()
-					}
-					stage('EBS Destroy') {
 						terraform_destroy()
 					}
 				}
@@ -249,19 +253,15 @@ node ('master'){
 		if (includeENI == 'true') {
 			dir(terraformDirectoryENI) {
 				if (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy') {
-					stage('ENI Init') {
+					stage('ENI-D Init Plan') {
 						terraform_init(tfstateBucketPrefixENI,'eni')
-					}
-					stage('Plan ENI Destroy') {
 						set_env_variables()
 						terraform_plan_destroy(global_tfvars,ec2_eni_tfvars)
 					}
 				}
 				if (terraformApplyPlan == 'destroy') {
-					stage('Approve ENI Destroy') {
+					stage('ENI-D Destroy') {
 						approval()
-					}
-					stage('ENI Destroy') {
 						terraform_destroy()
 					}
 				}
@@ -270,19 +270,15 @@ node ('master'){
 		if (includeSGRule == 'true') {
 			dir(terraformDirectorySGRule) {
 				if (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy') {
-					stage('SG-R Init') {
+					stage('SG-R Init Plan') {
 						terraform_init(tfstateBucketPrefixSGR,'sg-rule')
-					}
-					stage('Plan SG-R Destroy') {
 						set_env_variables()
 						terraform_plan_destroy(global_sg_rule_tfvars,sg_rule_tfvars)
 					}
 				}
 				if (terraformApplyPlan == 'destroy') {
-					stage('Approve SG-R Destroy') {
-						approval()
-					}
 					stage('SG-R Destroy') {
+						approval()
 						terraform_destroy()
 					}
 				}
@@ -291,19 +287,15 @@ node ('master'){
 		if (includeSG == 'true') {
 			dir(terraformDirectorySG) {
 				if (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy') {
-					stage('SG Init') {
+					stage('SG Init Plan') {
 						terraform_init(tfstateBucketPrefixSG,'sg')
-					}
-					stage('Plan SG Destroy') {
 						set_env_variables()
 						terraform_plan_destroy(global_tfvars,sg_tfvars)
 					}
 				}
 				if (terraformApplyPlan == 'destroy') {
-					stage('Approve SG Destroy') {
-						approval()
-					}
 					stage('SG Destroy') {
+						approval()
 						terraform_destroy()
 					}
 				}
