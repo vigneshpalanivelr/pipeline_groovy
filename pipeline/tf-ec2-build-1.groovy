@@ -220,7 +220,7 @@ node ('master'){
             dir(terraformDirectoryEC2) {
 				if (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy') {
 					stage('EC2-D Init Plan') {
-						terraform_init(tfstateBucketPrefixEC2,'ec2-instance'){
+						terraform_init(tfstateBucketPrefixEC2,'ec2-instance')
 						set_env_variables()
 						terraform_plan_destroy(global_tfvars,ec2_tfvars)
 					}
