@@ -24,13 +24,19 @@ node ('master') {
 			sh "sshpass -p '${SVC_PASS}' ssh -l '${SVC_USER}' -o StricthostKeyChecking=no $hostname 'if  [[ -d '${scriptHomeDir}${scriptsDir}${logsDir}' ]]; then echo Found : Log Path; else sudo mkdir -p ${scriptHomeDir}${scriptsDir}${logsDir}; fi'"
 		}
 		stage("Install Python2&3") {
+			if (pip2 || pip3) {
+				println "Downloading Pip"
+				sh "sshpass -p '${SVC_PASS}' ssh -l '${SVC_USER}' -o StricthostKeyChecking=no $hostname 'curl https://bootstrap.pypa.io/get-pip.py -o ${scriptHomeDir}${scriptsDir}get-pip.py | sudo tee -a ${scriptHomeDir}${scriptsDir}${logsDir}${installationLog}'"
+			}
 			if (python2) {
 				println "Checking : python2"
 				sh "sshpass -p '${SVC_PASS}' ssh -l '${SVC_USER}' -o StricthostKeyChecking=no $hostname 'if  [[ -f '/bin/python' ]]; then echo Found : Python; elif [[ -f '/bin/python2' ]]; then echo Found : Python2; else if [[ $installPlan == 'false' ]]; then echo Required : python2; elif [[ $installPlan == 'true' ]]; then sudo yum install -y python2; fi;fi | sudo tee -a ${scriptHomeDir}${scriptsDir}${logsDir}${installationLog}'"
+				sh "sshpass -p '${SVC_PASS}' ssh -l '${SVC_USER}' -o StricthostKeyChecking=no $hostname 'python2 -o ${scriptHomeDir}${scriptsDir}get-pip.py | sudo tee -a ${scriptHomeDir}${scriptsDir}${logsDir}${installationLog}'"
 			}
 			if (python3) {
 				println "Checking : python3"
 				sh "sshpass -p '${SVC_PASS}' ssh -l '${SVC_USER}' -o StricthostKeyChecking=no $hostname 'for i in `ls -R /bin/python3*`; do if [[ \$i == *python3* ]]; then echo Found : \$i; else if [[ $installPlan == 'false' ]]; then echo Required : python3; elif [[ $installPlan == 'true' ]]; then sudo yum install -y python3; fi;fi; done | sudo tee -a ${scriptHomeDir}${scriptsDir}${logsDir}${installationLog}'"
+				sh "sshpass -p '${SVC_PASS}' ssh -l '${SVC_USER}' -o StricthostKeyChecking=no $hostname 'python3 -o ${scriptHomeDir}${scriptsDir}get-pip.py | sudo tee -a ${scriptHomeDir}${scriptsDir}${logsDir}${installationLog}'"
 			}
 		}
 		stage("Install git-core") {
