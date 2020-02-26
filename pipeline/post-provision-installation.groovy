@@ -19,9 +19,10 @@ node ('master') {
 	def installationLog = "installation.log"
 	
 	withCredentials([usernamePassword(credentialsId: SVC_ACC, usernameVariable:'SVC_USER', passwordVariable: 'SVC_PASS')]) {
-	stage("Log Dir's") {
-		println "Checking : Log Directory ${scriptHomeDir}${scriptsDir}${logsDir}"
-		sh "sshpass -p '${SVC_PASS}' ssh -l '${SVC_USER}' -o StricthostKeyChecking=no $hostname 'if  [[ -d '${scriptHomeDir}${scriptsDir}${logsDir}' ]]; then echo Found : Log Path; else sudo mkdir -p ${scriptHomeDir}${scriptsDir}${logsDir}; fi'"
+		stage("Log Dir's") {
+			println "Checking : Log Directory ${scriptHomeDir}${scriptsDir}${logsDir}"
+			sh "sshpass -p '${SVC_PASS}' ssh -l '${SVC_USER}' -o StricthostKeyChecking=no $hostname 'if  [[ -d '${scriptHomeDir}${scriptsDir}${logsDir}' ]]; then echo Found : Log Path; else sudo mkdir -p ${scriptHomeDir}${scriptsDir}${logsDir}; fi'"
+		}
 	}
 	stage("Install Python2&3") {
 		if (python2) {
