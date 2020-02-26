@@ -1,6 +1,7 @@
 def scriptsRepo     = "https://github.com/vigneshpalanivelr/all_scripts.git"
 def scriptsBranch   = "master"
 def gitCreds        = "gitCreds"
+def gitCreds        = "SVC_ACC"
 
 // RDS DB Build Generic Job
 pipelineJob('playbook-provisioning-job') {
@@ -18,6 +19,26 @@ pipelineJob('playbook-provisioning-job') {
 	definition {
 		cps {
 			script(readFileFromWorkspace('pipeline/playbook-provisioning.groovy'))
+			sandbox()
+		}
+	}
+}
+
+//post-provision-installation
+pipelineJob("post-provision-installation") {
+	description ('Installing Python | Git | ')
+	logRotator(-1,-1)
+	parameters {
+		stringParam('hostname'	, ''			, 'New EC2 IP')
+		choiceParam('SVC_ACC'	, [SVC_ACC]		, '')
+		booleanParam('python2'	, true			, '')
+		booleanParam('git-core'	, true			, '')
+		booleanParam('pip2'		, true			, '')
+		booleanParam('ansible'	, true			, '')
+	}
+	definition {
+		cps {
+			script(readFileFromWorkspace('pipeline/post-provision-installation.groovy'))
 			sandbox()
 		}
 	}
