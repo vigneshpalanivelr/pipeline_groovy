@@ -2,6 +2,9 @@ def scriptsRepo     = "https://github.com/vigneshpalanivelr/all_scripts.git"
 def scriptsBranch   = "master"
 def gitCreds        = "gitCreds"
 def SVC_ACC			= "SVC_ACC"
+def scriptHomeDir	= "/usr/local/sbin/"
+def scriptsDir		= "custom-scripts/"
+def logsDir			= "logs/"
 
 // RDS DB Build Generic Job
 pipelineJob('playbook-provisioning-job') {
@@ -29,12 +32,15 @@ pipelineJob("post-provision-installation") {
 	description ('Installing Python | Git | ')
 	logRotator(-1,-1)
 	parameters {
-		stringParam('hostname'	, ''			, 'New EC2 IP')
-		choiceParam('SVC_ACC'	, [SVC_ACC]		, '')
-		booleanParam('python2'	, true			, '')
-		booleanParam('git-core'	, true			, '')
-		booleanParam('pip2'		, true			, '')
-		booleanParam('ansible'	, true			, '')
+		stringParam('hostname'		, ''					, 'New EC2 IP')
+		choiceParam('SVC_ACC'		, [SVC_ACC]				, '')
+		choiceParam('scriptHomeDir'	, [scriptHomeDir]		, '')
+		choiceParam('scriptsDir'	, [scriptsDir]			, '')
+		choiceParam('logsDir'		, [logsDir]				, '')
+		booleanParam('python2'		, true					, '')
+		booleanParam('git-core'		, true					, '')
+		booleanParam('pip2'			, true					, '')
+		booleanParam('ansible'		, true					, '')
 	}
 	definition {
 		cps {
