@@ -49,3 +49,22 @@ pipelineJob("practice-3.1-how-to-git-clone-checkout-build-job") {
 		}
 	}
 }
+//============================== Testing ============================
+pipelineJob("test") {
+	description('Explains how to use Jenins Approval for Build Jobs')
+	logRotator(-1,-1)
+	parameters{extendedChoice(
+		name			: "favorite_letters",
+		type			: "PT_CHECKBOX",
+		multiSelectDelimiter	: " ", 
+		value			: """a, b, c, d, e, f""",
+		defaultValue		: "d, f",
+		description		: "Select your favorite letter(s)"
+	)}
+	definition {
+		cps {
+			script(readFileFromWorkspace('pipeline/3.1-how_to_git_clone_checkout.groovy'))
+			sandbox()
+		}
+	}
+}
