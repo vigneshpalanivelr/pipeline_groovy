@@ -41,6 +41,7 @@ pipelineJob("post-provision-installation") {
 		booleanParam('git-core'		, true					, '')
 		booleanParam('pip2'			, true					, '')
 		booleanParam('ansible'		, true					, '')
+		choiceParam('installPlan'	, ['true','false']		, '')
 	}
 	definition {
 		cps {
