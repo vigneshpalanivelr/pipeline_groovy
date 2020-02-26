@@ -34,8 +34,8 @@ node ('master') {
 			}
 		}
 		stage("Install git-core") {
-			if (${git}) {
-				println "Checking : python2"
+			if (git) {
+				println "Checking : Git"
 				sh "sshpass -p '${SVC_PASS}' ssh -l '${SVC_USER}' -o StricthostKeyChecking=no $hostname 'if  [[ -f '/usr/bin/git' ]]; then echo Found : Git; else if [[ $installPlan == 'false' ]]; then echo Required : Git; elif [[ $installPlan == 'true' ]]; then sudo yum install -y git-core; fi;fi | sudo tee -a ${scriptHomeDir}${scriptsDir}${logsDir}${installationLog}'"
 			}
 		}
