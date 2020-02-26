@@ -7,9 +7,9 @@
 *	tfstateBucketPrefixEBS
 *	tfstateBucketPrefixEBSA
 
+*	resource_name
 *	ebs_volume_count
 *	ebs_az
-*	resource_name
 
 *	includeEBS
 *	includeEBSAttach
@@ -19,6 +19,7 @@
 node ('master'){
 	terraformDirectoryEBS		= "modules/all_modules/${tfstateBucketPrefixEBS}"
 	terraformDirectoryEBSAttach	= "modules/all_modules/${tfstateBucketPrefixEBSA}"
+	
 	global_tfvars				= "../../../variables/global_vars.tfvars"
 	ebs_tfvars		    		= "../../../variables/ebs_volume_vars.tfvars"
 	
@@ -28,17 +29,13 @@ node ('master'){
 	writeFile(file: "askp-${BUILD_TAG}",text:"#!/bin/bash/\ncase \"\$1\" in\nUsername*) echo \"\${STASH_USERNAME}\" ;;\nPassword*) \"\${STASH_PASWORD}\";;\nesac")
 	sh "chmod a+x askp-${BUILD_TAG}"
 
-	stage('Approval') {
-		approval()
-	}
-
 	stage('Checkout') {
 		checkout()
 		if (includeEBS == 'true') {
 			dir(terraformDirectoryEBS) {
 				if (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply') {
 					stage('Remote State Init') {
-						terraform_init(resource_name,'ebs-volumes')
+						terraform_init(tfstateBucketPrefixEBS, resource_name, 'ebs-volumes')
 					}
 					stage('Terraform Plan') {
 						set_env_variables()
@@ -59,7 +56,7 @@ node ('master'){
 			dir(terraformDirectoryEBSAttach) {
 				if (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply') {
 					stage('Remote State Init') {
-						terraform_init(resource_name,'ebs-attach')
+						terraform_init(tfstateBucketPrefixEBSA, resource_name, 'ebs-attach')
 					}
 					stage('Terraform Plan') {
 						set_env_variables()
@@ -76,7 +73,7 @@ node ('master'){
 				}
 				if (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy') {
 					stage('Remote State Init') {
-						terraform_init(resource_name,'ebs-attach')
+						terraform_init(tfstateBucketPrefixEBSA, resource_name, 'ebs-attach')
 					}
 					stage('Plan Destroy') {
 						set_env_variables()
@@ -97,7 +94,7 @@ node ('master'){
 			dir(terraformDirectoryEBS) {
 				if (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy') {
 					stage('Remote State Init') {
-						terraform_init(resource_name,'ebs-volumes')
+						terraform_init(tfstateBucketPrefixEBS, resource_name, 'ebs-volumes')
 					}
 					stage('Plan Destroy') {
 						set_env_variables()
@@ -118,7 +115,7 @@ node ('master'){
 }
 
 def approval() {
-	timeout(time: 1, unit: 'MINUTES') {
+	timeout(time: 5, unit: 'DAYS') {
 		input(
 			id: 'Approval', message: 'Shall i continue ?', parameters: [[
 				$class:	'BooleanParameterDefinition', defaultValue: true, description: 'default to tick', name: 'Please confirm to proceed']]
@@ -151,10 +148,10 @@ def set_env_variables() {
 	env.TF_VAR_ebs_key_state_prefix		= "${tfstateBucketPrefixEBS}"
 }
 
-def terraform_init(module,stack) {
+def terraform_init(module, tfstatename, stack) {
 	withEnv(["GIT_ASKPASS=${WORKSPACE}/askp-${BUILD_TAG}"]){
 		withCredentials([usernamePassword(credentialsId: gitCreds, usernameVariable: 'STASH_USERNAME', passwordVariable: 'STASH_PASSWORD')]) {
-			sh "terraform init -no-color -input=false -upgrade=true -backend=true -force-copy -backend-config='bucket=${tfstateBucket}' -backend-config='key=${module}/${resource_name}-${stack}.tfstate'"
+			sh "terraform init -no-color -input=false -upgrade=true -backend=true -force-copy -backend-config='bucket=${tfstateBucket}' -backend-config='key=${module}/${tfstatename}-${stack}.tfstate'"
 		}
 	}
 }

@@ -4,7 +4,10 @@
 *	gitCreds
 *	awsAccount
 *	tfstateBucket
-*	tfstateBucketPrefix
+*	tfStateBucketPrefixSG
+*	tfStateBucketPrefixSGR
+*	tfstateBucketPrefixDNS
+*	tfstateBucketPrefixRDS
 
 *	db_family
 *	db_engine
@@ -19,12 +22,17 @@
 *	db_multi_az
 *	db_read_replica
 *	db_apply_changes
+*	db_availability_zone
+*	db_subnet_group_name
+*	sg_group_name
 *	db_route53_name
 
-*	includeMaster
-*	includeReplica
+*	includeSG
+*	includeSGRule
+*	includeInstance
 *	includeInstanceDNS
 *	terraformApplyPlan
+
 Error on pipeline
 	local variable	: Use def keyword
 	global variable	: No def keyword
@@ -55,34 +63,67 @@ node('master') {
 	terraformDirReplicaRDS	= "modules/all_modules/rds_replica_module"
 	terraformDirectoryDNS	= "modules/all_modules/rds_dns_module"
 
-	global_tfvars		= "../../../variables/global_vars.tfvars"
-	rds_tfvars		= "../../../variables/rds_vars.tfvars"
-	rds_dns_tfvars		= "../../../variables/rds_dns_vars.tfvars"
+	global_tfvars			= "../../../variables/global_vars.tfvars"
+	global_2_tfvars			= "../../../../variables/global_vars.tfvars"
+	rds_tfvars				= "../../../variables/rds_vars.tfvars"
+	rds_dns_tfvars			= "../../../variables/rds_dns_vars.tfvars"
+	sg_tfvars				= "../../../variables/sg_vars.tfvars"
 
-	db_rds			= (db_engine		=~ /[a-zA-Z]+/)[0]
+	db_rds					= (db_engine		=~ /[a-zA-Z]+/)[0]
 	db_engine_major_version = (db_engine_version	=~ /\d+.\d+/)[0]
 	
-	date			= new Date()
+	date					= new Date()
 	println date
 	
 
 	writeFile(file: "askp-${BUILD_TAG}",text:"#!/bin/bash\ncase \"\$1\" in\nUsername*) echo \"\${STASH_USERNAME}\" ;;\nPassword*) \"\${STASH_PASSWORD}\" ;;\nesac")
 	sh "chmod a+x askp-${BUILD_TAG}"
 	
-	stage('Approval'){
-		approval()
-	}
 	stage('Checkout') {
 		checkout()
-		//Create Master RDS Instance
-		if ((db_action == 'master') && (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply')) {
-			dir(terraformDirMasterRDS) {
-				stage('RDS Init') {
-					terraform_master_init()
+		//Creating Security Groups
+		if (includeSG == 'true') {
+			dir(terraformDirectorySG) {
+				if (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply') {
+					stage('SG Init Plan') {
+						terraform_init(tfstateBucketPrefixSG, sg_group_name, 'sg')
+						set_env_variables()
+						terraform_plan(global_tfvars,sg_tfvars)
+					}
 				}
+				if (terraformApplyPlan == 'apply') {
+					stage('SG Apply') {
+						approval()
+						terraform_apply()
+					}
+				}
+			}
+		}
+		//Creating Security Group Rules
+		if (includeSGRule == 'true') {
+			dir(terraformDirectorySGRule) {
+				if (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply') {
+					stage('SG-R Init Apply') {
+						terraform_init(tfstateBucketPrefixSGR, sg_group_name, 'sg-rule')
+						set_env_variables()
+						terraform_plan(global_2_tfvars,sg_rule_tfvars)
+					}
+				}
+				if (terraformApplyPlan == 'apply') {
+					stage('SG-R Apply') {
+						approval()
+						terraform_apply()
+					}
+				}
+			}
+		}
+		//Create Master RDS Instance
+		if ((includeInstance == 'master') || (includeInstance == 'master-slave') && (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply')) {
+			dir(terraformDirMasterRDS) {
 				if (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply') {
 					stage('RDS Plan'){
 						withEnv(["TF_VAR_db_password=${db_password}"]) {
+							terraform_master_init(tfstateBucketPrefixRDS, db_identifier, 'master')
 							set_env_variables()
 							terraform_plan(global_tfvars,rds_tfvars)
 						}
@@ -91,21 +132,17 @@ node('master') {
 				if (terraformApplyPlan == 'apply') {
 					stage('RDS Approve'){
 						approval()
-					}
-					stage('RDS Apply') {
 						terraform_apply()
 					}
 				}
 			}
 		}
 		//Create Replica RDS Instance
-		if ((db_action != 'master') && (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply')) {
+		if ((includeInstance == 'master-slave') || (includeInstance == 'slave') && (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply')) {
 			dir(terraformDirReplicaRDS) {
-				stage('RDS Init') {
-					terraform_master_init()
-				}
 				if (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply') {
 					stage('RDS Plan'){
+						terraform_master_init(tfstateBucketPrefixRDS, db_identifier, 'slave')
 						set_env_variables()
 						terraform_plan(global_tfvars,rds_tfvars)
 					}
@@ -113,8 +150,6 @@ node('master') {
 				if (terraformApplyPlan == 'apply') {
 					stage('RDS Approve'){
 						approval()
-					}
-					stage('RDS Apply') {
 						terraform_apply()
 					}
 				}
@@ -123,11 +158,9 @@ node('master') {
 		//Create RDS DNS
 		if ((includeInstanceDNS == 'true') && (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply')) {
 			dir(terraformDirectoryDNS) {
-				stage('DNS Init') {
-					terraform_dns_init()
-				}
 				if (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply') {
 					stage('DNS Plan') {
+						terraform_dns_init(tfstateBucketPrefixDNS, db_identifier, 'dns')
 						set_env_variables()
 						terraform_plan(global_tfvars,rds_dns_tfvars)
 					}
@@ -135,21 +168,20 @@ node('master') {
 				if (terraformApplyPlan == 'apply') {
 					stage('DNS Approve'){
 						approval()
-					}
-					stage('DNS Apply') {
 						terraform_apply()
 					}
 				}
 			}
 		}
+		//################################################################################################################
+		//Destroy Pipeline starts
+		//################################################################################################################
 		//Destroy RDS DNS
 		if ((includeInstanceDNS == 'true') && (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy')) {
 			dir(terraformDirectoryDNS) {
-				stage('DNS Init') {
-					terraform_dns_init()
-				}
 				if (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy') {
 					stage('DNS Destroy Plan') {
+						terraform_dns_init(tfstateBucketPrefixDNS, db_identifier, 'dns')
 						set_env_variables()
 						terraform_plan_destroy(global_tfvars,rds_dns_tfvars)
 					}
@@ -157,21 +189,17 @@ node('master') {
 				if (terraformApplyPlan == 'destroy') {
 					stage('DNS Approve') {
 						approval()
-					}
-					stage('DNS Destroy') {
 						terraform_destroy()
 					}
 				}
 			}
 		}
 		//Destroy Replica RDS Instance
-		if ((db_action == 'replica') && (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy')) {
+		if ((includeInstance == 'master-slave') || (includeInstance == 'slave') && (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy')) {
 			dir(terraformDirReplicaRDS) {
-				stage('RDS Init') {
-					terraform_replica_init()
-				}
 				if (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy') {
 					stage('RDS Destroy Plan') {
+						terraform_replica_init(tfstateBucketPrefixRDS, db_identifier, 'slave')
 						set_env_variables()
 						terraform_plan_destroy(global_tfvars,rds_tfvars)
 					}
@@ -179,22 +207,18 @@ node('master') {
 				if (terraformApplyPlan == 'destroy') {
 					stage('RDS Approve') {
 						approval()
-					}
-					stage('RDS Destroy') {
 						terraform_destroy()
 					}
 				}
 			}
 		}
 		//Destroy Master RDS Instance
-		if ((db_action == 'master') && (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy')) {
+		if ((includeInstance == 'master') || (includeInstance == 'master-slave') && (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy')) {
 			dir(terraformDirMasterRDS) {
-				stage('RDS Init') {
-					terraform_master_init()
-				}
 				if (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy') {
 					stage('RDS Destroy Plan') {
 						withEnv(["TF_VAR_db_password=${db_password}"]) {
+							terraform_master_init(tfstateBucketPrefixRDS, db_identifier, 'master')
 							set_env_variables()
 							terraform_plan_destroy(global_tfvars,rds_tfvars)
 						}
@@ -203,8 +227,42 @@ node('master') {
 				if (terraformApplyPlan == 'destroy') {
 					stage('RDS Approve') {
 						approval()
+						terraform_destroy()
 					}
-					stage('RDS Destroy') {
+				}
+			}
+		}
+		//Destroy Security Group Rules
+		if (includeSGRule == 'true') {
+			dir(terraformDirectorySGRule) {
+				if (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy') {
+					stage('SG-R Init Plan') {
+						terraform_init(tfstateBucketPrefixSGR, sg_group_name, 'sg-rule')
+						set_env_variables()
+						terraform_plan_destroy(global_2_tfvars,sg_rule_tfvars)
+					}
+				}
+				if (terraformApplyPlan == 'destroy') {
+					stage('SG-R Destroy') {
+						approval()
+						terraform_destroy()
+					}
+				}
+			}
+		}
+		//Destroy Security Groups
+		if (includeSG == 'true') {
+			dir(terraformDirectorySG) {
+				if (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy') {
+					stage('SG Init Plan') {
+						terraform_init(tfstateBucketPrefixSG, sg_group_name, 'sg')
+						set_env_variables()
+						terraform_plan_destroy(global_tfvars,sg_tfvars)
+					}
+				}
+				if (terraformApplyPlan == 'destroy') {
+					stage('SG Destroy') {
+						approval()
 						terraform_destroy()
 					}
 				}
@@ -215,32 +273,33 @@ node('master') {
 
 //Common functions
 def approval() {
-	timeout(time: 5, unit: 'MINUTES') {
+	timeout(time: 5, unit: 'DAYS') {
 		input(
 			id: 'Approval', message: 'Shall I Continue ?', parameters: [[
 				$class:	'BooleanParameterDefinition', defaultValue: true, description: 'default to tick', name: 'Please confirm to proceed']]
 		)
 	}
 }
+
 def checkout() {
 	checkout([
-		$class: 'GitSCM', 
-		branches: [[name: gitBranch ]], 
-		doGenerateSubmoduleConfigurations: false, 
-		clearWorkspace: true,
-		extensions: [
-			[$class: 'CleanCheckout'], [
-			$class: 'SubmoduleOption', 
-			disableSubmodules: false, 
-			parentCredentials: true, 
-			recursiveSubmodules: true, 
-			reference: '', trackingSubmodules: false]], 
-		submoduleCfg: [], 
-		userRemoteConfigs: [[credentialsId: gitCreds, url: gitRepo]]
-	])
+		$class                            : 'GitSCM', 
+		branches                          : [[name		: gitBranch ]], 
+		doGenerateSubmoduleConfigurations : false, 
+		clearWorkspace                    : true,
+		extensions                        : [[$class	: 'CleanCheckout' ],[
+			$class					: 'SubmoduleOption', 
+			disableSubmodules		: false,
+			parentCredentials		: true,
+			recursiveSubmodules		: true,
+			reference				: '',
+			trackingSubmodules		: false]],
+		submoduleCfg				: [],
+		userRemoteConfigs			: [[credentialsId: gitCreds, url: gitRepo]]])
 }
+
 def set_env_variables() {
-	env.TF_VAR_aws_account_num            	= "${awsAccount}"
+	env.TF_VAR_aws_account_num			= "${awsAccount}"
 	env.TF_VAR_db_family            	= "${db_family}"
 	env.TF_VAR_db_engine            	= "${db_engine}"
 	env.TF_VAR_db_engine_version    	= "${db_engine_version}"
@@ -248,29 +307,42 @@ def set_env_variables() {
 	env.TF_VAR_db_instance_class    	= "${db_instance_class}"
 	env.TF_VAR_db_identifier        	= "${db_identifier}"
 	env.TF_VAR_db_source_identifier		= "${db_source_identifier}"
-	env.TF_VAR_db_rds			= "${db_rds}"
+	env.TF_VAR_db_rds					= "${db_rds}"
 	env.TF_VAR_db_name              	= "${db_name}"
 	env.TF_VAR_db_username          	= "${db_username}"
 	env.TF_VAR_db_allocated_storage 	= "${db_allocated_storage}"
 	env.TF_VAR_db_multi_az          	= "${db_multi_az}"
 	env.TF_VAR_db_apply_immediately		= "${db_apply_changes}"
 	env.TF_VAR_db_availability_zone    	= "${db_availability_zone}"
-	env.TF_VAR_db_action			= "${db_action}"
-	env.TF_VAR_db_route53_name		= "${db_route53_name}"
+	env.TF_VAR_db_route53_name			= "${db_route53_name}"
+	env.TF_VAR_sg_group_name			= "${sg_group_name}"
 }
+
+def terraform_init(module, tfstatename, stack) {
+	withEnv(["GIT_ASKPASS=${WORKSPACE}/askp-${BUILD_TAG}"]){
+		withCredentials([usernamePassword(credentialsId: gitCreds, usernameVariable: 'STASH_USERNAME', passwordVariable: 'STASH_PASSWORD')]) {
+			sh "terraform init -no-color -input=false -upgrade=true -backend=true -force-copy -backend-config='bucket=${tfstateBucket}' -backend-config='key=${module}/${tfstatename}-${stack}.tfstate'"
+		}
+	}
+}
+
 def terraform_plan(global_tfvars,first_tfvars) {
 	sh "terraform plan -no-color -out=tfplan -input=false -var-file=${global_tfvars} -var-file=${first_tfvars}"
 }
+
 def terraform_apply() {
 	sh "terraform apply -no-color -input=false tfplan"
 }
+
 def terraform_plan_destroy(global_tfvars,first_tfvars) {
 	sh "terraform plan -destroy -no-color -out=tfdestroy -input=false -var-file=${global_tfvars} -var-file=${first_tfvars}"
 }
+
 def terraform_destroy() {
 	sh "terraform apply -no-color -input=false tfdestroy"
 }
 
+/*
 //RDS Instance init/load remote state function for Master RDS
 def terraform_master_init() {
 	withEnv(["GIT_ASKPASS=${WORKSPACE}/askp-${BUILD_TAG}"]){
@@ -281,7 +353,7 @@ def terraform_master_init() {
 }
 
 //RDS Instance init/load remote state function for Replica RDS
-def terraform_replica_init() {
+def terraform_replica_init(module, tfstatename, stack) {
 	withEnv(["GIT_ASKPASS=${WORKSPACE}/askp-${BUILD_TAG}"]){
 		withCredentials([usernamePassword(credentialsId: gitCreds, usernameVariable: 'STASH_USERNAME', passwordVariable: 'STASH_PASSWORD')]) {
 			sh "terraform init -no-color -input=false -upgrade=true -backend=true -force-copy -backend-config='bucket=${tfstateBucket}' -backend-config='key=${tfstateBucketPrefixRDS}/${db_identifier}-rr.tfstate'"
@@ -290,10 +362,11 @@ def terraform_replica_init() {
 }
 
 //RDS DNS init/load remote state function
-def terraform_dns_init() {
+def terraform_dns_init(module, tfstatename, stack) {
 	withEnv(["GIT_ASKPASS=${WORKSPACE}/askp-${BUILD_TAG}"]){
 		withCredentials([usernamePassword(credentialsId: gitCreds, usernameVariable: 'STASH_USERNAME', passwordVariable: 'STASH_PASSWORD')]) {
 			sh "terraform init -no-color -input=false -upgrade=true -backend=true -force-copy -backend-config='bucket=${tfstateBucket}' -backend-config='key=${tfstateBucketPrefixDNS}/${db_route53_name}-dns.tfstate'"
 		}
 	}
 }
+*/

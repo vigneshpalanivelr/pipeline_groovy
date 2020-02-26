@@ -9,11 +9,11 @@ nestedView('seed-jobs') {
 				columns {
 					status()
 					weather()
+					buildButton()
 					name()
 					lastSuccess()
 					lastFailure()
 					lastDuration()
-					buildButton()
 				}
 			}
 		}
@@ -30,11 +30,11 @@ nestedView('terraform-jobs') {
 				columns {
 					status()
 					weather()
+					buildButton()
 					name()
 					lastSuccess()
 					lastFailure()
 					lastDuration()
-					buildButton()
 				}
 			}
 		}
@@ -47,11 +47,11 @@ nestedView('terraform-jobs') {
 				columns {
 					status()
 					weather()
+					buildButton()
 					name()
 					lastSuccess()
 					lastFailure()
 					lastDuration()
-					buildButton()
 				}
 			}
 		}
@@ -64,11 +64,11 @@ nestedView('terraform-jobs') {
 				columns {
 					status()
 					weather()
+					buildButton()
 					name()
 					lastSuccess()
 					lastFailure()
 					lastDuration()
-					buildButton()
 				}
 			}
 		}
@@ -81,11 +81,11 @@ nestedView('terraform-jobs') {
 				columns {
 					status()
 					weather()
+					buildButton()
 					name()
 					lastSuccess()
 					lastFailure()
 					lastDuration()
-					buildButton()
 				}
 			}
 		}
@@ -98,11 +98,11 @@ nestedView('terraform-jobs') {
 				columns {
 					status()
 					weather()
+					buildButton()
 					name()
 					lastSuccess()
 					lastFailure()
 					lastDuration()
-					buildButton()
 				}
 			}
 		}
@@ -115,11 +115,11 @@ nestedView('terraform-jobs') {
 				columns {
 					status()
 					weather()
+					buildButton()
 					name()
 					lastSuccess()
 					lastFailure()
 					lastDuration()
-					buildButton()
 				}
 			}
 		}
@@ -132,11 +132,11 @@ nestedView('terraform-jobs') {
 				columns {
 					status()
 					weather()
+					buildButton()
 					name()
 					lastSuccess()
 					lastFailure()
 					lastDuration()
-					buildButton()
 				}
 			}
 		}
@@ -149,11 +149,11 @@ nestedView('terraform-jobs') {
 				columns {
 					status()
 					weather()
+					buildButton()
 					name()
 					lastSuccess()
 					lastFailure()
 					lastDuration()
-					buildButton()
 				}
 			}
 		}
@@ -166,11 +166,11 @@ nestedView('terraform-jobs') {
 				columns {
 					status()
 					weather()
+					buildButton()
 					name()
 					lastSuccess()
 					lastFailure()
 					lastDuration()
-					buildButton()
 				}
 			}
 		}
@@ -183,11 +183,11 @@ nestedView('terraform-jobs') {
 				columns {
 					status()
 					weather()
+					buildButton()
 					name()
 					lastSuccess()
 					lastFailure()
 					lastDuration()
-					buildButton()
 				}
 			}
 		}
@@ -204,11 +204,11 @@ nestedView('practice-jobs') {
 				columns {
 					status()
 					weather()
+					buildButton()
 					name()
 					lastSuccess()
 					lastFailure()
 					lastDuration()
-					buildButton()
 				}
 			}
 		}
@@ -225,11 +225,11 @@ nestedView('master-jobs') {
 				columns {
 					status()
 					weather()
+					buildButton()
 					name()
 					lastSuccess()
 					lastFailure()
 					lastDuration()
-					buildButton()
 				}
 			}
 		}
@@ -246,11 +246,11 @@ nestedView('playbooks') {
 				columns {
 					status()
 					weather()
+					buildButton()
 					name()
 					lastSuccess()
 					lastFailure()
 					lastDuration()
-					buildButton()
 				}
 			}
 		}

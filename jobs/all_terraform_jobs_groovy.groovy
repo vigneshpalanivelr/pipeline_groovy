@@ -32,20 +32,22 @@ pipelineJob('tf-rds-db-build-1-job') {
 	<br>&emsp 2) Destroy Master Route53 DNS&emsp&emsp&emsp&emsp&emsp &emsp TF-STATE : Route53-dns.tfstate
 	<br>&emsp 1) Destroy Master Instance&emsp&emsp&emsp&emsp&emsp&emsp&emsp&emsp&ensp&nbsp TF-STATE : InstanceId.tfstate
 	''')
-	logRotator(-1,-1)
+	logRotator(100,100)
 	parameters{
 		choiceParam('gitRepo'					, [terraformRepo]				, '')
 		choiceParam('gitBranch'					, [terraformBranch]				, '')
 		choiceParam('gitCreds'					, [gitCreds]					, '')
 		choiceParam('awsAccount'				, [awsAccount]					, '')
-		choiceParam('tfstateBucket'				, [tfStateBucket]				, 'TF State Bucket'             	)
-		choiceParam('tfstateBucketPrefixRDS'	, [tfStateBucketPrefixRDS]		, 'TF State Bucket Prefix - RDS'	)
-		choiceParam('tfstateBucketPrefixDNS'	, [tfStateBucketPrefixR53ac]	, 'TF State Bucket Prefix - DNS'	)
+		choiceParam('tfstateBucket'				, [tfStateBucket]				, 'TF State Bucket'             )
+		choiceParam('tfStateBucketPrefixSG'		, [tfStateBucketPrefixSG]		, 'TF State Bucket Prefix - SG'	)
+		choiceParam('tfStateBucketPrefixSGR'	, [tfStateBucketPrefixSGRule]	, 'TF State Bucket Prefix - SGR')
+		choiceParam('tfstateBucketPrefixDNS'	, [tfStateBucketPrefixR53ac]	, 'TF State Bucket Prefix - DNS')
+		choiceParam('tfstateBucketPrefixRDS'	, [tfStateBucketPrefixRDS]		, 'TF State Bucket Prefix - RDS')
 		stringParam('db_family'					, 'postgres9.6,oracle-se1-11.2'	, '')
 		stringParam('db_engine'					, 'postgres,oracle-se1'			, '')
 		stringParam('db_engine_version'			, '9.6.11,11.2.0.4.v21'			, '')
 		choiceParam('db_instance_class'			, ['db.t2.small','db.t2.micro']	, '')
-		stringParam('db_identifier'				, 'test-instance'				, '''Name : name-(pgsql|oracle|mysql|mariadb)-rds + rr<br>
+		stringParam('db_identifier'				, 'test-instance-rds'			, '''Name : name-(pgsql|oracle|mysql|mariadb)-rds + rr<br>
 		TF-STATE : Statefile for Instance<br>
 		db_identifier.tfstate''')
 		choiceParam('db_name'					, ['DBNAME']					, '')
@@ -54,13 +56,16 @@ pipelineJob('tf-rds-db-build-1-job') {
 		choiceParam('db_allocated_storage'		, ['10']						, 'in GBs'						)
 		choiceParam('db_multi_az'				, ['false','true']				, '')
 		choiceParam('db_apply_changes'			, ['true','false']				, '')
-		choiceParam('db_availability_zone'		, ['ap-south-1a','ap-south-1b','ap-south-1c']	, ''			)
-		choiceParam('db_action'					, ['master','replica','promote'	,'promote-as-master'], ''		)
-		choiceParam('includeInstance'			, ['true','false']				, '')
-		stringParam('db_source_identifier'		, 'test-instance'				, 'source instance to replicate')
-		stringParam('db_route53_name'			, 'test-instance'				, '''TF-STATE : Statefile for Route53 Name<br>
-		db_route53_name-dns.tfstate''')
+		choiceParam('db_availability_zone'		, ['ap-south-1a','ap-south-1b','ap-south-1c'],				  '')
+		choiceParam('db_subnet_group_name'		, ['default-subnet-1','default-subnet-2','default-subnet-3'], '')
+		stringParam('sg_group_name'				, 'test-instance-rds'			, 'name + sg (by default)'		)
+		choiceParam('includeSG'					, ['true','false']				, '')
+		choiceParam('includeSGRule'				, ['true','false']				, '')
+		choiceParam('includeInstance'			, ['master','slave','master-slave']							, '')
+		stringParam('db_source_identifier'		, 'test-instance-rds'			, 'source instance to replicate')
 		choiceParam('includeInstanceDNS'		, ['false','true']				, '')
+		stringParam('db_route53_name'			, 'test-instance-rds'			, '''TF-STATE : Statefile for Route53 Name<br>
+		db_route53_name-dns.tfstate''')
 		choiceParam('terraformApplyPlan'		, ['plan','apply','plan-destroy','destroy']	, '''
 		<br>&emsp plan&emsp&emsp&emsp&emsp: only plan to create 
 		<br>&emsp apply&emsp&emsp&emsp&ensp: will apply above plan 
@@ -78,7 +83,7 @@ pipelineJob('tf-rds-db-build-1-job') {
 // Route53 Zone Creation
 pipelineJob('tf-route53-zone-build-1-job') {
 	description('Building AWS Route53 Zone Creation')
-	logRotator(-1,-1)
+	logRotator(100,100)
 	parameters{
 		choiceParam('gitRepo'				, [terraformRepo]			, '')
 		choiceParam('gitBranch'				, [terraformBranch]			, '')
@@ -102,7 +107,7 @@ pipelineJob('tf-route53-zone-build-1-job') {
 // Route53 A-record and CNAME Creation
 pipelineJob('tf-route53ac-record-build-1-job') {
 	description('Building AWS Route53 Record Creation')
-	logRotator(-1,-1)
+	logRotator(100,100)
 	parameters{
 		choiceParam('gitRepo'				, [terraformRepo]				, '')
 		choiceParam('gitBranch'				, [terraformBranch]				, '')
@@ -128,7 +133,7 @@ pipelineJob('tf-route53ac-record-build-1-job') {
 // AWS S3 Bucket and S3 Log Bucket Creation
 pipelineJob('tf-s3-build-1-job') {
 	description('Building AWS KMS key creation')
-	logRotator(-1,-1)
+	logRotator(100,100)
 	parameters{
 		choiceParam('gitRepo'				, [terraformRepo]				, '')
 		choiceParam('gitBranch'				, [terraformBranch]				, '')
@@ -137,10 +142,10 @@ pipelineJob('tf-s3-build-1-job') {
 		choiceParam('tfstateBucket'			, [tfStateBucket]				, 'TF State Bucket'					)
 		choiceParam('tfstateBucketPrefixS3'	, [tfStateBucketPrefixS3]		, 'TF State Bucket Prefix S3'		)
 		choiceParam('tfstateBucketPrefixS3L', [tfStateBucketPrefixS3Log]	, 'TF State Bucket Prefix S3 Log'	)
-		stringParam('s3_bucket_name'		, ''							, '')
 		choiceParam('s3_versioning'			, ['true','false']				, '')
+		stringParam('s3_bucket_name'		, 'terraform-tfstate-mum-bkt-1'	, '')
 		choiceParam('includeS3Bucket'		, ['true','false']				, '')
-		stringParam('s3_log_bucket_name'	, ''							, '')
+		stringParam('s3_log_bucket_name'	, 'Can also used for normal bkt', '')
 		choiceParam('includeS3LogBucket'	, ['true','false']				, '')
 		choiceParam('terraformApplyPlan'	, ['plan','apply','plan-destroy','destroy']	, '')
 	}
@@ -155,7 +160,7 @@ pipelineJob('tf-s3-build-1-job') {
 // AWS KMS Key Creation
 pipelineJob('tf-kms-key-build-1-job') {
 	description('Building AWS KMS key creation')
-	logRotator(-1,-1)
+	logRotator(100,100)
 	parameters{
 		choiceParam('gitRepo'				, [terraformRepo]				, '')
 		choiceParam('gitBranch'				, [terraformBranch]				, '')
@@ -178,7 +183,7 @@ pipelineJob('tf-kms-key-build-1-job') {
 // AWS SNS Topic Creation
 pipelineJob('tf-sns-build-1-job') {
 	description('Building AWS KMS key creation')
-	logRotator(-1,-1)
+	logRotator(100,100)
 	parameters{
 		choiceParam('gitRepo'				, [terraformRepo]				, '')
 		choiceParam('gitBranch'				, [terraformBranch]				, '')
@@ -203,7 +208,7 @@ pipelineJob('tf-sns-build-1-job') {
 // AWS SG Creation
 pipelineJob('tf-sg-build-1-job') {
 	description('Building AWS SG creation')
-	logRotator(-1,-1)
+	logRotator(100,100)
 	parameters{
 		choiceParam('gitRepo'				, [terraformRepo]				, '')
 		choiceParam('gitBranch'				, [terraformBranch]				, '')
@@ -230,7 +235,7 @@ pipelineJob('tf-sg-build-1-job') {
 // AWS ENI Creation
 pipelineJob('tf-eni-build-1-job') {
 	description('Building AWS ENI creation')
-	logRotator(-1,-1)
+	logRotator(100,100)
 	parameters{
 		choiceParam('gitRepo'				, [terraformRepo]				, '')
 		choiceParam('gitBranch'				, [terraformBranch]				, '')
@@ -239,7 +244,7 @@ pipelineJob('tf-eni-build-1-job') {
 		choiceParam('tfstateBucket'			, [tfStateBucket]				, 'TF State Bucket'             )
 		choiceParam('tfstateBucketPrefix'	, [tfStateBucketPrefixENI]		, 'TF State Bucket Prefix'      )
 		choiceParam('eni_subnet'			, ['default-subnet-1','default-subnet-2','default-subnet-3']	, 'ENI Subnet'	)
-		stringParam('sg_group_name'			, 'default-ec2-sg'				, 'ENI Security Group'			)
+		stringParam('sg_group_name'			, 'test-instance'				, 'ENI Security Group'			)
 		stringParam('resource_name'			, 'test-instance'				, '')
 		choiceParam('includeENI'			, ['true','false']				, '')
 		choiceParam('terraformApplyPlan'	, ['plan','apply','plan-destroy','destroy']	, '')
@@ -255,7 +260,7 @@ pipelineJob('tf-eni-build-1-job') {
 // AWS EBS Creation
 pipelineJob('tf-ebs-build-1-job') {
 	description('Building AWS EBS Volume creation')
-	logRotator(-1,-1)
+	logRotator(100,100)
 	parameters{
 		choiceParam('gitRepo'					, [terraformRepo]					, '')
 		choiceParam('gitBranch'					, [terraformBranch]					, '')
@@ -282,7 +287,7 @@ pipelineJob('tf-ebs-build-1-job') {
 // AWS CW Alarm Configuration
 pipelineJob('tf-cw-build-1-job') {
 	description('Building AWS EBS Volume creation')
-	logRotator(-1,-1)
+	logRotator(100,100)
 	parameters{
 		choiceParam('gitRepo'					, [terraformRepo]					, '')
 		choiceParam('gitBranch'					, [terraformBranch]					, '')
@@ -291,6 +296,7 @@ pipelineJob('tf-cw-build-1-job') {
 		choiceParam('tfstateBucket'				, [tfStateBucket]					, 'TF State Bucket'				)
 		choiceParam('tfStateBucketPrefixCW'		, [tfStateBucketPrefixEC2CW]		, 'TF State Bucket Prefix'		)
 		stringParam('resource_name'				, 'test-instance'					, '')
+		choiceParam('cw_alarm'					, ['ec2','rds']						, '')
 		choiceParam('includeCW'					, ['true','false']					, '')
 		choiceParam('terraformApplyPlan'		, ['plan','apply','plan-destroy','destroy']		, '')
 	}
@@ -305,7 +311,7 @@ pipelineJob('tf-cw-build-1-job') {
 // AWS EC2 Creation
 pipelineJob('tf-ec2-build-1-job') {
 	description('Building AWS EC2 creation')
-	logRotator(-1,-1)
+	logRotator(100,100)
 	parameters{
 		choiceParam('gitRepo'					, [terraformRepo]					, '')
 		choiceParam('gitBranch'					, [terraformBranch]					, '')

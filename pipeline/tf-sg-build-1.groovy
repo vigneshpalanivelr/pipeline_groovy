@@ -31,17 +31,12 @@ node ('master'){
 	writeFile(file: "askp-${BUILD_TAG}",text:"#!/bin/bash/\ncase \"\$1\" in\nUsername*) echo \"\${STASH_USERNAME}\" ;;\nPassword*) \"\${STASH_PASWORD}\";;\nesac")
 	sh "chmod a+x askp-${BUILD_TAG}"
 
-	stage('Approval') {
-		approval()
-	}
-
 	stage('Checkout') {
 		checkout()
 		if (includeSG == 'true') {
 			dir(terraformDirectorySG) {
-				sh "tree"
 				stage('Remote State Init') {
-					terraform_init(tfstateBucketPrefixSG,"sg")
+					terraform_init(tfstateBucketPrefixSG, sg_group_name, "sg")
 				}
 				if (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply') {
 					stage('Terraform Plan') {
@@ -57,27 +52,12 @@ node ('master'){
 						terraform_apply()
 					}
 				}
-				if (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy') {
-					stage('Plan Destroy') {
-						set_env_variables()
-						terraform_plan_destroy(global_tfvars,sg_tfvars)
-					}
-				}
-				if (terraformApplyPlan == 'destroy') {
-					stage('Approve Destroy') {
-						approval()
-					}
-					stage('Destroy') {
-						terraform_destroy()
-					}
-				}
 			}
 		}
 		if (includeSGRule == 'true') {
 			dir(terraformDirectorySGRule) {
-				sh "tree"
 				stage('Remote State Init') {
-					terraform_init(tfstateBucketPrefixSGR,"sg-rule")
+					terraform_init(tfstateBucketPrefixSGR, sg_group_name, "sg-rule")
 				}
 				if (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply') {
 					stage('Terraform Plan') {
@@ -96,7 +76,28 @@ node ('master'){
 				if (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy') {
 					stage('Plan Destroy') {
 						set_env_variables()
-						terraform_plan_destroy(rule_global_tfvars,rule_sg_tfvars)
+						terraform_plan_destroy(global_tfvars,rule_sg_tfvars)
+					}
+				}
+				if (terraformApplyPlan == 'destroy') {
+					stage('Approve Destroy') {
+						approval()
+					}
+					stage('Destroy') {
+						terraform_destroy()
+					}
+				}
+			}
+		}
+		if (includeSG == 'true') {
+			dir(terraformDirectorySG) {
+				stage('Remote State Init') {
+					terraform_init(tfstateBucketPrefixSG, sg_group_name, "sg")
+				}
+				if (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy') {
+					stage('Plan Destroy') {
+						set_env_variables()
+						terraform_plan_destroy(rule_global_tfvars,sg_tfvars)
 					}
 				}
 				if (terraformApplyPlan == 'destroy') {
@@ -113,7 +114,7 @@ node ('master'){
 }
 
 def approval() {
-	timeout(time: 1, unit: 'MINUTES') {
+	timeout(time: 5, unit: 'DAYS') {
 		input(
 			id: 'Approval', message: 'Shall i continue ?', parameters: [[
 				$class:	'BooleanParameterDefinition', defaultValue: true, description: 'default to tick', name: 'Please confirm to proceed']]
@@ -145,10 +146,10 @@ def set_env_variables() {
 	env.TF_VAR_resource_name	= "${resource_name}"
 }
 
-def terraform_init(module,stack) {
+def terraform_init(module, tfstatename, stack) {
 	withEnv(["GIT_ASKPASS=${WORKSPACE}/askp-${BUILD_TAG}"]){
 		withCredentials([usernamePassword(credentialsId: gitCreds, usernameVariable: 'STASH_USERNAME', passwordVariable: 'STASH_PASSWORD')]) {
-			sh "terraform init -no-color -input=false -upgrade=true -backend=true -force-copy -backend-config='bucket=${tfstateBucket}' -backend-config='key=${module}/${sg_group_name}-${stack}.tfstate'"
+			sh "terraform init -no-color -input=false -upgrade=true -backend=true -force-copy -backend-config='bucket=${tfstateBucket}' -backend-config='key=${module}/${tfstatename}-${stack}.tfstate'"
 		}
 	}
 }

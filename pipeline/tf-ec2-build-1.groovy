@@ -54,17 +54,13 @@ node ('master'){
 	writeFile(file: "askp-${BUILD_TAG}",text:"#!/bin/bash/\ncase \"\$1\" in\nUsername*) echo \"\${STASH_USERNAME}\" ;;\nPassword*) \"\${STASH_PASWORD}\";;\nesac")
 	sh "chmod a+x askp-${BUILD_TAG}"
 
-	stage('Approval') {
-		approval()
-	}
-
 	stage('Checkout') {
 		checkout()
 		if (includeSG == 'true') {
 			dir(terraformDirectorySG) {
 				if (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply') {
 					stage('SG Init Plan') {
-						terraform_init(tfstateBucketPrefixSG,'sg')
+						terraform_init(tfstateBucketPrefixSG, sg_group_name, 'sg')
 						set_env_variables()
 						terraform_plan(global_tfvars,sg_tfvars)
 					}
@@ -81,7 +77,7 @@ node ('master'){
 			dir(terraformDirectorySGRule) {
 				if (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply') {
 					stage('SG-R Init Apply') {
-						terraform_init(tfstateBucketPrefixSGR,'sg-rule')
+						terraform_init(tfstateBucketPrefixSGR, sg_group_name, 'sg-rule')
 						set_env_variables()
 						terraform_plan(global_2_tfvars,sg_rule_tfvars)
 					}
@@ -98,7 +94,7 @@ node ('master'){
 			dir(terraformDirectoryENI) {
 				if (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply') {
 					stage('ENI Init Plan') {
-						terraform_init(tfstateBucketPrefixENI,'eni')
+						terraform_init(tfstateBucketPrefixENI, instance_name, 'eni')
 						set_env_variables()
 						terraform_plan(global_tfvars,ec2_eni_tfvars)
 					}
@@ -115,7 +111,7 @@ node ('master'){
             dir(terraformDirectoryEBS) {
 				if (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply') {
 					stage('EBS Init Plan') {
-						terraform_init(tfstateBucketPrefixEBS,'ebs-volumes')
+						terraform_init(tfstateBucketPrefixEBS, instance_name, 'ebs-volumes')
 						set_env_variables()
 						terraform_plan(global_tfvars,ebs_tfvars)
 					}
@@ -132,7 +128,7 @@ node ('master'){
             dir(terraformDirectoryEC2) {
 				if (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply') {
 					stage('EC2 Init Plan') {
-						terraform_init(tfstateBucketPrefixEC2,'ec2-instance')
+						terraform_init(tfstateBucketPrefixEC2, instance_name, 'ec2-instance')
 						set_env_variables()
 						terraform_plan(global_tfvars,ec2_tfvars)
 					}
@@ -149,7 +145,7 @@ node ('master'){
             dir(terraformDirectoryEBSAttach) {
 				if (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply') {
 					stage('EBS-A Init Plan') {
-						terraform_init(tfstateBucketPrefixEBSA,'ebs-attach')
+						terraform_init(tfstateBucketPrefixEBSA, instance_name, 'ebs-attach')
 						set_env_variables()
 						terraform_plan(global_tfvars,ebs_tfvars)
 					}
@@ -166,7 +162,7 @@ node ('master'){
             dir(terraformDirectoryEC2CW) {
 				if (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply') {
 					stage('CW Init Plan') {
-						terraform_init(tfstateBucketPrefixEC2CW + '/cw_ec2','cw-alarm')
+						terraform_init(tfstateBucketPrefixEC2CW + '/cw_alarm_ec2', instance_name, 'cw-alarm')
 						set_env_variables()
 						terraform_plan(global_2_tfvars,cw_tfvars)
 					}
@@ -186,7 +182,7 @@ node ('master'){
             dir(terraformDirectoryEC2CW) {
 				if (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy') {
 					stage('CW-D Init Plan') {
-						terraform_init(tfstateBucketPrefixEC2CW + '/cw_ec2','cw-alarm')
+						terraform_init(tfstateBucketPrefixEC2CW + '/cw_alarm_ec2', instance_name, 'cw-alarm')
 						set_env_variables()
 						terraform_plan_destroy(global_2_tfvars,cw_tfvars)
 					}
@@ -203,7 +199,7 @@ node ('master'){
             dir(terraformDirectoryEBSAttach) {
 				if (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy') {
 					stage('EBS-A Init Plan') {
-						terraform_init(tfstateBucketPrefixEBSA,'ebs-attach')
+						terraform_init(tfstateBucketPrefixEBSA, instance_name, 'ebs-attach')
 						set_env_variables()
 						terraform_plan_destroy(global_tfvars,ebs_tfvars)
 					}
@@ -220,7 +216,7 @@ node ('master'){
             dir(terraformDirectoryEC2) {
 				if (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy') {
 					stage('EC2-D Init Plan') {
-						terraform_init(tfstateBucketPrefixEC2,'ec2-instance')
+						terraform_init(tfstateBucketPrefixEC2, instance_name, 'ec2-instance')
 						set_env_variables()
 						terraform_plan_destroy(global_tfvars,ec2_tfvars)
 					}
@@ -237,7 +233,7 @@ node ('master'){
             dir(terraformDirectoryEBS) {
 				if (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy') {
 					stage('EBS-D Init Apply') {
-						terraform_init(tfstateBucketPrefixEBS,'ebs-volumes')
+						terraform_init(tfstateBucketPrefixEBS, instance_name, 'ebs-volumes')
 						set_env_variables()
 						terraform_plan_destroy(global_tfvars,ebs_tfvars)
 					}
@@ -254,7 +250,7 @@ node ('master'){
 			dir(terraformDirectoryENI) {
 				if (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy') {
 					stage('ENI-D Init Plan') {
-						terraform_init(tfstateBucketPrefixENI,'eni')
+						terraform_init(tfstateBucketPrefixENI, instance_name, 'eni')
 						set_env_variables()
 						terraform_plan_destroy(global_tfvars,ec2_eni_tfvars)
 					}
@@ -271,7 +267,7 @@ node ('master'){
 			dir(terraformDirectorySGRule) {
 				if (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy') {
 					stage('SG-R Init Plan') {
-						terraform_init(tfstateBucketPrefixSGR,'sg-rule')
+						terraform_init(tfstateBucketPrefixSGR, sg_group_name, 'sg-rule')
 						set_env_variables()
 						terraform_plan_destroy(global_2_tfvars,sg_rule_tfvars)
 					}
@@ -288,7 +284,7 @@ node ('master'){
 			dir(terraformDirectorySG) {
 				if (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy') {
 					stage('SG Init Plan') {
-						terraform_init(tfstateBucketPrefixSG,'sg')
+						terraform_init(tfstateBucketPrefixSG, sg_group_name, 'sg')
 						set_env_variables()
 						terraform_plan_destroy(global_tfvars,sg_tfvars)
 					}
@@ -305,7 +301,7 @@ node ('master'){
 }
 
 def approval() {
-	timeout(time: 1, unit: 'MINUTES') {
+	timeout(time: 5, unit: 'DAYS') {
 		input(
 			id: 'Approval', message: 'Shall i continue ?', parameters: [[
 				$class:	'BooleanParameterDefinition', defaultValue: true, description: 'default to tick', name: 'Please confirm to proceed']]
@@ -348,10 +344,10 @@ def set_env_variables() {
 	env.TF_VAR_ec2_ami_regex			= "${ec2_ami_regex}"
 }
 
-def terraform_init(module,stack) {
+def terraform_init(module, tfstatename, stack) {
 	withEnv(["GIT_ASKPASS=${WORKSPACE}/askp-${BUILD_TAG}"]){
 		withCredentials([usernamePassword(credentialsId: gitCreds, usernameVariable: 'STASH_USERNAME', passwordVariable: 'STASH_PASSWORD')]) {
-			sh "terraform init -no-color -input=false -upgrade=true -backend=true -force-copy -backend-config='bucket=${tfstateBucket}' -backend-config='key=${module}/${instance_name}-${stack}.tfstate'"
+			sh "terraform init -no-color -input=false -upgrade=true -backend=true -force-copy -backend-config='bucket=${tfstateBucket}' -backend-config='key=${module}/${tfstatename}-${stack}.tfstate'"
 		}
 	}
 }
