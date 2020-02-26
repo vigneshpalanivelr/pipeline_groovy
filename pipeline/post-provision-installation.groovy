@@ -14,8 +14,8 @@
 node ('master') {
 	withCredentials([usernamePassword(credentialsId: SVC_ACC, usernameVariable:'SVC_USER', passwordVariable: 'SVC_PASS')]) {
 	stage("Log Dir's") {
-		println "Checking : Log Directory"
-		sh "sshpass -p '${SVC_PASS}' ssh -l '${SVC_USER}' -o StricthostKeyChecking=no $hostname 'if  [[ -f '/usr/local/sbin/custome-scripts/logs/' ]]; then echo "Found : Log Path(/usr/local/sbin/custome-scripts/logs/)"; else sudo mkdir -p /usr/local/sbin/custome-scripts/logs/; fi'"
+		println "Checking : Log Directory /usr/local/sbin/custome-scripts/logs/"
+		sh "sshpass -p '${SVC_PASS}' ssh -l '${SVC_USER}' -o StricthostKeyChecking=no $hostname 'if  [[ -d '/usr/local/sbin/custome-scripts/logs/' ]]; then echo "Found : Log Path"; else sudo mkdir -p /usr/local/sbin/custome-scripts/logs/; fi'"
 	}
 	stage("Install Python2&3") {
 		if (python2) {
