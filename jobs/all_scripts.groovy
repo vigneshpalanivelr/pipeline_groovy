@@ -1,7 +1,7 @@
 def scriptsRepo     = "https://github.com/vigneshpalanivelr/all_scripts.git"
 def scriptsBranch   = "master"
 def gitCreds        = "gitCreds"
-def gitCreds        = "SVC_ACC"
+def SVC_ACC			= "SVC_ACC"
 
 // RDS DB Build Generic Job
 pipelineJob('playbook-provisioning-job') {
