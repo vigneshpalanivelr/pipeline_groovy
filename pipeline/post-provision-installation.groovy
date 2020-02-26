@@ -30,7 +30,7 @@ node ('master') {
 		stage("Install epel-release") {
 			if (epel) {
 				println "Checking : wget"
-				sh "sshpass -p '${SVC_PASS}' ssh -l '${SVC_USER}' -o StricthostKeyChecking=no $hostname 'sudo wget -P ${scriptHomeDir}${scriptsDir}${rpmDir} https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm && rpm -ivh ${scriptHomeDir}${scriptsDir}${rpmDir}epel-release-latest-7.noarch.rpm && yum install epel-release | sudo tee -a ${scriptHomeDir}${scriptsDir}${logsDir}${installationLog}'"
+				sh "sshpass -p '${SVC_PASS}' ssh -l '${SVC_USER}' -o StricthostKeyChecking=no $hostname 'sudo wget -P ${scriptHomeDir}${scriptsDir}${rpmDir} https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm && sudo rpm -ivh ${scriptHomeDir}${scriptsDir}${rpmDir}epel-release-latest-7.noarch.rpm && sudo yum install epel-release | sudo tee -a ${scriptHomeDir}${scriptsDir}${logsDir}${installationLog}'"
 			}
 		}
 		stage("Install Python2&3") {
