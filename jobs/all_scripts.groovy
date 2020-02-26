@@ -38,6 +38,7 @@ pipelineJob("post-provision-installation") {
 		choiceParam('scriptsDir'	, [scriptsDir]			, '')
 		choiceParam('logsDir'		, [logsDir]				, '')
 		booleanParam('python2'		, true					, '')
+		booleanParam('python3'		, true					, '')
 		booleanParam('git-core'		, true					, '')
 		booleanParam('pip2'			, true					, '')
 		booleanParam('ansible'		, true					, '')
