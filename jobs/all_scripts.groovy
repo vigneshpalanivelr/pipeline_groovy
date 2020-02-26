@@ -5,6 +5,7 @@ def SVC_ACC			= "SVC_ACC"
 def scriptHomeDir	= "/usr/local/sbin/"
 def scriptsDir		= "custom-scripts/"
 def logsDir			= "logs/"
+def rpmDir			= "rpms/"
 
 // RDS DB Build Generic Job
 pipelineJob('playbook-provisioning-job') {
@@ -37,6 +38,7 @@ pipelineJob("post-provision-installation") {
 		choiceParam('scriptHomeDir'	, [scriptHomeDir]		, '')
 		choiceParam('scriptsDir'	, [scriptsDir]			, '')
 		choiceParam('logsDir'		, [logsDir]				, '')
+		choiceParam('rpmDir'		, [rpmDir]				, '')
 		booleanParam('python2'		, true					, '')
 		booleanParam('wget'			, true					, '')
 		booleanParam('epel'			, true					, '')
