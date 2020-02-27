@@ -39,12 +39,15 @@ pipelineJob("post-provision-installation") {
 		choiceParam('scriptsDir'	, [scriptsDir]			, '')
 		choiceParam('logsDir'		, [logsDir]				, '')
 		choiceParam('rpmDir'		, [rpmDir]				, '')
-		booleanParam('python2'		, true					, '')
 		booleanParam('wget'			, true					, '')
 		booleanParam('epel'			, true					, '')
+		booleanParam('python2'		, true					, '')
 		booleanParam('python3'		, true					, '')
 		booleanParam('git'			, true					, '')
 		booleanParam('ansible'		, true					, '')
+		stringParam('epelRepo'		, 'https://dl.fedoraproject.org/pub/epel/'		, '')
+		stringParam('epel7RPM'		, 'epel-release-latest-7.noarch.rpm'			, '')
+		stringParam('pythonPipPack'	, 'https://bootstrap.pypa.io/get-pip.py'		, '')
 		choiceParam('installPlan'	, ['true','false']		, '')
 	}
 	definition {
