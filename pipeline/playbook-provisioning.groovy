@@ -52,6 +52,7 @@ node ('master') {
 				sh "/usr/bin/ansible-playbook ${playbook} --inventory ${inventory} --tags=${playbookTags} --extra-vars '${extraVars}'"
 			}
 		}
+		*/
 		else {
 			stage('Playbook Execution without extravars') {
 				ansiColor('xterm') {
