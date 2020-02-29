@@ -98,7 +98,7 @@ def checkout() {
 def set_env_variables() {
 	env.TF_VAR_resource_name	= "${resource_name}"
 	env.TF_VAR_aws_account_num	= "${awsAccount}"
-	env.TF_VAR_eni_subnet		= "${eni_subnet}"
+	env.TF_VAR_vpc_subnet_name	= "${eni_subnet}"
 	env.TF_VAR_sg_group_name	= "${sg_group_name}"
 }
 
