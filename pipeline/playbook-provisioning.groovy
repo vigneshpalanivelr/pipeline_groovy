@@ -65,7 +65,6 @@ node ('master') {
 				}
 			}
 		}
-		*/
 	}
 }
 def checkout() {
