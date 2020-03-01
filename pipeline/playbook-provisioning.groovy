@@ -36,6 +36,7 @@ node ('master') {
 						inventory		: "${inventory}",
 						tags            : "${playbookTags}",
 						extras			: "${extras}",
+						credentialsId	: "${SVC_ACC}",
 						colorized       : true
 						//Example Options
 						//extras		: "-e group_name='root_group' -e action='create_group'",
@@ -60,6 +61,7 @@ node ('master') {
 						playbook        : "${playbook}",
 						inventory		: "${inventory}",
 						tags            : "${playbookTags}",
+						credentialsId	: "${SVC_ACC}",
 						colorized       : true
 					)
 				}
