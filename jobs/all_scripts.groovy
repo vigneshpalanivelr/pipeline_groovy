@@ -13,8 +13,8 @@ pipelineJob('playbook-provisioning-job') {
 	parameters {
 		choiceParam('gitRepo'					, [scriptsRepo]								, '')
 		choiceParam('gitBranch'					, [scriptsBranch]							, '')
-		choiceParam('gitCreds'					, [gitCreds]								, '')
-		choiceParam('scriptType'				, ['select','ansible','python','pgsql']		, '')
+		choiceParam('SVC_ACC'					, [SVC_ACC]									, '')
+		choiceParam('scriptType'				, ['ansible','python','pgsql']				, '')
 		stringParam('playbook'					, 'site.yml'								, '')
 		stringParam('inventory'					, 'inventory'								, '')
 		stringParam('extras'					, ''										, '')
