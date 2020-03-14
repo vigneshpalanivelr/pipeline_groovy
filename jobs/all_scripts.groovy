@@ -7,6 +7,9 @@ def scriptsDir		= "custom-scripts/"
 def logsDir			= "logs/"
 def rpmDir			= "rpms/"
 
+def epelRepo		= "https://dl.fedoraproject.org/pub/epel/"
+def pythonPipPack	= "https://bootstrap.pypa.io/get-pip.py"
+
 // RDS DB Build Generic Job
 pipelineJob('playbook-provisioning-job') {
 	logRotator (-1,-1)
@@ -46,9 +49,9 @@ pipelineJob("post-provision-installation") {
 		booleanParam('python3'		, true					, '')
 		booleanParam('git'			, true					, '')
 		booleanParam('ansible'		, true					, '')
-		stringParam('epelRepo'		, 'https://dl.fedoraproject.org/pub/epel/'		, '')
+		stringParam('epelRepo'		, epelRepo				, '')
 		choiceParam('RHEL'			, ['6','7','8']			, '')
-		stringParam('pythonPipPack'	, 'https://bootstrap.pypa.io/get-pip.py'		, '')
+		stringParam('pythonPipPack'	, pythonPipPack			, '')
 		choiceParam('installPlan'	, ['true','false']		, '')
 	}
 	definition {
