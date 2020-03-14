@@ -47,7 +47,7 @@ pipelineJob("post-provision-installation") {
 		booleanParam('git'			, true					, '')
 		booleanParam('ansible'		, true					, '')
 		stringParam('epelRepo'		, 'https://dl.fedoraproject.org/pub/epel/'		, '')
-		stringParam('epel7RPM'		, 'epel-release-latest-7.noarch.rpm'			, '')
+		choiceParam('RHEL'			, ['6','7','8']			, '')
 		stringParam('pythonPipPack'	, 'https://bootstrap.pypa.io/get-pip.py'		, '')
 		choiceParam('installPlan'	, ['true','false']		, '')
 	}
