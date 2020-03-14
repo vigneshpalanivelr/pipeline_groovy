@@ -40,7 +40,7 @@ node ('master') {
 			if (epel == 'true') {
 				println "Checking : epel-release"
 				//sh "sshpass -p '${SVC_PASS}' ssh -l '${SVC_USER}' -o StricthostKeyChecking=no $hostname 'if ! rpm -qa | grep epel-release; then sudo rpm -ivh ${scriptHomeDir}${scriptsDir}${rpmDir}${epel7RPM}; else sudo wget -c -P ${scriptHomeDir}${scriptsDir}${rpmDir} ${epelRepo}${epel7RPM}; sudo yum install -y epel-release; fi | sudo tee -a ${scriptHomeDir}${scriptsDir}${logsDir}${installationLog}'"
-				sh "sshpass -p '${SVC_PASS}' ssh -l '${SVC_USER}' -o StricthostKeyChecking=no $hostname 'if rpm -qa | grep epel-release*; then echo \"Found : epel-release\"; sudo yum install -y epel-release; else sudo wget -c -P ${scriptHomeDir}${scriptsDir}${rpmDir} ${epelRepo}epel-release-latest-${RHEL}.noarch.rpm; sudo rpm -ivh ${scriptHomeDir}${scriptsDir}${rpmDir}${epel7RPM}; fi | sudo tee -a ${scriptHomeDir}${scriptsDir}${logsDir}${installationLog}'"
+				sh "sshpass -p '${SVC_PASS}' ssh -l '${SVC_USER}' -o StricthostKeyChecking=no $hostname 'if rpm -qa | grep epel-release*; then echo \"Found : epel-release\"; sudo yum install -y epel-release; else sudo wget -c -P ${scriptHomeDir}${scriptsDir}${rpmDir} ${epelRepo}epel-release-latest-${RHEL}.noarch.rpm; sudo rpm -ivh ${scriptHomeDir}${scriptsDir}${rpmDir}epel-release-latest-${RHEL}.noarch.rpm; fi | sudo tee -a ${scriptHomeDir}${scriptsDir}${logsDir}${installationLog}'"
 			}
 		}
 		stage("Install Python2&3") {
