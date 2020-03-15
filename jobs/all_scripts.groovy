@@ -32,7 +32,7 @@ pipelineJob('playbook-provisioning-job') {
 		stringParam('groupName'					, 'root_group'								, '')
 		booleanParam('createUser'				, true										, '')
 		stringParam('username'					, 'root_user'								, '')
-		passwordParam('password'				,'')
+		nonStoredPasswordParam('password'		, 'Do you think that you can see !!'			)
 		booleanParam('addSudoers'				, true										, '')
 		booleanParam('pgsqlUnInstall'			, true										, '')
 		booleanParam('listUnInstall'			, true										, '')
