@@ -64,7 +64,7 @@ node ('master') {
 			if (git == 'true') {
 				println "Checking : Git"
 				//sh "sshpass -p '${SVC_PASS}' ssh -l '${SVC_USER}' -o StricthostKeyChecking=no $hostname 'if  [[ -f '/usr/bin/git' ]]; then echo Found : Git; else if [[ $installPlan == 'false' ]]; then echo Required : Git; elif [[ $installPlan == 'true' ]]; then sudo yum install -y git-core; fi;fi | sudo tee -a ${scriptHomeDir}${scriptsDir}${logsDir}${installationLog}'"
-				sh "sshpass -p '${SVC_PASS}' ssh -l '${SVC_USER}' -o StricthostKeyChecking=no $hostname 'if rpm -qa | grep git*; then echo Found : Git; else if [[ $installPlan == 'false' ]]; then echo Required : Git; elif [[ $installPlan == 'true' ]]; then sudo yum install -y git-core; fi;fi | sudo tee -a ${scriptHomeDir}${scriptsDir}${logsDir}${installationLog}'"
+				sh "sshpass -p '${SVC_PASS}' ssh -l '${SVC_USER}' -o StricthostKeyChecking=no $hostname 'if rpm -qa | grep git-core; then echo Found : Git; else if [[ $installPlan == 'false' ]]; then echo Required : Git; elif [[ $installPlan == 'true' ]]; then sudo yum install -y git-core; fi;fi | sudo tee -a ${scriptHomeDir}${scriptsDir}${logsDir}${installationLog}'"
 			}
 		}
 		stage("Install Ansible") {
