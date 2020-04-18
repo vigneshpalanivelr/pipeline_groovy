@@ -6,8 +6,9 @@
 *	tfstateBucket
 *	tfStateBucketPrefixSG
 *	tfStateBucketPrefixSGR
-*	tfstateBucketPrefixDNS
 *	tfstateBucketPrefixRDS
+*	tfstateBucketPrefixRDSRR
+*	tfstateBucketPrefixDNS
 
 *	db_family
 *	db_engine
@@ -59,20 +60,22 @@ Pending Implementation
 
 node('master') {
 
-	terraformDirMasterRDS	= "modules/all_modules/rds_module"
-	terraformDirReplicaRDS	= "modules/all_modules/rds_replica_module"
-	terraformDirectoryDNS	= "modules/all_modules/rds_dns_module"
+	terraformDirectorySG		= "modules/all_modules/${tfstateBucketPrefixSG}"
+	terraformDirectorySGRule	= "modules/all_modules/${tfstateBucketPrefixSGR}/${sg_group_name}-sg"
+	terraformDirMasterRDS		= "modules/all_modules/${tfstateBucketPrefixRDS}"
+	terraformDirReplicaRDS		= "modules/all_modules/${tfstateBucketPrefixRDSRR}"
+	terraformDirectoryDNS		= "modules/all_modules/${tfstateBucketPrefixDNS}"
 
-	global_tfvars			= "../../../variables/global_vars.tfvars"
-	global_2_tfvars			= "../../../../variables/global_vars.tfvars"
-	rds_tfvars				= "../../../variables/rds_vars.tfvars"
-	rds_dns_tfvars			= "../../../variables/rds_dns_vars.tfvars"
-	sg_tfvars				= "../../../variables/sg_vars.tfvars"
+	global_tfvars				= "../../../variables/global_vars.tfvars"
+	global_2_tfvars				= "../../../../variables/global_vars.tfvars"
+	rds_tfvars					= "../../../variables/rds_vars.tfvars"
+	rds_dns_tfvars				= "../../../variables/rds_dns_vars.tfvars"
+	sg_tfvars					= "../../../variables/sg_vars.tfvars"
 
-	db_rds					= (db_engine		=~ /[a-zA-Z]+/)[0]
-	db_engine_major_version = (db_engine_version	=~ /\d+.\d+/)[0]
+	db_rds						= (db_engine		=~ /[a-zA-Z]+/)[0]
+	db_engine_major_version 	= (db_engine_version	=~ /\d+.\d+/)[0]
 	
-	date					= new Date()
+	date						= new Date()
 	println date
 	
 
@@ -321,25 +324,35 @@ def set_env_variables() {
 def terraform_init(module, tfstatename, stack) {
 	withEnv(["GIT_ASKPASS=${WORKSPACE}/askp-${BUILD_TAG}"]){
 		withCredentials([usernamePassword(credentialsId: gitCreds, usernameVariable: 'STASH_USERNAME', passwordVariable: 'STASH_PASSWORD')]) {
-			sh "terraform init -no-color -input=false -upgrade=true -backend=true -force-copy -backend-config='bucket=${tfstateBucket}' -backend-config='key=${module}/${tfstatename}-${stack}.tfstate'"
+			wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'xterm']) {
+				sh "terraform init -input=false -upgrade=true -backend=true -force-copy -backend-config='bucket=${tfstateBucket}' -backend-config='key=${module}/${tfstatename}-${stack}.tfstate'"
+			}
 		}
 	}
 }
 
 def terraform_plan(global_tfvars,first_tfvars) {
-	sh "terraform plan -no-color -out=tfplan -input=false -var-file=${global_tfvars} -var-file=${first_tfvars}"
+	wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'xterm']) {
+		sh "terraform plan -out=tfplan -input=false -var-file=${global_tfvars} -var-file=${first_tfvars}"
+	}
 }
 
 def terraform_apply() {
-	sh "terraform apply -no-color -input=false tfplan"
+	wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'xterm']) {
+		sh "terraform apply -input=false tfplan"
+	}
 }
 
 def terraform_plan_destroy(global_tfvars,first_tfvars) {
-	sh "terraform plan -destroy -no-color -out=tfdestroy -input=false -var-file=${global_tfvars} -var-file=${first_tfvars}"
+	wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'xterm']) {
+		sh "terraform plan -destroy -out=tfdestroy -input=false -var-file=${global_tfvars} -var-file=${first_tfvars}"
+	}
 }
 
 def terraform_destroy() {
-	sh "terraform apply -no-color -input=false tfdestroy"
+	wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'xterm']) {
+		sh "terraform apply -input=false tfdestroy"
+	}
 }
 
 /*

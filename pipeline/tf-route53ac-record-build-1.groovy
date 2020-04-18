@@ -2,6 +2,7 @@
 *	gitRepo
 *	gitBranch
 *	gitCreds
+*	awsAccount
 *	tfstateBucket
 *	tfstateBucketPrefix
 
@@ -19,7 +20,7 @@ node ('master'){
 	global_tfvars   	= "../../../variables/global_vars.tfvars"
 	r53ac_tfvars		= "../../../variables/r53ac_vars.tfvars"
 
-	date 			= new Date()
+	date 				= new Date()
 	println date
 
 	writeFile(file: "askp-${BUILD_TAG}",text:"#!/bin/bash/\ncase \"\$1\" in\nUsername*) echo \"\${STASH_USERNAME}\" ;;\nPassword*) \"\${STASH_PASWORD}\";;\nesac")
@@ -92,6 +93,7 @@ def checkout() {
 }
 
 def set_env_variables() {
+	env.TF_VAR_aws_account_num		= "${awsAccount}"
 	env.TF_VAR_r53_zone_name		= "${r53_zone_name}"
 	env.TF_VAR_r53_record_name		= "${r53_record_name}"
 	env.TF_VAR_r53_records 			= "${r53_records}"
@@ -101,23 +103,33 @@ def set_env_variables() {
 def terraform_init(module, tfstatename, stack) {
 	withEnv(["GIT_ASKPASS=${WORKSPACE}/askp-${BUILD_TAG}"]){
 		withCredentials([usernamePassword(credentialsId: gitCreds, usernameVariable: 'STASH_USERNAME', passwordVariable: 'STASH_PASSWORD')]) {
-			sh "terraform init -no-color -input=false -upgrade=true -backend=true -force-copy -backend-config='bucket=${tfstateBucket}' -backend-config='key=${module}/${tfstatename}-${stack}.tfstate'"
+			wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'xterm']) {
+				sh "terraform init -input=false -upgrade=true -backend=true -force-copy -backend-config='bucket=${tfstateBucket}' -backend-config='key=${module}/${tfstatename}-${stack}.tfstate'"
+			}
 		}
 	}
 }
 
 def terraform_plan(global_tfvars,r53ac_tfvars) {
-	sh "terraform plan -no-color -out=tfplan -input=false -var-file=${global_tfvars} -var-file=${r53ac_tfvars}"
+	wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'xterm']) {
+		sh "terraform plan -out=tfplan -input=false -var-file=${global_tfvars} -var-file=${r53ac_tfvars}"
+	}
 }
 
 def terraform_apply() {
-	sh "terraform apply -no-color -input=false tfplan"
+	wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'xterm']) {
+		sh "terraform apply -input=false tfplan"
+	}
 }
 
 def terraform_plan_destroy(global_tfvars,r53ac_tfvars) {
-        sh "terraform plan -destroy -no-color -out=tfdestroy -input=false -var-file=${global_tfvars} -var-file=${r53ac_tfvars}"
+	wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'xterm']) {
+		sh "terraform plan -destroy -out=tfdestroy -input=false -var-file=${global_tfvars} -var-file=${r53ac_tfvars}"
+	}
 }
 
 def terraform_destroy() {
-        sh "terraform apply -no-color -input=false tfdestroy"
+	wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'xterm']) {
+		sh "terraform apply -input=false tfdestroy"
+	}
 }

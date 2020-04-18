@@ -7,6 +7,7 @@ def tfStateBucket					= "terraform-tfstate-mumba-1"
 def tfStateBucketPrefixS3			= "s3_module"
 def tfStateBucketPrefixS3Log		= "s3_log_module"
 def tfStateBucketPrefixRDS			= "rds_module"
+def tfStateBucketPrefixRDSRR		= "rds_replica_module"
 def tfStateBucketPrefixR53			= "r53_module"
 def tfStateBucketPrefixR53ac		= "r53ac_module"
 def tfStateBucketPrefixKMS			= "kms_module"
@@ -38,11 +39,12 @@ pipelineJob('tf-rds-db-build-1-job') {
 		choiceParam('gitBranch'					, [terraformBranch]				, '')
 		choiceParam('gitCreds'					, [gitCreds]					, '')
 		choiceParam('awsAccount'				, [awsAccount]					, '')
-		choiceParam('tfstateBucket'				, [tfStateBucket]				, 'TF State Bucket'             )
-		choiceParam('tfStateBucketPrefixSG'		, [tfStateBucketPrefixSG]		, 'TF State Bucket Prefix - SG'	)
-		choiceParam('tfStateBucketPrefixSGR'	, [tfStateBucketPrefixSGRule]	, 'TF State Bucket Prefix - SGR')
-		choiceParam('tfstateBucketPrefixDNS'	, [tfStateBucketPrefixR53ac]	, 'TF State Bucket Prefix - DNS')
-		choiceParam('tfstateBucketPrefixRDS'	, [tfStateBucketPrefixRDS]		, 'TF State Bucket Prefix - RDS')
+		choiceParam('tfstateBucket'				, [tfStateBucket]				, 'TF State Bucket'             	)
+		choiceParam('tfStateBucketPrefixSG'		, [tfStateBucketPrefixSG]		, 'TF State Bucket Prefix - SG'		)
+		choiceParam('tfStateBucketPrefixSGR'	, [tfStateBucketPrefixSGRule]	, 'TF State Bucket Prefix - SGR'	)
+		choiceParam('tfstateBucketPrefixDNS'	, [tfStateBucketPrefixR53ac]	, 'TF State Bucket Prefix - DNS'	)
+		choiceParam('tfstateBucketPrefixRDS'	, [tfStateBucketPrefixRDS]		, 'TF State Bucket Prefix - RDS'	)
+		choiceParam('tfstateBucketPrefixRDSRR'	, [tfStateBucketPrefixRDSRR]	, 'TF State Bucket Prefix - RDS RR'	)
 		stringParam('db_family'					, 'postgres9.6,oracle-se1-11.2'	, '')
 		stringParam('db_engine'					, 'postgres,oracle-se1'			, '')
 		stringParam('db_engine_version'			, '9.6.11,11.2.0.4.v21'			, '')
@@ -115,8 +117,8 @@ pipelineJob('tf-route53ac-record-build-1-job') {
 		choiceParam('awsAccount'			, [awsAccount]					, '')
 		choiceParam('tfstateBucket'			, [tfStateBucket]				, 'TF State Bucket'             )
 		choiceParam('tfstateBucketPrefix'	, [tfStateBucketPrefixR53ac]	, 'TF State Bucket Prefix'      )
-		stringParam('r53_zone_name'			, 'vignesh-private-zone'		, 'zone name'					)
-		stringParam('r53_record_name'		, 'postgres-r53,ec2-r53'		, 'route53 name'				)
+		stringParam('r53_zone_name'			, 'vignesh-private.zone.com'	, 'zone name'					)
+		stringParam('r53_record_name'		, 'test-instance-ec2-r53'		, 'route53 name'				)
 		stringParam('r53_records'			, ''							, 'ip-address | end-point'		)
 		choiceParam('r53_record_type'		, ['A','CNAME']					, 'A : ip-address | CNAME : end-point')
 		choiceParam('includeR53acRecord'	, ['true','false']				, '')
