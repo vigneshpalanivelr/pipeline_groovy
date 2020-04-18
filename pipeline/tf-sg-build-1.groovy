@@ -35,11 +35,9 @@ node ('master'){
 		checkout()
 		if (includeSG == 'true') {
 			dir(terraformDirectorySG) {
-				stage('Remote State Init') {
-					terraform_init(tfstateBucketPrefixSG, sg_group_name, "sg")
-				}
 				if (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply') {
 					stage('Terraform Plan') {
+						terraform_init(tfstateBucketPrefixSG, sg_group_name, "sg")
 						set_env_variables()
 						terraform_plan(global_tfvars,sg_tfvars)
 					}
@@ -76,7 +74,7 @@ node ('master'){
 				if (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy') {
 					stage('Plan Destroy') {
 						set_env_variables()
-						terraform_plan_destroy(global_tfvars,rule_sg_tfvars)
+						terraform_plan_destroy(rule_global_tfvars,rule_sg_tfvars)
 					}
 				}
 				if (terraformApplyPlan == 'destroy') {
@@ -91,13 +89,11 @@ node ('master'){
 		}
 		if (includeSG == 'true') {
 			dir(terraformDirectorySG) {
-				stage('Remote State Init') {
-					terraform_init(tfstateBucketPrefixSG, sg_group_name, "sg")
-				}
 				if (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy') {
 					stage('Plan Destroy') {
+						terraform_init(tfstateBucketPrefixSG, sg_group_name, "sg")
 						set_env_variables()
-						terraform_plan_destroy(rule_global_tfvars,sg_tfvars)
+						terraform_plan_destroy(global_tfvars,sg_tfvars)
 					}
 				}
 				if (terraformApplyPlan == 'destroy') {
@@ -149,23 +145,33 @@ def set_env_variables() {
 def terraform_init(module, tfstatename, stack) {
 	withEnv(["GIT_ASKPASS=${WORKSPACE}/askp-${BUILD_TAG}"]){
 		withCredentials([usernamePassword(credentialsId: gitCreds, usernameVariable: 'STASH_USERNAME', passwordVariable: 'STASH_PASSWORD')]) {
-			sh "terraform init -no-color -input=false -upgrade=true -backend=true -force-copy -backend-config='bucket=${tfstateBucket}' -backend-config='key=${module}/${tfstatename}-${stack}.tfstate'"
+			wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'xterm']) {
+				sh "terraform init -input=false -upgrade=true -backend=true -force-copy -backend-config='bucket=${tfstateBucket}' -backend-config='key=${module}/${tfstatename}-${stack}.tfstate'"
+			}
 		}
 	}
 }
 
 def terraform_plan(global_tfvars,sg_tfvars) {
-	sh "terraform plan -no-color -out=tfplan -input=false -var-file=${global_tfvars} -var-file=${sg_tfvars}"
+	wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'xterm']) {
+		sh "terraform plan -out=tfplan -input=false -var-file=${global_tfvars} -var-file=${sg_tfvars}"
+	}
 }
 
 def terraform_apply() {
-	sh "terraform apply -no-color -input=false tfplan"
+	wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'xterm']) {
+		sh "terraform apply -input=false tfplan"
+	}
 }
 
 def terraform_plan_destroy(global_tfvars,sg_tfvars) {
-    sh "terraform plan -destroy -no-color -out=tfdestroy -input=false -var-file=${global_tfvars} -var-file=${sg_tfvars}"
+	wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'xterm']) {
+    	sh "terraform plan -destroy -out=tfdestroy -input=false -var-file=${global_tfvars} -var-file=${sg_tfvars}"
+    }
 }
 
 def terraform_destroy() {
-    sh "terraform apply -no-color -input=false tfdestroy"
+	wrap([$class: 'AnsiColorBuildWrapper', 'colorMapName': 'xterm']) {
+    	sh "terraform apply -input=false tfdestroy"
+    }
 }
