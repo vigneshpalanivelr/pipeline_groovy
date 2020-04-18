@@ -2,14 +2,14 @@
 *	gitRepo
 *	gitBranch
 *	gitCreds
-*	tfstateBucket
 *	awsAccount
+*	tfstateBucket
 *	tfstateBucketPrefixS3
 *	tfstateBucketPrefixS3L
 
 *	s3_bucket_name
-*	s3_log_bucket_name
 *	s3_versioning
+*	s3_log_bucket_name
 
 *	includeS3Bucket
 *	includeS3LogBucket
@@ -19,28 +19,27 @@
 node ('master'){
 	terraformDirectoryS3	= "modules/all_modules/${tfstateBucketPrefixS3}"
 	terraformDirectoryS3Log	= "modules/all_modules/${tfstateBucketPrefixS3L}"
+	
 	global_tfvars   	= "../../../variables/global_vars.tfvars"
 	s3_storage_tfvars	= "../../../variables/s3_storage_vars.tfvars"
+	
 	date 				= new Date()
-
 	println date
 
 	writeFile(file: "askp-${BUILD_TAG}",text:"#!/bin/bash/\ncase \"\$1\" in\nUsername*) echo \"\${STASH_USERNAME}\" ;;\nPassword*) \"\${STASH_PASWORD}\";;\nesac")
 	sh "chmod a+x askp-${BUILD_TAG}"
 
-	stage('Approval') {
-		approval()
-	}
-
 	stage('Checkout') {
 		checkout()
+		//Log Bucket should be created 1st
+		//This can also be used for Normal bucket without logging
 		if (includeS3LogBucket == 'true') {
 			dir(terraformDirectoryS3Log) {
 				stage('Remote State Init') {
-					terraform_init(tfstateBucketPrefixS3L,s3_log_bucket_name)
+					terraform_init(tfstateBucketPrefixS3L, s3_log_bucket_name, 's3-log-bucket')
 				}
 				if (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply') {
-					stage('Terraform Plan S3 Log Bucket') {
+					stage('Plan S3 Log Bucket') {
 						set_env_variables()
 						terraform_plan(global_tfvars,s3_storage_tfvars)
 					}
@@ -48,8 +47,6 @@ node ('master'){
 				if (terraformApplyPlan == 'apply') {
 					stage('Approve Plan') {
 						approval()
-					}
-					stage('Terraform Apply') {
 						terraform_apply()
 					}
 				}
@@ -62,20 +59,20 @@ node ('master'){
 				if (terraformApplyPlan == 'destroy') {
 					stage('Approve Destroy') {
 						approval()
-					}
-					stage('Destroy') {
 						terraform_destroy()
 					}
 				}
 			}
 		}
+		//Normal Bucket should be created after Log Bucket
+		//THis bucket with loggin enabled
 		if (includeS3Bucket == 'true') {
 			dir(terraformDirectoryS3) {
 				stage('Remote State Init') {
-					terraform_init(tfstateBucketPrefixS3,s3_bucket_name)
+					terraform_init(tfstateBucketPrefixS3, s3_bucket_name ,'s3-bucket')
 				}
 				if (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply') {
-					stage('Terraform Plan') {
+					stage('Plan') {
 						set_env_variables()
 						terraform_plan(global_tfvars,s3_storage_tfvars)
 					}
@@ -83,8 +80,6 @@ node ('master'){
 				if (terraformApplyPlan == 'apply') {
 					stage('Approve Plan') {
 						approval()
-					}
-					stage('Terraform Apply') {
 						terraform_apply()
 					}
 				}
@@ -97,8 +92,6 @@ node ('master'){
 				if (terraformApplyPlan == 'destroy') {
 					stage('Approve Destroy') {
 						approval()
-					}
-					stage('Destroy') {
 						terraform_destroy()
 					}
 				}
@@ -108,7 +101,7 @@ node ('master'){
 }
 
 def approval() {
-	timeout(time: 1, unit: 'MINUTES') {
+	timeout(time: 5, unit: 'DAYS') {
 		input(
 			id: 'Approval', message: 'Shall i continue ?', parameters: [[
 				$class:	'BooleanParameterDefinition', defaultValue: true, description: 'default to tick', name: 'Please confirm to proceed']]
@@ -141,10 +134,10 @@ def set_env_variables() {
 	env.TF_VAR_s3_versioning		= "${s3_versioning}"
 }
 
-def terraform_init(tfstateBucketPrefix,s3_bucket_name) {
+def terraform_init(module, tfstatename, stack) {
 	withEnv(["GIT_ASKPASS=${WORKSPACE}/askp-${BUILD_TAG}"]){
 		withCredentials([usernamePassword(credentialsId: gitCreds, usernameVariable: 'STASH_USERNAME', passwordVariable: 'STASH_PASSWORD')]) {
-			sh "terraform init -no-color -input=false -upgrade=true -backend=true -force-copy -backend-config='bucket=${tfstateBucket}' -backend-config='key=${tfstateBucketPrefix}/${s3_bucket_name}-bucket.tfstate'"
+			sh "terraform init -no-color -input=false -upgrade=true -backend=true -force-copy -backend-config='bucket=${tfstateBucket}' -backend-config='key=${module}/${tfstatename}-${stack}.tfstate'"
 		}
 	}
 }

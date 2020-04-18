@@ -16,6 +16,7 @@
 
 node ('master'){
 	terraformDirectory			= "modules/all_modules/${tfstateBucketPrefix}"
+	
 	global_tfvars				= "../../../variables/global_vars.tfvars"
 	sns_tfvars					= "../../../variables/sns_vars.tfvars"
 	
@@ -25,16 +26,12 @@ node ('master'){
 	writeFile(file: "askp-${BUILD_TAG}",text:"#!/bin/bash/\ncase \"\$1\" in\nUsername*) echo \"\${STASH_USERNAME}\" ;;\nPassword*) \"\${STASH_PASWORD}\";;\nesac")
 	sh "chmod a+x askp-${BUILD_TAG}"
 
-	stage('Approval') {
-		approval()
-	}
-
 	stage('Checkout') {
 		checkout()
 		if (includeSNS == 'true') {
 			dir(terraformDirectory) {
 				stage('Remote State Init') {
-					terraform_init(tfstateBucketPrefix,sns_topic_name,"sns")
+					terraform_init(tfstateBucketPrefix, sns_topic_name, "sns")
 				}
 				if (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply') {
 					stage('Terraform Plan') {
@@ -70,7 +67,7 @@ node ('master'){
 }
 
 def approval() {
-	timeout(time: 1, unit: 'MINUTES') {
+	timeout(time: 5, unit: 'DAYS') {
 		input(
 			id: 'Approval', message: 'Shall i continue ?', parameters: [[
 				$class:	'BooleanParameterDefinition', defaultValue: true, description: 'default to tick', name: 'Please confirm to proceed']]
@@ -102,10 +99,10 @@ def set_env_variables() {
 	env.TF_VAR_sns_endpoint		= "${sns_endpoint}"
 }
 
-def terraform_init(module,name,stack) {
+def terraform_init(module, tfstatename, stack) {
 	withEnv(["GIT_ASKPASS=${WORKSPACE}/askp-${BUILD_TAG}"]){
 		withCredentials([usernamePassword(credentialsId: gitCreds, usernameVariable: 'STASH_USERNAME', passwordVariable: 'STASH_PASSWORD')]) {
-			sh "terraform init -no-color -input=false -upgrade=true -backend=true -force-copy -backend-config='bucket=${tfstateBucket}' -backend-config='key=${module}/${sns_topic_name}-${stack}.tfstate'"
+			sh "terraform init -no-color -input=false -upgrade=true -backend=true -force-copy -backend-config='bucket=${tfstateBucket}' -backend-config='key=${module}/${tfstatename}-${stack}.tfstate'"
 		}
 	}
 }

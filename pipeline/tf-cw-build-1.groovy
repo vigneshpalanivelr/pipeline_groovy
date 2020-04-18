@@ -7,6 +7,7 @@
 *	tfStateBucketPrefixCW
 
 *	resource_name
+*	cw_alarm
 
 *	includeCW
 *	terraformApplyPlan
@@ -24,16 +25,12 @@ node ('master'){
 	writeFile(file: "askp-${BUILD_TAG}",text:"#!/bin/bash/\ncase \"\$1\" in\nUsername*) echo \"\${STASH_USERNAME}\" ;;\nPassword*) \"\${STASH_PASWORD}\";;\nesac")
 	sh "chmod a+x askp-${BUILD_TAG}"
 
-	stage('Approval') {
-		approval()
-	}
-
 	stage('Checkout') {
 		checkout()
 		if (includeCW == 'true') {
 			dir(terraformDirectoryCW) {
 				stage('CW Init') {
-					terraform_init(tfStateBucketPrefixCW + '/cw_ec2','cw-alarm')
+					terraform_init(tfStateBucketPrefixCW + '/cw_alarm_' + cw_alarm, resource_name, 'cw-alarm')
 				}
 				if (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply') {
 					stage('CW Plan') {
@@ -65,7 +62,7 @@ node ('master'){
 }
 
 def approval() {
-	timeout(time: 1, unit: 'MINUTES') {
+	timeout(time: 1, unit: 'DAYS') {
 		input(
 			id: 'Approval', message: 'Shall i continue ?', parameters: [[
 				$class:	'BooleanParameterDefinition', defaultValue: true, description: 'default to tick', name: 'Please confirm to proceed']]
@@ -95,10 +92,10 @@ def set_env_variables() {
 	env.TF_VAR_resource_name	= "${resource_name}"
 }
 
-def terraform_init(module,stack) {
+def terraform_init(module, tfstatename, stack) {
 	withEnv(["GIT_ASKPASS=${WORKSPACE}/askp-${BUILD_TAG}"]){
 		withCredentials([usernamePassword(credentialsId: gitCreds, usernameVariable: 'STASH_USERNAME', passwordVariable: 'STASH_PASSWORD')]) {
-			sh "terraform init -no-color -input=false -upgrade=true -backend=true -force-copy -backend-config='bucket=${tfstateBucket}' -backend-config='key=${module}/${resource_name}-${stack}.tfstate'"
+			sh "terraform init -no-color -input=false -upgrade=true -backend=true -force-copy -backend-config='bucket=${tfstateBucket}' -backend-config='key=${module}/${tfstatename}-${stack}.tfstate'"
 		}
 	}
 }
