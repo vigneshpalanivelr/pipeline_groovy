@@ -42,7 +42,6 @@ pipelineJob('tf-rds-db-build-1-job') {
 		choiceParam('tfstateBucket'				, [tfStateBucket]				, 'TF State Bucket'             	)
 		choiceParam('tfStateBucketPrefixSG'		, [tfStateBucketPrefixSG]		, 'TF State Bucket Prefix - SG'		)
 		choiceParam('tfStateBucketPrefixSGR'	, [tfStateBucketPrefixSGRule]	, 'TF State Bucket Prefix - SGR'	)
-		choiceParam('tfstateBucketPrefixDNS'	, [tfStateBucketPrefixR53ac]	, 'TF State Bucket Prefix - DNS'	)
 		choiceParam('tfstateBucketPrefixRDS'	, [tfStateBucketPrefixRDS]		, 'TF State Bucket Prefix - RDS'	)
 		choiceParam('tfstateBucketPrefixRDSRR'	, [tfStateBucketPrefixRDSRR]	, 'TF State Bucket Prefix - RDS RR'	)
 		stringParam('db_family'					, 'postgres9.6,oracle-se1-11.2'	, '')
@@ -58,16 +57,13 @@ pipelineJob('tf-rds-db-build-1-job') {
 		choiceParam('db_allocated_storage'		, ['10']						, 'in GBs'						)
 		choiceParam('db_multi_az'				, ['false','true']				, '')
 		choiceParam('db_apply_changes'			, ['true','false']				, '')
+		stringParam('vpc_name'					, 'default-vpc'					, '')
 		choiceParam('db_availability_zone'		, ['ap-south-1a','ap-south-1b','ap-south-1c'],				  '')
-		choiceParam('db_subnet_group_name'		, ['default-subnet-1','default-subnet-2','default-subnet-3'], '')
-		stringParam('sg_group_name'				, 'test-instance-rds'			, 'name + sg (by default)'		)
+		stringParam('sg_group_name'				, 'test-instance-rds-sg'		, 'name + sg (by default)'		)
 		choiceParam('includeSG'					, ['true','false']				, '')
 		choiceParam('includeSGRule'				, ['true','false']				, '')
 		choiceParam('includeInstance'			, ['master','slave','master-slave']							, '')
 		stringParam('db_source_identifier'		, 'test-instance-rds'			, 'source instance to replicate')
-		choiceParam('includeInstanceDNS'		, ['false','true']				, '')
-		stringParam('db_route53_name'			, 'test-instance-rds'			, '''TF-STATE : Statefile for Route53 Name<br>
-		db_route53_name-dns.tfstate''')
 		choiceParam('terraformApplyPlan'		, ['plan','apply','plan-destroy','destroy']	, '''
 		<br>&emsp plan&emsp&emsp&emsp&emsp: only plan to create 
 		<br>&emsp apply&emsp&emsp&emsp&ensp: will apply above plan 
