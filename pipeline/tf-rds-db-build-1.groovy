@@ -13,8 +13,8 @@
 *	db_engine
 *	db_engine_version
 *	db_instance_class
-*	db_identifier
-*	db_source_identifier
+*	db_master_identifier
+*	db_slave_identifier
 *	db_name
 *	db_username
 *	db_password
@@ -122,7 +122,7 @@ node('master') {
 				if (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply') {
 					stage('RDS Plan'){
 						withEnv(["TF_VAR_db_password=${db_password}"]) {
-							terraform_init(tfstateBucketPrefixRDS, db_identifier, 'master')
+							terraform_init(tfstateBucketPrefixRDS, db_master_identifier, 'master')
 							set_env_variables()
 							terraform_plan(global_tfvars,rds_tfvars)
 						}
@@ -141,7 +141,7 @@ node('master') {
 			dir(terraformDirReplicaRDS) {
 				if (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply') {
 					stage('RDS Plan'){
-						terraform_init(tfstateBucketPrefixRDS, db_identifier, 'slave')
+						terraform_init(tfstateBucketPrefixRDS, db_slave_identifier, 'slave')
 						set_env_variables()
 						terraform_plan(global_tfvars,rds_tfvars)
 					}
@@ -162,7 +162,7 @@ node('master') {
 			dir(terraformDirReplicaRDS) {
 				if (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy') {
 					stage('RDS Destroy Plan') {
-						terraform_init(tfstateBucketPrefixRDS, db_identifier, 'slave')
+						terraform_init(tfstateBucketPrefixRDS, db_slave_identifier, 'slave')
 						set_env_variables()
 						terraform_plan_destroy(global_tfvars,rds_tfvars)
 					}
@@ -181,7 +181,7 @@ node('master') {
 				if (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy') {
 					stage('RDS Destroy Plan') {
 						withEnv(["TF_VAR_db_password=${db_password}"]) {
-							terraform_init(tfstateBucketPrefixRDS, db_identifier, 'master')
+							terraform_init(tfstateBucketPrefixRDS, db_master_identifier, 'master')
 							set_env_variables()
 							terraform_plan_destroy(global_tfvars,rds_tfvars)
 						}
@@ -264,14 +264,15 @@ def checkout() {
 def set_env_variables() {
 	env.TF_VAR_aws_account_num			= "${awsAccount}"
 	env.TF_VAR_aws_vpc_name			    = "${vpc_name}"
-	env.TF_VAR_resource_name        	= "${db_identifier}"
+	env.TF_VAR_resource_name        	= "${db_master_identifier}"
 	env.TF_VAR_db_family            	= "${db_family}"
 	env.TF_VAR_db_engine            	= "${db_engine}"
 	env.TF_VAR_db_engine_version    	= "${db_engine_version}"
 	env.TF_VAR_db_engine_major_version	= "${db_engine_major_version}"
 	env.TF_VAR_db_instance_class    	= "${db_instance_class}"
-	env.TF_VAR_db_identifier        	= "${db_identifier}"
-	env.TF_VAR_db_source_identifier		= "${db_source_identifier}"
+	env.TF_VAR_db_master_identifier    	= "${db_master_identifier}"
+	env.TF_VAR_db_slave_identifier    	= "${db_slave_identifier}"
+	env.TF_VAR_db_source_identifier		= "${db_master_identifier}"
 	env.TF_VAR_db_rds					= "${db_rds}"
 	env.TF_VAR_db_name              	= "${db_name}"
 	env.TF_VAR_db_username          	= "${db_username}"
