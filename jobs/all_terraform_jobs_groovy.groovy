@@ -1,3 +1,4 @@
+//Ref : https://www.scmtechblog.net/2017/05/colour-formatting-jenkins-console.html
 def terraformRepo					= "https://github.com/vigneshpalanivelr/terraform_practice_codes.git"
 def terraformBranch					= "master"
 def gitCreds						= "gitCreds"
@@ -331,6 +332,7 @@ pipelineJob('tf-ec2-build-1-job') {
 		choiceParam('subnet'					, ['default-subnet-1','default-subnet-2','default-subnet-3'], 'ENI | EC2')
 		stringParam('ebs_volume_count'			, '3'								, '')
 		stringParam('ec2_ami_regex'				, 'RHEL-7.7'						, '')
+		stringParam('ec2_ami_owner_id'			, '309956199498,734555027572'		, '''309956199498 : RHEL<br>734555027572 : CentOS''')
 		choiceParam('root_user'					, ['vignesh']						, 'Login Cred')
 		choiceParam('root_passwd'				, ['vignesh']						, 'Login Cred')
 		choiceParam('includeSG'					, ['true','false']					, '')
