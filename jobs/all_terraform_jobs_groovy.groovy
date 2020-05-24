@@ -365,7 +365,6 @@ pipelineJob('tf-lambda-build-1-job') {
 		choiceParam('tfstateBucket'			, [tfStateBucket]				, 'TF State Bucket'             )
 		choiceParam('tfstateBucketPrefix'	, [tfStateBucketPrefixLambda]	, 'TF State Bucket Prefix'      )
 		stringParam('vpc_name'				, 'default-vpc'					, '')
-		choiceParam('lambda_subnet'			, ['default-subnet-1','default-subnet-2','default-subnet-3']	, 'ENI Subnet'	)
 		stringParam('sg_group_name'			, 'test-instance-sg'			, 'ENI Security Group'			)
 		choiceParam('lambda_function'		, ['ec2_stop_scheduler']		, '')
 		choiceParam('includeLambda'			, ['true','false']				, '')
