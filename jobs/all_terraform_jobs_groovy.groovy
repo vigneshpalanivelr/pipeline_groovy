@@ -367,7 +367,7 @@ pipelineJob('tf-lambda-build-1-job') {
 		choiceParam('lambda_subnet'			, ['default-subnet-1','default-subnet-2','default-subnet-3']	, 'ENI Subnet'	)
 		stringParam('sg_group_name'			, 'test-instance-sg'			, 'ENI Security Group'			)
 		choiceParam('lambda_function'		, ['ec2_stop_scheduler']		, '')
-		choiceParam('includeENI'			, ['true','false']				, '')
+		choiceParam('includeLambda'			, ['true','false']				, '')
 		choiceParam('terraformApplyPlan'	, ['plan','apply','plan-destroy','destroy']	, '')
 	}
 	definition {
