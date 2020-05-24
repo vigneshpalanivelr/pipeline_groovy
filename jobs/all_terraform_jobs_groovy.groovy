@@ -20,6 +20,7 @@ def tfStateBucketPrefixEBS			= "ebs_module"
 def tfStateBucketPrefixEBSAttach	= "ebs_attachment_module"
 def tfStateBucketPrefixEC2			= "ec2_module"
 def tfStateBucketPrefixEC2CW		= "cw_module"
+def tfStateBucketPrefixLambda		= "lambda_module"
 
 // RDS DB Build Generic Job
 pipelineJob('tf-rds-db-build-1-job') {
@@ -347,6 +348,31 @@ pipelineJob('tf-ec2-build-1-job') {
 	definition {
 		cps {
 			script(readFileFromWorkspace('pipeline/tf-ec2-build-1.groovy'))
+			sandbox()
+		}
+	}
+}
+
+// AWS Lambda Creation
+pipelineJob('tf-lambda-build-1-job') {
+	description('Building AWS ENI creation')
+	logRotator(100,100)
+	parameters{
+		choiceParam('gitRepo'				, [terraformRepo]				, '')
+		choiceParam('gitBranch'				, [terraformBranch]				, '')
+		choiceParam('gitCreds'				, [gitCreds]					, '')
+		choiceParam('awsAccount'			, [awsAccount]					, '')
+		choiceParam('tfstateBucket'			, [tfStateBucket]				, 'TF State Bucket'             )
+		choiceParam('tfstateBucketPrefix'	, [tfStateBucketPrefixLambda]	, 'TF State Bucket Prefix'      )
+		choiceParam('lambda_subnet'			, ['default-subnet-1','default-subnet-2','default-subnet-3']	, 'ENI Subnet'	)
+		stringParam('sg_group_name'			, 'test-instance-sg'			, 'ENI Security Group'			)
+		choiceParam('lambda_function'		, ['ec2_stop_scheduler']		, '')
+		choiceParam('includeENI'			, ['true','false']				, '')
+		choiceParam('terraformApplyPlan'	, ['plan','apply','plan-destroy','destroy']	, '')
+	}
+	definition {
+		cps {
+			script(readFileFromWorkspace('pipeline/tf-lambda-build-1.groovy'))
 			sandbox()
 		}
 	}
