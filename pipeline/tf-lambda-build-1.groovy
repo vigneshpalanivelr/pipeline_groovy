@@ -6,6 +6,7 @@
 *	tfstateBucket
 *	tfstateBucketPrefix
 
+*	vpc_name
 *	lambda_subnet
 *	sg_group_name
 *	lambda_function
@@ -95,6 +96,7 @@ def checkout() {
 def set_env_variables() {
 	env.TF_VAR_lambda_function	= "${lambda_function}"
 	env.TF_VAR_aws_account_num	= "${awsAccount}"
+	env.TF_VAR_aws_vpc_name	    = "${vpc_name}"
 	env.TF_VAR_vpc_subnet_name	= "${lambda_subnet}"
 	env.TF_VAR_sg_group_name	= "${sg_group_name}"
 }
