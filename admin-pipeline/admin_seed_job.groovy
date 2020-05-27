@@ -22,6 +22,6 @@ node('master') {
                         userRemoteConfigs: [[credentialsId: jobDSL_creds, url: jobDSL_repo]]])
         }
 	stage('Process DSL') {
-		jobDsl targets : jobDSL_scripts
+		jobDsl removedJobAction: 'DELETE', removedViewAction: 'DELETE', targets : jobDSL_scripts
 	}
 }
