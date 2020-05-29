@@ -21,11 +21,11 @@ nestedView('seed-jobs') {
 }
 nestedView('terraform-jobs') {
 	views {
-		listView('rds') {
+		listView('rds-database') {
 			views {
 				description('All Terraform Jobs')
 				jobs {
-					regex(/tf-rds-.*/)
+					regex(/terraform-rds-.*/)
 				}
 				columns {
 					status()
@@ -38,11 +38,11 @@ nestedView('terraform-jobs') {
 				}
 			}
 		}
-		listView('r53') {
+		listView('route53') {
 			views {
 				description('All Terraform Jobs')
 				jobs {
-					regex(/tf-route.*/)
+					regex(/terraform-r53.*/)
 				}
 				columns {
 					status()
@@ -55,11 +55,11 @@ nestedView('terraform-jobs') {
 				}
 			}
 		}
-		listView('kms') {
+		listView('kms-keys') {
 			views {
 				description('All Terraform Jobs')
 				jobs {
-					regex(/tf-kms.*/)
+					regex(/terraform-kms.*/)
 				}
 				columns {
 					status()
@@ -72,11 +72,11 @@ nestedView('terraform-jobs') {
 				}
 			}
 		}
-		listView('sg') {
+		listView('security-group') {
 			views {
 				description('All Terraform Jobs')
 				jobs {
-					regex(/tf-sg.*/)
+					regex(/terraform-sg.*/)
 				}
 				columns {
 					status()
@@ -89,11 +89,11 @@ nestedView('terraform-jobs') {
 				}
 			}
 		}
-		listView('eni') {
+		listView('network-interface') {
 			views {
 				description('All Terraform Jobs')
 				jobs {
-					regex(/tf-eni.*/)
+					regex(/terraform-eni.*/)
 				}
 				columns {
 					status()
@@ -106,11 +106,11 @@ nestedView('terraform-jobs') {
 				}
 			}
 		}
-		listView('ebs') {
+		listView('block-devices') {
 			views {
 				description('All Terraform Jobs')
 				jobs {
-					regex(/tf-ebs.*/)
+					regex(/terraform-ebs.*/)
 				}
 				columns {
 					status()
@@ -123,11 +123,11 @@ nestedView('terraform-jobs') {
 				}
 			}
 		}
-		listView('ec2') {
+		listView('ec2-compute') {
 			views {
 				description('All Terraform Jobs')
 				jobs {
-					regex(/tf-ec2.*/)
+					regex(/terraform-ec2.*/)
 				}
 				columns {
 					status()
@@ -140,11 +140,11 @@ nestedView('terraform-jobs') {
 				}
 			}
 		}
-		listView('cw') {
+		listView('cloud-watch') {
 			views {
 				description('All Terraform Jobs')
 				jobs {
-					regex(/tf-cw.*/)
+					regex(/terraform-cw.*/)
 				}
 				columns {
 					status()
@@ -157,11 +157,11 @@ nestedView('terraform-jobs') {
 				}
 			}
 		}
-		listView('s3') {
+		listView('s3-storage') {
 			views {
 				description('All Terraform Jobs')
 				jobs {
-					regex(/tf-s3.*/)
+					regex(/terraform-s3.*/)
 				}
 				columns {
 					status()
@@ -174,11 +174,28 @@ nestedView('terraform-jobs') {
 				}
 			}
 		}
-		listView('sns') {
+		listView('sns-notification') {
 			views {
 				description('All Terraform Jobs')
 				jobs {
-					regex(/tf-sns.*/)
+					regex(/terraform-sns.*/)
+				}
+				columns {
+					status()
+					weather()
+					buildButton()
+					name()
+					lastSuccess()
+					lastFailure()
+					lastDuration()
+				}
+			}
+		}
+		listView('lambda') {
+			views {
+				description('All Terraform Jobs')
+				jobs {
+					regex(/terraform-lambda.*/)
 				}
 				columns {
 					status()
@@ -195,7 +212,7 @@ nestedView('terraform-jobs') {
 }
 nestedView('practice-jobs') {
 	views {
-		listView('practice') {
+		listView('z-practice') {
 			views {
 				description('All Jenkins Practice Jobs')
 				jobs {

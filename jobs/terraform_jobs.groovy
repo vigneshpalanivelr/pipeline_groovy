@@ -1,6 +1,5 @@
 //Ref : https://www.scmtechblog.net/2017/05/colour-formatting-jenkins-console.html
 def terraformRepo					= "https://github.com/vigneshpalanivelr/terraform_practice_codes.git"
-def terraformBranch					= "master"
 def gitCreds						= "gitCreds"
 def awsAccount						= "210315133748"
 def tfStateBucket					= "terraform-tfstate-mumba-1"
@@ -23,7 +22,7 @@ def tfStateBucketPrefixEC2CW		= "cw_module"
 def tfStateBucketPrefixLambda		= "lambda_module"
 
 // RDS DB Build Generic Job
-pipelineJob('tf-rds-db-build-1-job') {
+pipelineJob('terraform-rds-db-job') {
 	description('''Building AWS RDS Instances 1) PostgreSQL 2) Oracle 3) MySQL 4) MariaDB <br><br>Instructions for Creating:
 	<br>&emsp 1) Creates Master Instance&emsp&emsp&emsp&emsp&emsp&emsp&emsp&emsp&ensp TF-STATE : InstanceId.tfstate
 	<br>&emsp 2) Creates Master Route53 DNS&emsp&emsp&emsp&emsp&emsp&emsp&nbsp TF-STATE : Route53-dns.tfstate
@@ -38,7 +37,7 @@ pipelineJob('tf-rds-db-build-1-job') {
 	logRotator(100,100)
 	parameters{
 		choiceParam('gitRepo'					, [terraformRepo]				, '')
-		choiceParam('gitBranch'					, [terraformBranch]				, '')
+		stringParam('gitBranch'					, 'master'				        , '')
 		choiceParam('gitCreds'					, [gitCreds]					, '')
 		choiceParam('awsAccount'				, [awsAccount]					, '')
 		choiceParam('tfstateBucket'				, [tfStateBucket]				, 'TF State Bucket'             	)
@@ -74,19 +73,19 @@ pipelineJob('tf-rds-db-build-1-job') {
 	}
 	definition {
 		cps {
-			script(readFileFromWorkspace('pipeline/tf-rds-db-build-1.groovy'))
+			script(readFileFromWorkspace('pipeline/terraform-rds-db-pipeline.groovy'))
 			sandbox()
 		}
 	}
 }
 
 // Route53 Zone Creation
-pipelineJob('tf-route53-zone-build-1-job') {
+pipelineJob('terraform-r53-zone-job') {
 	description('Building AWS Route53 Zone Creation')
 	logRotator(100,100)
 	parameters{
 		choiceParam('gitRepo'				, [terraformRepo]			, '')
-		choiceParam('gitBranch'				, [terraformBranch]			, '')
+		stringParam('gitBranch'				, 'master'					, '')
 		choiceParam('gitCreds'				, [gitCreds]				, '')
 		choiceParam('awsAccount'			, [awsAccount]				, '')
 		choiceParam('tfstateBucket'			, [tfStateBucket]			, 'TF State Bucket'             )
@@ -98,19 +97,19 @@ pipelineJob('tf-route53-zone-build-1-job') {
 	}
 	definition {
 		cps {
-			script(readFileFromWorkspace('pipeline/tf-route53-zone-build-1.groovy'))
+			script(readFileFromWorkspace('pipeline/terraform-route53-zone-pipeline.groovy'))
 			sandbox()
 		}
 	}
 }
 
 // Route53 A-record and CNAME Creation
-pipelineJob('tf-route53ac-record-build-1-job') {
+pipelineJob('terraform-r53-ac-record-job') {
 	description('Building AWS Route53 Record Creation')
 	logRotator(100,100)
 	parameters{
 		choiceParam('gitRepo'				, [terraformRepo]				, '')
-		choiceParam('gitBranch'				, [terraformBranch]				, '')
+		stringParam('gitBranch'				, 'master'						, '')
 		choiceParam('gitCreds'				, [gitCreds]					, '')
 		choiceParam('awsAccount'			, [awsAccount]					, '')
 		choiceParam('tfstateBucket'			, [tfStateBucket]				, 'TF State Bucket'             )
@@ -124,19 +123,19 @@ pipelineJob('tf-route53ac-record-build-1-job') {
 	}
 	definition {
 		cps {
-			script(readFileFromWorkspace('pipeline/tf-route53ac-record-build-1.groovy'))
+			script(readFileFromWorkspace('pipeline/terraform-route53-ac-record-pipeline.groovy'))
 			sandbox()
 		}
 	}
 }
 
 // AWS S3 Bucket and S3 Log Bucket Creation
-pipelineJob('tf-s3-build-1-job') {
+pipelineJob('terraform-s3-job') {
 	description('Building AWS KMS key creation')
 	logRotator(100,100)
 	parameters{
 		choiceParam('gitRepo'				, [terraformRepo]				, '')
-		choiceParam('gitBranch'				, [terraformBranch]				, '')
+		stringParam('gitBranch'				, 'master'						, '')
 		choiceParam('gitCreds'				, [gitCreds]					, '')
 		choiceParam('awsAccount'			, [awsAccount]					, '')
 		choiceParam('tfstateBucket'			, [tfStateBucket]				, 'TF State Bucket'					)
@@ -151,19 +150,19 @@ pipelineJob('tf-s3-build-1-job') {
 	}
 	definition {
 		cps {
-			script(readFileFromWorkspace('pipeline/tf-s3-build-1.groovy'))
+			script(readFileFromWorkspace('pipeline/terraform-s3-pipeline.groovy'))
 			sandbox()
 		}
 	}
 }
 
 // AWS KMS Key Creation
-pipelineJob('tf-kms-key-build-1-job') {
+pipelineJob('terraform-kms-key-job') {
 	description('Building AWS KMS key creation')
 	logRotator(100,100)
 	parameters{
 		choiceParam('gitRepo'				, [terraformRepo]				, '')
-		choiceParam('gitBranch'				, [terraformBranch]				, '')
+		stringParam('gitBranch'				, 'master'						, '')
 		choiceParam('gitCreds'				, [gitCreds]					, '')
 		choiceParam('awsAccount'			, [awsAccount]					, '')
 		choiceParam('tfstateBucket'			, [tfStateBucket]				, 'TF State Bucket'             )
@@ -174,19 +173,19 @@ pipelineJob('tf-kms-key-build-1-job') {
 	}
 	definition {
 		cps {
-			script(readFileFromWorkspace('pipeline/tf-kms-key-build-1.groovy'))
+			script(readFileFromWorkspace('pipeline/terraform-kms-key-pipeline.groovy'))
 			sandbox()
 		}
 	}
 }
 
 // AWS SNS Topic Creation
-pipelineJob('tf-sns-build-1-job') {
+pipelineJob('terraform-sns-job') {
 	description('Building AWS KMS key creation')
 	logRotator(100,100)
 	parameters{
 		choiceParam('gitRepo'				, [terraformRepo]				, '')
-		choiceParam('gitBranch'				, [terraformBranch]				, '')
+		stringParam('gitBranch'				, 'master'						, '')
 		choiceParam('gitCreds'				, [gitCreds]					, '')
 		choiceParam('awsAccount'			, [awsAccount]					, '')
 		choiceParam('tfstateBucket'			, [tfStateBucket]				, 'TF State Bucket'             )
@@ -199,19 +198,19 @@ pipelineJob('tf-sns-build-1-job') {
 	}
 	definition {
 		cps {
-			script(readFileFromWorkspace('pipeline/tf-sns-build-1.groovy'))
+			script(readFileFromWorkspace('pipeline/terraform-sns-pipeline.groovy'))
 			sandbox()
 		}
 	}
 }
 
 // AWS SG Creation
-pipelineJob('tf-sg-build-1-job') {
+pipelineJob('terraform-sg-job') {
 	description('Building AWS SG creation')
 	logRotator(100,100)
 	parameters{
 		choiceParam('gitRepo'				, [terraformRepo]				, '')
-		choiceParam('gitBranch'				, [terraformBranch]				, '')
+		stringParam('gitBranch'				, 'master'						, '')
 		choiceParam('gitCreds'				, [gitCreds]					, '')
 		choiceParam('awsAccount'			, [awsAccount]					, '')
 		choiceParam('tfstateBucket'			, [tfStateBucket]				, 'TF State Bucket'             )
@@ -226,19 +225,19 @@ pipelineJob('tf-sg-build-1-job') {
 	}
 	definition {
 		cps {
-			script(readFileFromWorkspace('pipeline/tf-sg-build-1.groovy'))
+			script(readFileFromWorkspace('pipeline/terraform-sg-pipeline.groovy'))
 			sandbox()
 		}
 	}
 }
 
 // AWS ENI Creation
-pipelineJob('tf-eni-build-1-job') {
+pipelineJob('terraform-eni-job') {
 	description('Building AWS ENI creation')
 	logRotator(100,100)
 	parameters{
 		choiceParam('gitRepo'				, [terraformRepo]				, '')
-		choiceParam('gitBranch'				, [terraformBranch]				, '')
+		stringParam('gitBranch'				, 'master'						, '')
 		choiceParam('gitCreds'				, [gitCreds]					, '')
 		choiceParam('awsAccount'			, [awsAccount]					, '')
 		choiceParam('tfstateBucket'			, [tfStateBucket]				, 'TF State Bucket'             )
@@ -251,19 +250,19 @@ pipelineJob('tf-eni-build-1-job') {
 	}
 	definition {
 		cps {
-			script(readFileFromWorkspace('pipeline/tf-eni-build-1.groovy'))
+			script(readFileFromWorkspace('pipeline/terraform-eni-pipeline.groovy'))
 			sandbox()
 		}
 	}
 }
 
 // AWS EBS Creation
-pipelineJob('tf-ebs-build-1-job') {
+pipelineJob('terraform-ebs-job') {
 	description('Building AWS EBS Volume creation')
 	logRotator(100,100)
 	parameters{
 		choiceParam('gitRepo'					, [terraformRepo]					, '')
-		choiceParam('gitBranch'					, [terraformBranch]					, '')
+		stringParam('gitBranch'					, 'master'							, '')
 		choiceParam('gitCreds'					, [gitCreds]						, '')
 		choiceParam('awsAccount'				, [awsAccount]						, '')
 		choiceParam('tfstateBucket'				, [tfStateBucket]					, 'TF State Bucket'				)
@@ -278,19 +277,19 @@ pipelineJob('tf-ebs-build-1-job') {
 	}
 	definition {
 		cps {
-			script(readFileFromWorkspace('pipeline/tf-ebs-build-1.groovy'))
+			script(readFileFromWorkspace('pipeline/terraform-ebs-pipeline.groovy'))
 			sandbox()
 		}
 	}
 }
 
 // AWS CW Alarm Configuration
-pipelineJob('tf-cw-build-1-job') {
+pipelineJob('terraform-cw-job') {
 	description('Building AWS EBS Volume creation')
 	logRotator(100,100)
 	parameters{
 		choiceParam('gitRepo'					, [terraformRepo]					, '')
-		choiceParam('gitBranch'					, [terraformBranch]					, '')
+		stringParam('gitBranch'					, 'master'							, '')
 		choiceParam('gitCreds'					, [gitCreds]						, '')
 		choiceParam('awsAccount'				, [awsAccount]						, '')
 		choiceParam('tfstateBucket'				, [tfStateBucket]					, 'TF State Bucket'				)
@@ -302,19 +301,19 @@ pipelineJob('tf-cw-build-1-job') {
 	}
 	definition {
 		cps {
-			script(readFileFromWorkspace('pipeline/tf-cw-build-1.groovy'))
+			script(readFileFromWorkspace('pipeline/terraform-cw-pipeline.groovy'))
 			sandbox()
 		}
 	}
 }
 
 // AWS EC2 Creation
-pipelineJob('tf-ec2-build-1-job') {
+pipelineJob('terraform-ec2-job') {
 	description('Building AWS EC2 creation')
 	logRotator(100,100)
 	parameters{
 		choiceParam('gitRepo'					, [terraformRepo]					, '')
-		choiceParam('gitBranch'					, [terraformBranch]					, '')
+		stringParam('gitBranch'					, 'master'							, '')
 		choiceParam('gitCreds'					, [gitCreds]						, '')
 		choiceParam('awsAccount'				, [awsAccount]						, '')
 		choiceParam('tfstateBucket'				, [tfStateBucket]					, 'TF State Bucket'             )
@@ -347,32 +346,32 @@ pipelineJob('tf-ec2-build-1-job') {
 	}
 	definition {
 		cps {
-			script(readFileFromWorkspace('pipeline/tf-ec2-build-1.groovy'))
+			script(readFileFromWorkspace('pipeline/terraform-ec2-pipeline.groovy'))
 			sandbox()
 		}
 	}
 }
 
 // AWS Lambda Creation
-pipelineJob('tf-lambda-build-1-job') {
+pipelineJob('terraform-lambda-job') {
 	description('Building AWS ENI creation')
 	logRotator(100,100)
 	parameters{
 		choiceParam('gitRepo'				, [terraformRepo]				, '')
-		choiceParam('gitBranch'				, [terraformBranch]				, '')
+		stringParam('gitBranch'				, 'master'						, '')
 		choiceParam('gitCreds'				, [gitCreds]					, '')
 		choiceParam('awsAccount'			, [awsAccount]					, '')
 		choiceParam('tfstateBucket'			, [tfStateBucket]				, 'TF State Bucket'             )
 		choiceParam('tfstateBucketPrefix'	, [tfStateBucketPrefixLambda]	, 'TF State Bucket Prefix'      )
 		stringParam('vpc_name'				, 'default-vpc'					, '')
 		stringParam('sg_group_name'			, 'test-instance-sg'			, 'ENI Security Group'			)
-		choiceParam('lambda_function'		, ['ec2_stop_scheduler']		, '')
+		choiceParam('lambda_function'		, ['select','ec2_stop_scheduler','ec2_ss_delete_scheduler']	, '')
 		choiceParam('includeLambda'			, ['true','false']				, '')
 		choiceParam('terraformApplyPlan'	, ['plan','apply','plan-destroy','destroy']	, '')
 	}
 	definition {
 		cps {
-			script(readFileFromWorkspace('pipeline/tf-lambda-build-1.groovy'))
+			script(readFileFromWorkspace('pipeline/terraform-lambda-pipeline.groovy'))
 			sandbox()
 		}
 	}
