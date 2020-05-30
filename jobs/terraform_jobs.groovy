@@ -365,7 +365,7 @@ pipelineJob('terraform-lambda-job') {
 		choiceParam('tfstateBucketPrefix'	, [tfStateBucketPrefixLambda]	, 'TF State Bucket Prefix'      )
 		stringParam('vpc_name'				, 'default-vpc'					, '')
 		stringParam('sg_group_name'			, 'test-instance-sg'			, 'ENI Security Group'			)
-		choiceParam('lambda_function'		, ['select','ec2_stop_scheduler','ec2_ss_delete_scheduler']	, '')
+		choiceParam('lambda_function'		, ['select','ec2_stop_scheduler','ec2_ss_delete_scheduler','rds_ss_delete_scheduler']	, '')
 		choiceParam('includeLambda'			, ['true','false']				, '')
 		choiceParam('terraformApplyPlan'	, ['plan','apply','plan-destroy','destroy']	, '')
 	}
