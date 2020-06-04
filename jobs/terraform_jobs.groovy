@@ -21,6 +21,8 @@ def tfStateBucketPrefixEC2			= "ec2_module"
 def tfStateBucketPrefixEC2CW		= "cw_module"
 def tfStateBucketPrefixLambda		= "lambda_module"
 
+def lambda_functions_list           = ['select','ec2_stop_scheduler','ec2_ss_delete_scheduler','rds_stop_scheduler','rds_ss_delete_scheduler','ec2_instance_profile_checker']
+
 // RDS DB Build Generic Job
 pipelineJob('terraform-rds-db-job') {
 	description('''Building AWS RDS Instances 1) PostgreSQL 2) Oracle 3) MySQL 4) MariaDB <br><br>Instructions for Creating:
@@ -365,7 +367,7 @@ pipelineJob('terraform-lambda-job') {
 		choiceParam('tfstateBucketPrefix'	, [tfStateBucketPrefixLambda]	, 'TF State Bucket Prefix'      )
 		stringParam('vpc_name'				, 'default-vpc'					, '')
 		stringParam('sg_group_name'			, 'test-instance-sg'			, 'ENI Security Group'			)
-		choiceParam('lambda_function'		, ['select','ec2_stop_scheduler','ec2_ss_delete_scheduler','rds_stop_scheduler','rds_ss_delete_scheduler']	, '')
+		choiceParam('lambda_function'		, lambda_functions_list			, '')
 		choiceParam('includeLambda'			, ['true','false']				, '')
 		choiceParam('terraformApplyPlan'	, ['plan','apply','plan-destroy','destroy']	, '')
 	}
