@@ -21,7 +21,7 @@ def tfStateBucketPrefixEC2			= "ec2_module"
 def tfStateBucketPrefixEC2CW		= "cw_module"
 def tfStateBucketPrefixLambda		= "lambda_module"
 
-def lambda_functions_list           = ['select','ec2_stop_scheduler','ec2_ss_delete_scheduler','rds_stop_scheduler','rds_ss_delete_scheduler','ec2_instance_profile_checker']
+def lambda_functions_list           = ['select','ec2_stop_scheduler','ec2_ss_delete_scheduler','rds_stop_scheduler','rds_ss_delete_scheduler','ec2_instance_profile_checker', 'ec2_volume_eni_checker']
 
 // RDS DB Build Generic Job
 pipelineJob('terraform-rds-db-job') {
