@@ -2,7 +2,9 @@
 def terraformRepo					= "https://github.com/vigneshpalanivelr/terraform_practice_codes.git"
 def gitCreds						= "gitCreds"
 def awsAccount						= "210315133748"
+
 def tfStateBucket					= "terraform-tfstate-mumba-1"
+def logBucket						= "terraform-tfstate-mumba-1-bucket-1"
 
 def tfStateBucketPrefixS3			= "s3_module"
 def tfStateBucketPrefixS3Log		= "s3_log_module"
@@ -10,6 +12,7 @@ def tfStateBucketPrefixRDS			= "rds_module"
 def tfStateBucketPrefixRDSRR		= "rds_replica_module"
 def tfStateBucketPrefixR53			= "r53_module"
 def tfStateBucketPrefixR53ac		= "r53ac_module"
+def tfStateBucketPrefixR53alias		= "r53alias_module"
 def tfStateBucketPrefixKMS			= "kms_module"
 def tfStateBucketPrefixSNS			= "sns_module"
 def tfStateBucketPrefixSG			= "sg_module"
@@ -20,6 +23,7 @@ def tfStateBucketPrefixEBSAttach	= "ebs_attachment_module"
 def tfStateBucketPrefixEC2			= "ec2_module"
 def tfStateBucketPrefixEC2CW		= "cw_module"
 def tfStateBucketPrefixLambda		= "lambda_module"
+def tfStateBucketPrefixLB			= "load_balancer_module"
 
 def lambda_functions_list           = ['select','ec2_stop_scheduler','ec2_ss_delete_scheduler','rds_stop_scheduler','rds_ss_delete_scheduler','ec2_instance_profile_checker', 'ec2_volume_eni_checker']
 
@@ -51,10 +55,10 @@ pipelineJob('terraform-rds-db-job') {
 		stringParam('db_engine'					, 'postgres,oracle-se1'			, '')
 		stringParam('db_engine_version'			, '9.6.11,11.2.0.4.v21'			, '')
 		choiceParam('db_instance_class'			, ['db.t2.micro','db.t2.small']	, '')
-		stringParam('db_master_identifier'		, 'test-instance-rds'			, '''Name : name-(pgsql|oracle|mysql|mariadb)-rds + rr<br>
+		stringParam('db_master_identifier'		, 'test-rds'					, '''Name : name-(pgsql|oracle|mysql|mariadb)-rds + rr<br>
 		TF-STATE : Statefile for Instance<br>
 		db_identifier.tfstate''')
-		stringParam('db_slave_identifier'		, 'test-instance-rds-rr'		, '')
+		stringParam('db_slave_identifier'		, 'test-rds-rr'					, '')
 		choiceParam('db_name'					, ['DBNAME']					, '')
 		choiceParam('db_username'				, ['Administrator']				, '')
 		nonStoredPasswordParam('db_password'	, 'Do you think that you can see !!')
@@ -105,23 +109,28 @@ pipelineJob('terraform-r53-zone-job') {
 	}
 }
 
-// Route53 A-record and CNAME Creation
+// Route53 Record  Creation A - CNAME - ALIAS
 pipelineJob('terraform-r53-ac-record-job') {
 	description('Building AWS Route53 Record Creation')
 	logRotator(100,100)
 	parameters{
-		choiceParam('gitRepo'				, [terraformRepo]				, '')
-		stringParam('gitBranch'				, 'master'						, '')
-		choiceParam('gitCreds'				, [gitCreds]					, '')
-		choiceParam('awsAccount'			, [awsAccount]					, '')
-		choiceParam('tfstateBucket'			, [tfStateBucket]				, 'TF State Bucket'             )
-		choiceParam('tfstateBucketPrefix'	, [tfStateBucketPrefixR53ac]	, 'TF State Bucket Prefix'      )
-		stringParam('r53_zone_name'			, 'vignesh-private.zone.com'	, 'zone name'					)
-		stringParam('r53_record_name'		, 'test-instance-ec2-r53'		, 'route53 name'				)
-		stringParam('r53_records'			, ''							, 'ip-address | end-point'		)
-		choiceParam('r53_record_type'		, ['A','CNAME']					, 'A : ip-address | CNAME : end-point')
-		choiceParam('includeR53acRecord'	, ['true','false']				, '')
-		choiceParam('terraformApplyPlan'	, ['plan','apply','plan-destroy','destroy']	, '')
+		choiceParam('gitRepo'					, [terraformRepo]					, '')
+		stringParam('gitBranch'					, 'master'							, '')
+		choiceParam('gitCreds'					, [gitCreds]						, '')
+		choiceParam('awsAccount'				, [awsAccount]						, '')
+		choiceParam('tfstateBucket'				, [tfStateBucket]					, 'TF State Bucket'             )
+		choiceParam('tfstateBucketPrefix'		, [tfStateBucketPrefixR53ac]		, 'TF State Bucket Prefix'      )
+		choiceParam('tfstateBucketPrefixALIAS'	, [tfStateBucketPrefixR53alias]		, 'TF State Bucket Prefix'      )
+		stringParam('r53_zone_name'				, 'vignesh-private.zone.com'		, '')
+		stringParam('r53_record_name'			, 'test-instance-ec2-r53'			, '')
+		stringParam('r53_records'				, '---'								, 'ip-address (NA : ALIAS)'		)
+		choiceParam('r53_overwrite'				, ['true','false']					, '')
+		choiceParam('r53_record_type'			, ['A','CNAME']						, 'A/CNAME : ip-address | A : end-point/dns')
+		choiceParam('alias_for'					, ['load-balancer','rds-instance']	, '')
+		stringParam('resource_name'				, 'test-alb | test-rds'				, 'RDS / ALB')
+		choiceParam('includeR53acRecord'		, ['true','false']					, '')
+		choiceParam('includeR53AliasRecord'		, ['true','false']					, '')
+		choiceParam('terraformApplyPlan'		, ['plan','apply','plan-destroy','destroy']	, '')
 	}
 	definition {
 		cps {
@@ -374,6 +383,54 @@ pipelineJob('terraform-lambda-job') {
 	definition {
 		cps {
 			script(readFileFromWorkspace('pipeline/terraform-lambda-pipeline.groovy'))
+			sandbox()
+		}
+	}
+}
+
+// AWS LB Creation
+pipelineJob('terraform-lb-job') {
+	description('Building AWS ALB/NLB creation')
+	logRotator(100,100)
+	parameters{
+		choiceParam('gitRepo'					, [terraformRepo]				, '')
+		stringParam('gitBranch'					, 'master'						, '')
+		choiceParam('gitCreds'					, [gitCreds]					, '')
+		choiceParam('awsAccount'				, [awsAccount]					, '')
+		choiceParam('tfstateBucket'				, [tfStateBucket]				, 'TF State Bucket'             )
+		choiceParam('tfstateBucketPrefixSG'		, [tfStateBucketPrefixSG]		, 'TF State Bucket Prefix'      )
+		choiceParam('tfstateBucketPrefixSGR'	, [tfStateBucketPrefixSGRule]	, 'TF State Bucket Prefix'      )
+		choiceParam('tfstateBucketPrefixLB'		, [tfStateBucketPrefixLB]		, 'TF State Bucket Prefix'      )
+		choiceParam('tfstateBucketPrefixALIAS'	, [tfStateBucketPrefixR53alias]		, 'TF State Bucket Prefix'      )
+		stringParam('vpc_name'					, 'default-vpc'					, '')
+		stringParam('lb_name'					, 'test-alb'					, '')
+		choiceParam('lb_type'					, ['application','network']		, '')
+		choiceParam('lb_is_internal'			, ['true']						, '')
+		stringParam('lb_sg_name'				, 'test-alb'					, '')
+		choiceParam('includeSG'					, ['true','false']				, '')
+		choiceParam('includeSGRule'				, ['true','false']				, '')
+		choiceParam('includeLB'					, ['true','false']				, '')
+		stringParam('lis_port'					, '80'							, '')
+		choiceParam('lis_protocol'				, ['HTTP','HTTPS']				, '')
+		choiceParam('lis_response_type'			, ['fixed-response','forward','redirect']	, '')
+		choiceParam('includeLBLis'				, ['true','false']				, '')
+		stringParam('tg_name'					, 'test-alb-tg'					, '')
+		stringParam('tg_port'					, '8080'						, '')
+		choiceParam('tg_protocol'				, ['HTTP','HTTPS']				, '')
+		choiceParam('tg_target_type'			, ['instance','ip','lambda']	, '')
+		choiceParam('includeLBTG'				, ['true','false']				, '')
+		stringParam('ec2_name'					, 'test-instance-rhel-7'		, '')
+		stringParam('tg_attach_name'			, 'test-alb-tg-attach'			, '')
+		choiceParam('includeLBTGA'				, ['true','false']				, '')
+		stringParam('rule_target_dns'			, 'test-instance-ec2-r53'		, '')
+		choiceParam('rule_response_type'		, ['forward','redirect','fixed-response']	, '')
+		choiceParam('includeR53AliasRecord'		, ['true','false']				, '')
+		choiceParam('includeLBRule'				, ['true','false']				, '')
+		choiceParam('terraformApplyPlan'		, ['plan','apply','plan-destroy','destroy']	, '')
+	}
+	definition {
+		cps {
+			script(readFileFromWorkspace('pipeline/terraform-lb-pipeline.groovy'))
 			sandbox()
 		}
 	}

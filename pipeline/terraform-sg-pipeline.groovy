@@ -45,8 +45,6 @@ node ('master'){
 				if (terraformApplyPlan == 'apply') {
 					stage('Approve Plan') {
 						approval()
-					}
-					stage('Terraform Apply') {
 						terraform_apply()
 					}
 				}
@@ -54,11 +52,9 @@ node ('master'){
 		}
 		if (includeSGRule == 'true') {
 			dir(terraformDirectorySGRule) {
-				stage('Remote State Init') {
-					terraform_init(tfstateBucketPrefixSGR, sg_group_name, "sg-rule")
-				}
 				if (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply') {
 					stage('Terraform Plan') {
+						terraform_init(tfstateBucketPrefixSGR, sg_group_name, "sg-rule")
 						set_env_variables()
 						terraform_plan(rule_global_tfvars,rule_sg_tfvars)
 					}
@@ -66,13 +62,16 @@ node ('master'){
 				if (terraformApplyPlan == 'apply') {
 					stage('Approve Plan') {
 						approval()
-					}
-					stage('Terraform Apply') {
 						terraform_apply()
 					}
 				}
+			}
+		}
+		if (includeSGRule == 'true') {
+			dir(terraformDirectorySGRule) {
 				if (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy') {
 					stage('Plan Destroy') {
+						terraform_init(tfstateBucketPrefixSGR, sg_group_name, "sg-rule")
 						set_env_variables()
 						terraform_plan_destroy(rule_global_tfvars,rule_sg_tfvars)
 					}
@@ -80,8 +79,6 @@ node ('master'){
 				if (terraformApplyPlan == 'destroy') {
 					stage('Approve Destroy') {
 						approval()
-					}
-					stage('Destroy') {
 						terraform_destroy()
 					}
 				}
@@ -99,8 +96,6 @@ node ('master'){
 				if (terraformApplyPlan == 'destroy') {
 					stage('Approve Destroy') {
 						approval()
-					}
-					stage('Destroy') {
 						terraform_destroy()
 					}
 				}

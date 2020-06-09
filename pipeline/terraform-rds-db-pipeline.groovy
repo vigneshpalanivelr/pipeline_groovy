@@ -84,7 +84,7 @@ node('master') {
 		if (includeSG == 'true') {
 			dir(terraformDirectorySG) {
 				if (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply') {
-					stage('SG Init Plan') {
+					stage('SG Plan') {
 						terraform_init(tfstateBucketPrefixSG, sg_group_name, 'sg')
 						set_env_variables()
 						terraform_plan(global_tfvars,sg_tfvars)
@@ -102,7 +102,7 @@ node('master') {
 		if (includeSGRule == 'true') {
 			dir(terraformDirectorySGRule) {
 				if (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply') {
-					stage('SG-R Init Apply') {
+					stage('SG-R Plan') {
 						terraform_init(tfstateBucketPrefixSGR, sg_group_name, 'sg-rule')
 						set_env_variables()
 						terraform_plan(global_2_tfvars,sg_rule_tfvars)
@@ -129,7 +129,7 @@ node('master') {
 					}
 				}
 				if (terraformApplyPlan == 'apply') {
-					stage('RDS Approve'){
+					stage('RDS Apply'){
 						approval()
 						terraform_apply()
 					}
@@ -140,14 +140,14 @@ node('master') {
 		if ((includeInstance == 'master-slave') || (includeInstance == 'slave') && (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply')) {
 			dir(terraformDirReplicaRDS) {
 				if (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply') {
-					stage('RDS Plan'){
+					stage('RR Plan'){
 						terraform_init(tfstateBucketPrefixRDS, db_slave_identifier, 'slave')
 						set_env_variables()
 						terraform_plan(global_tfvars,rds_tfvars)
 					}
 				}
 				if (terraformApplyPlan == 'apply') {
-					stage('RDS Approve'){
+					stage('RR Apply'){
 						approval()
 						terraform_apply()
 					}
@@ -161,14 +161,14 @@ node('master') {
 		if ((includeInstance == 'master-slave') || (includeInstance == 'slave') && (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy')) {
 			dir(terraformDirReplicaRDS) {
 				if (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy') {
-					stage('RDS Destroy Plan') {
+					stage('RR Destroy Plan') {
 						terraform_init(tfstateBucketPrefixRDS, db_slave_identifier, 'slave')
 						set_env_variables()
 						terraform_plan_destroy(global_tfvars,rds_tfvars)
 					}
 				}
 				if (terraformApplyPlan == 'destroy') {
-					stage('RDS Approve') {
+					stage('RR Destroy Approve') {
 						approval()
 						terraform_destroy()
 					}
@@ -188,7 +188,7 @@ node('master') {
 					}
 				}
 				if (terraformApplyPlan == 'destroy') {
-					stage('RDS Approve') {
+					stage('RDS Apply') {
 						approval()
 						terraform_destroy()
 					}
@@ -199,7 +199,7 @@ node('master') {
 		if (includeSGRule == 'true') {
 			dir(terraformDirectorySGRule) {
 				if (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy') {
-					stage('SG-R Init Plan') {
+					stage('SG-R Destroy Plan') {
 						terraform_init(tfstateBucketPrefixSGR, sg_group_name, 'sg-rule')
 						set_env_variables()
 						terraform_plan_destroy(global_2_tfvars,sg_rule_tfvars)
@@ -217,7 +217,7 @@ node('master') {
 		if (includeSG == 'true') {
 			dir(terraformDirectorySG) {
 				if (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy') {
-					stage('SG Init Plan') {
+					stage('SG Plan') {
 						terraform_init(tfstateBucketPrefixSG, sg_group_name, 'sg')
 						set_env_variables()
 						terraform_plan_destroy(global_tfvars,sg_tfvars)
