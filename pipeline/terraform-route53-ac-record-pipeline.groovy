@@ -5,17 +5,25 @@
 *	awsAccount
 *	tfstateBucket
 *	tfstateBucketPrefix
+*	tfstateBucketPrefixALIAS
 
 *	r53_zone_name
 *	r53_record_name
+*	r53_record_type
 *	r53_records
+*	r53_overwrite
+
+*	alias_for
+*	resource_name
 
 *	includeR53acRecord
-*	terraformApplyPlan
+*	includeR53AliasRecord
+*	terraformApplyPlan	
 */
 
 node ('master'){
-	terraformDirectory	= "modules/all_modules/${tfstateBucketPrefix}"
+	terraformDirectory		= "modules/all_modules/${tfstateBucketPrefix}"
+	terraformDirectoryALIAS	= "modules/all_modules/${tfstateBucketPrefixALIAS}"
 
 	global_tfvars   	= "../../../variables/global_vars.tfvars"
 	r53ac_tfvars		= "../../../variables/r53ac_vars.tfvars"
@@ -28,36 +36,76 @@ node ('master'){
 
 	stage('Checkout') {
 		checkout()
+		//Create Route53 A/CNAME Record
 		if (includeR53acRecord == 'true') {
 			dir(terraformDirectory) {
-				stage('Remote State Init') {
-					terraform_init(tfstateBucketPrefix, r53_record_name, 'dns')
-				}
 				if (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply') {
-					stage('Terraform Plan') {
+					stage('R53 AC Plan') {
+						terraform_init(tfstateBucketPrefix, r53_record_name + r53_record_type, 'dns')
 						set_env_variables()
 						terraform_plan(global_tfvars,r53ac_tfvars)
 					}
 				}
 				if (terraformApplyPlan == 'apply') {
-					stage('Approve Plan') {
+					stage('R53 AC Apply') {
 						approval()
-					}
-					stage('Terraform Apply') {
 						terraform_apply()
 					}
 				}
+			}
+		}
+		//Create Route53 Alias Record
+		if (includeR53AliasRecord == 'true') {
+			dir(terraformDirectoryALIAS) {
+				if (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply') {
+					stage('R53 Alias Plan') {
+						terraform_init(tfstateBucketPrefix, r53_record_name, 'alias-dns')
+						set_env_variables()
+						terraform_plan(global_tfvars,r53ac_tfvars)
+					}
+				}
+				if (terraformApplyPlan == 'apply') {
+					stage('R53 Alias Apply') {
+						approval()
+						terraform_apply()
+					}
+				}
+			}
+		}
+		//################################################################################################################
+		//Destroy Pipeline starts
+		//################################################################################################################
+		//Destroy Route53 Alias Record
+		if (includeR53AliasRecord == 'true') {
+			dir(terraformDirectoryALIAS) {
 				if (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy') {
-					stage('Plan Destroy') {
+					stage('R53 AC Destroy Plan') {
+						terraform_init(tfstateBucketPrefix, r53_record_name, 'alias-dns')
 						set_env_variables()
 						terraform_plan_destroy(global_tfvars,r53ac_tfvars)
 					}
 				}
 				if (terraformApplyPlan == 'destroy') {
-					stage('Approve Destroy') {
+					stage('R53 AC Destroy Destroy') {
 						approval()
+						terraform_destroy()
 					}
-					stage('Destroy') {
+				}
+			}
+		}
+		//Destroy Route53 A/CNAME Record
+		if (includeR53acRecord == 'true') {
+			dir(terraformDirectory) {
+				if (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy') {
+					stage('R53 Alias Destroy Plan') {
+						terraform_init(tfstateBucketPrefix, r53_record_name + r53_record_type, 'dns')
+						set_env_variables()
+						terraform_plan_destroy(global_tfvars,r53ac_tfvars)
+					}
+				}
+				if (terraformApplyPlan == 'destroy') {
+					stage('R53 Alias Destroy') {
+						approval()
 						terraform_destroy()
 					}
 				}
@@ -96,8 +144,12 @@ def set_env_variables() {
 	env.TF_VAR_aws_account_num		= "${awsAccount}"
 	env.TF_VAR_r53_zone_name		= "${r53_zone_name}"
 	env.TF_VAR_r53_record_name		= "${r53_record_name}"
-	env.TF_VAR_r53_records 			= "${r53_records}"
 	env.TF_VAR_r53_record_type		= "${r53_record_type}"
+	env.TF_VAR_r53_records 			= "${r53_records}"
+	env.TF_VAR_r53_overwrite		= "${r53_overwrite}"
+	env.TF_VAR_alias_for			= "${alias_for}"
+	env.TF_VAR_lb_name				= "${resource_name}"
+	env.TF_VAR_rds_instance_name	= "${resource_name}"
 }
 
 def terraform_init(module, tfstatename, stack) {

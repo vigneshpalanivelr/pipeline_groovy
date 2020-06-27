@@ -27,36 +27,40 @@ node ('master'){
 
 	stage('Checkout') {
 		checkout()
+		//Create Route53 Zone
 		if (includeR53Zone == 'true') {
 			dir(terraformDirectory) {
-				stage('Remote State Init') {
-					terraform_init(tfstateBucketPrefix, r53_zone_name, 'r53-zone')
-				}
 				if (terraformApplyPlan == 'plan' || terraformApplyPlan == 'apply') {
-					stage('Terraform Plan') {
+					stage('R53 Zone Plan') {
+						terraform_init(tfstateBucketPrefix, r53_zone_name, 'r53-zone')
 						set_env_variables()
 						terraform_plan(global_tfvars,r53_tfvars)
 					}
 				}
 				if (terraformApplyPlan == 'apply') {
-					stage('Approve Plan') {
+					stage('R53 Zone Apply') {
 						approval()
-					}
-					stage('Terraform Apply') {
 						terraform_apply()
 					}
 				}
+			}
+		}
+		//################################################################################################################
+		//Destroy Pipeline starts
+		//################################################################################################################
+		//Destroy Route53 Zone
+		if (includeR53Zone == 'true') {
+			dir(terraformDirectory) {
 				if (terraformApplyPlan == 'plan-destroy' || terraformApplyPlan == 'destroy') {
-					stage('Plan Destroy') {
+					stage('R53 Zone Destroy Plan') {
+						terraform_init(tfstateBucketPrefix, r53_zone_name, 'r53-zone')
 						set_env_variables()
 						terraform_plan_destroy(global_tfvars,r53_tfvars)
 					}
 				}
 				if (terraformApplyPlan == 'destroy') {
-					stage('Approve Destroy') {
+					stage('R53 Zone Destroy') {
 						approval()
-					}
-					stage('Destroy') {
 						terraform_destroy()
 					}
 				}
