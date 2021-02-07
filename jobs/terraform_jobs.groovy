@@ -1,9 +1,10 @@
 //Ref : https://www.scmtechblog.net/2017/05/colour-formatting-jenkins-console.html
 def terraformRepo					= "https://github.com/vigneshpalanivelr/terraform_practice_codes.git"
+def packerRepo                      = "https://github.com/vigneshpalanivelr/all_scripts.git"
 def gitCreds						= "gitCreds"
-def awsAccount						= "210315133748"
-
-def tfStateBucket					= "terraform-tfstate-mumba-1"
+def awsAccount						= "495710143902"
+ 
+def tfStateBucket					= "terraform-tfstate-mumbai-1"
 def logBucket						= "terraform-tfstate-mumba-1-bucket-1"
 
 def tfStateBucketPrefixS3			= "s3_module"
@@ -24,8 +25,10 @@ def tfStateBucketPrefixEC2			= "ec2_module"
 def tfStateBucketPrefixEC2CW		= "cw_module"
 def tfStateBucketPrefixLambda		= "lambda_module"
 def tfStateBucketPrefixLB			= "load_balancer_module"
+def tfstateBucketPrefixASG          = "asg_module/auto_scaling_group"
+def tfstateBucketPrefixASGLT        = "asg_module/auto_scaling_lt"
 
-def lambda_functions_list           = ['select','ec2_stop_scheduler','ec2_ss_delete_scheduler','rds_stop_scheduler','rds_ss_delete_scheduler','ec2_instance_profile_checker', 'ec2_volume_eni_checker']
+def lambda_functions_list           = ['select','ec2_stop_scheduler','ec2_ss_delete_scheduler','rds_stop_scheduler','rds_ss_delete_scheduler','ec2_instance_profile_checker', 'ec2_volume_eni_checker', 'iam_access_key_checker']
 
 // RDS DB Build Generic Job
 pipelineJob('terraform-rds-db-job') {
@@ -431,6 +434,100 @@ pipelineJob('terraform-lb-job') {
 	definition {
 		cps {
 			script(readFileFromWorkspace('pipeline/terraform-lb-pipeline.groovy'))
+			sandbox()
+		}
+	}
+}
+
+pipelineJob('packer-build-ami') {
+	description('Building AMI')
+	logRotator(100,100)
+	parameters{
+		choiceParam('gitRepo'					, [packerRepo]					, '')
+		stringParam('gitBranch'					, 'master'						, '')
+		choiceParam('gitCreds'					, [gitCreds]					, '')
+		choiceParam('awsAccount'				, [awsAccount]					, '')
+		choiceParam('packerDir'					, ['packer/templateFile']		, '')
+		choiceParam('packerTempFile'			, ['packer.json']				, '')
+		choiceParam('packerVarFile'				, ['packer-vars.json']			, '')
+		choiceParam('packerLogLevel'			, ['select', '', '0', '1']		, '')
+		choiceParam('packerLogFile'				, ['packer-logs.log']			, '')
+		stringParam('packer_ami_name'			, 'jenkins-ami-custom'			, '')
+		stringParam('source_ami_name'			, 'RHEL-7.7_HVM'				, '')
+		stringParam('source_ami_owner'			, '309956199498'				, '')
+		stringParam('packer_instance_type'		, 't2.micro'					, '')
+		stringParam('vpc_name'					, 'default-vpc'					, '')
+		choiceParam('subnet_name'				, ['default-subnet-1','default-subnet-2','default-subnet-3'], '')
+		stringParam('security_group_name'		, 'default-ec2-sg'				, '')
+		choiceParam('RHEL'						, ['7','8','6']					, '')
+		stringParam('packerRepo'				, packerRepo					, '')
+		stringParam('packerBranch'				, 'testing'						, '')
+		stringParam('pipModules'				, 'pip,pip2,pip2.7,pip3,pip3.6'	, '')
+		stringParam('PG_MAJOR'					, '9.6'							, '')
+		stringParam('PG_MINOR'					, '6'							, '')
+		stringParam('packerVersion'				, '1.6.0'						, '')
+		stringParam('tfVersion'					, '0.12.7'						, '')
+		stringParam('group_name'				, 'root_group'					, '')
+		stringParam('username'					, 'vignesh'						, '')
+		stringParam('password'					, 'vignesh'						, '')
+		booleanParam('pgsql'					, true							, '')
+		booleanParam('packer'					, true							, '')
+		booleanParam('terraform'				, true							, '')
+		booleanParam('CloudWatch'				, true							, '')
+		booleanParam('CloudInit'				, true							, '')
+		booleanParam('jenkins'					, true							, '')
+		booleanParam('jenkinsPlugins'			, true							, '')
+		booleanParam('pythonModules'			, true							, '')
+		booleanParam('createGroup'				, true							, '')
+		booleanParam('createUser'				, true							, '')
+		booleanParam('addSudoers'				, true							, '')
+		choiceParam('includeAMIBuild'			, ['true','false']				, '')
+		stringParam('amiId'						, 'ami-'						, '')
+		stringParam('kmsAlias'					, 'aws/ebs'						, '')
+		stringParam('subnetId'					, 'subnet-5ddcf635'				, '')
+		stringParam('sgId'						, 'sg-0ca60bf03afe214ab'		, '')
+		choiceParam('includeAMIEncrypt'			, ['true','false']				, '')
+		choiceParam('deleteAMI'					, ['false','true']				, '')
+	}
+	definition {
+		cps {
+			script(readFileFromWorkspace('pipeline/aws-linux-rhel7-ami.groovy'))
+			sandbox()
+		}
+	}
+}
+
+// AWS ASG Creation
+pipelineJob('terraform-asg-job') {
+	description('Building AWS ASG creation')
+	logRotator(100,100)
+	parameters{
+		choiceParam('gitRepo'					, [terraformRepo]					, '')
+		stringParam('gitBranch'					, 'master'							, '')
+		choiceParam('gitCreds'					, [gitCreds]						, '')
+		choiceParam('awsAccount'				, [awsAccount]						, '')
+		choiceParam('tfstateBucket'				, [tfStateBucket]					, 'TF State Bucket'             )
+		choiceParam('tfstateBucketPrefixSG'		, [tfStateBucketPrefixSG]			, 'TF State Bucket Prefix'      )
+		choiceParam('tfstateBucketPrefixSGR'	, [tfStateBucketPrefixSGRule]		, 'TF State Bucket Prefix'      )
+		choiceParam('tfstateBucketPrefixASGLT'	, [tfstateBucketPrefixASGLT]		, 'TF State Bucket Prefix'		)
+		choiceParam('tfstateBucketPrefixASG'	, [tfstateBucketPrefixASG]			, 'TF State Bucket Prefix'      )
+		stringParam('vpc_name'					, 'default-vpc'						, '')
+		stringParam('asg_lt_name'				, 'test-asg-lt'						, '')
+		choiceParam('asg_lt_instance_type'		, ['t2.micro']						, '')
+		stringParam('asg_lt_sg_name'			, 'test-instance'					, 'name + sg (by default)'		)
+		stringParam('ami_regex'					, 'RHEL-7.7'						, '')
+		stringParam('ami_owner_id'				, '309956199498,734555027572'		, '''309956199498 : RHEL<br>734555027572 : CentOS''')
+		choiceParam('root_user'					, ['vignesh']						, 'Login Cred')
+		choiceParam('root_passwd'				, ['vignesh']						, 'Login Cred')
+		choiceParam('includeSG'					, ['true','false']					, '')
+		choiceParam('includeSGRule'				, ['true','false']					, '')
+		choiceParam('includeASGLT'				, ['true','false']					, '')
+		choiceParam('includeASG'				, ['true','false']					, '')
+		choiceParam('terraformApplyPlan'		, ['plan','apply','plan-destroy','destroy']	, '')
+	}
+	definition {
+		cps {
+			script(readFileFromWorkspace('pipeline/terraform-asg-pipeline.groovy'))
 			sandbox()
 		}
 	}
