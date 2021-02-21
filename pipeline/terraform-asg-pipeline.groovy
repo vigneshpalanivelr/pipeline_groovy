@@ -229,7 +229,7 @@ def set_env_variables() {
 	env.TF_VAR_ami_owner_id				= "${ami_owner_id}"
 	env.TF_VAR_root_user				= "${root_user}"
 	env.TF_VAR_root_passwd				= "${root_passwd}"
-	env.TF_asg_name						= "${asg_name}"
+	env.TF_VAR_asg_name					= "${asg_name}"
 	env.TF_VAR_asg_min_size				= "${asg_min_size}"
 	env.TF_VAR_asg_max_size				= "${asg_max_size}"
 	env.TF_VAR_asg_desired_capacity     = "${asg_desired_capacity}"
