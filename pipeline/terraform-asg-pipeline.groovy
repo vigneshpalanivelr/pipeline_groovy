@@ -9,13 +9,18 @@
 *	tfstateBucketPrefixASGLTLT
 *	tfstateBucketPrefixASGLT
 
+*	vpc_name
 *	asg_lt_name
-*	asg_lt_instance_type
 *	asg_lt_sg_name
+*	asg_lt_instance_type
 *	ami_regex
 *	ami_owner_id
 *	root_user
 *	root_passwd
+*	asg_min_size
+*	asg_max_size
+*	asg_desired_capacity
+*	asg_health_check_type
 
 *	includeSG
 *	includeSGRule
@@ -223,6 +228,10 @@ def set_env_variables() {
 	env.TF_VAR_ami_owner_id				= "${ami_owner_id}"
 	env.TF_VAR_root_user				= "${root_user}"
 	env.TF_VAR_root_passwd				= "${root_passwd}"
+	env.TF_VAR_asg_min_size				= "${asg_min_size}"
+	env.TF_VAR_asg_max_size				= "${asg_max_size}"
+	env.TF_VAR_asg_desired_capacity     = "${asg_desired_capacity}"
+	env.TF_VAR_asg_health_check_type    = "${asg_health_check_type}"
 }
 
 def terraform_init(module, tfstatename, stack) {
