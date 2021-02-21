@@ -519,6 +519,7 @@ pipelineJob('terraform-asg-job') {
 		stringParam('ami_owner_id'				, '309956199498,734555027572'		, '''309956199498 : RHEL<br>734555027572 : CentOS''')
 		choiceParam('root_user'					, ['vignesh']						, 'Login Cred')
 		choiceParam('root_passwd'				, ['vignesh']						, 'Login Cred')
+		stringParam('asg_name'					, 'test-asg'						, '')
 		stringParam('asg_min_size'				, '1'								, '')
 		stringParam('asg_max_size'				, '1'								, '')
 		stringParam('asg_desired_capacity'		, '1'								, '')
